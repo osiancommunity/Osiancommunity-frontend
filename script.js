@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const passwordInput = document.getElementById('password');
     const errorMessage = document.getElementById('error-message');
     
-const backendUrl = 'http://localhost:5000/api';
+const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osiancommunity-backend.vercel.app/api' : 'http://localhost:5000/api';
 
     // --- 1. Check if already logged in ---
     // If a user visits login.html but is already logged in, send them to their dashboard.

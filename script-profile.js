@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const backendUrl = 'http://localhost:5000/api';
+    const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osiancommunity-backend.vercel.app/api' : 'http://localhost:5000/api';
 
     const settingsForm = document.getElementById('settings-form');
     const formStatus = document.getElementById('form-status');

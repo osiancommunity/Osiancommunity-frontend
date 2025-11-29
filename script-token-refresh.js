@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-const backendUrl = 'http://localhost:5000/api';
+const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osiancommunity-backend.vercel.app/api' : 'http://localhost:5000/api';
 
   // Periodically refresh the JWT token to prevent session expiration
   async function refreshToken() {

@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formStatus.style.color = '#555';
 
         try {
-            const response = await fetch('http://localhost:5000/api/forgot-password', {
+            const response = await fetch((location.hostname.endsWith('vercel.app') ? 'https://osiancommunity-backend.vercel.app' : 'http://localhost:5000') + '/api/forgot-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: emailInput.value })
