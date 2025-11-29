@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - Quiz in Progress</title>
+    <link rel="stylesheet" href="style-quiz.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="warning-modal" class="modal-overlay active">
+        <div class="modal-content">
+            <i class='bx bxs-error-circle'></i>
+            <h2>Quiz Instructions & Warnings</h2>
+            <p>Please read the following rules carefully before you begin:</p>
+            <ul>
+                <li>This is a timed quiz. The timer will start once you click "Start".</li>
+                <li><strong>Do NOT switch tabs or minimize the window.</strong></li>
+                <li>Switching tabs will result in a warning. You get 3 warnings.</li>
+                <li>On the 3rd violation, your quiz will be <strong>auto-submitted</strong>.</li>
+                <li>Copying, pasting, or right-clicking is disabled.</li>
+                <li>If you are found cheating, your result will be sent to the admin.</li>
+            </ul>
+            <p><strong>It is your responsibility to follow these rules.</strong></p>
+            <button id="start-quiz-btn" class="btn-primary">I Understand, Start the Quiz</button>
+        </div>
+    </div>
+
+    <div id="auto-submit-modal" class="modal-overlay">
+        <div class="modal-content">
+            <i class='bx bxs-shield-x'></i>
+            <h2>Quiz Auto-Submitted</h2>
+            <p>You exceeded the allowed number of tab switches.</p>
+            <p>As per the rules, your quiz has been automatically submitted. A notification has been sent to the admin.</p>
+            <a href="dashboard-user.html" class="btn-primary">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div id="final-submit-modal" class="modal-overlay">
+        <div class="modal-content">
+            <i class='bx bxs-check-circle'></i>
+            <h2>Quiz Submitted!</h2>
+            <p>Your responses have been successfully recorded.</p>
+            <p>For this quiz, the result will be available in 1-2 days. You can check your "My Quiz Progress" page.</p>
+            <a href="dashboard-user.html" class="btn-primary">Back to Dashboard</a>
+        </div>
+    </div>
+
+
+    <div id="quiz-container" class="quiz-container" style="display: none;">
+        <header class="quiz-header">
+            <div class="quiz-header-left">
+                <button onclick="window.history.back()" class="btn-secondary back-btn">
+                    <i class='bx bx-arrow-back'></i> Back
+                </button>
+                <h1 class="logo">OSIAN</h1>
+            </div>
+            <div class="quiz-info">
+                <h3>Loading Quiz...</h3>
+            </div>
+            <div class="timer">
+                <i class='bx bx-time'></i>
+                <span id="time-left">00:00</span>
+            </div>
+        </header>
+
+        <div id="cheating-warning" class="warning-banner" style="display: none;">
+            <i class='bx bxs-error'></i>
+            <strong>Warning!</strong> Violation <span id="violation-count">1</span> of 3. <span class="warning-text"></span>
+        </div>
+
+        <main class="quiz-main">
+            <div class="question-header">
+                <span id="question-number">Loading...</span>
+                <h2>Loading question...</h2>
+            </div>
+
+            <div class="options-container">
+                <!-- Options will be dynamically loaded here -->
+            </div>
+
+            <div class="written-answer-container" style="display: none;">
+                <textarea id="written-answer" placeholder="Write your answer here..." rows="6"></textarea>
+            </div>
+
+            <div class="quiz-navigation">
+                <button id="prev-btn" class="btn-secondary" style="display: none;">Previous</button>
+                <button id="next-btn" class="btn-primary">Next</button>
+                <button id="submit-btn" class="btn-submit" style="display: none;">Submit Quiz</button>
+            </div>
+        </main>
+    </div>
+
+    <div id="proctor-video-wrapper" style="display:none;">
+        <video id="proctor-video" autoplay muted playsinline></video>
+        <div id="proctor-status"></div>
+    </div>
+
+    <script src="script-quiz.js"></script>
+</body>
+</html>

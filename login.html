@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="login-container">
+        
+        <div class="info-section">
+            <div class="info-content">
+                <h1 class="logo-name">OSIAN</h1>
+                <p>Welcome to OSIAN</p>
+                </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-wrapper">
+                <h2>Login</h2>
+                
+                <form id="login-form">
+                    <div class="input-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                    </div>
+                    
+                    <div class="form-options">
+                        <a href="forgot-password.html" class="forgot-password">Forgot Password?</a>
+                    </div>
+                    
+                    <button type="submit" class="login-btn">Login</button>
+                </form>
+                <p id="error-message" style="margin-top: 10px; color: #d00; display: none;"></p>
+
+                <div class="social-separator">
+                    <span>Or sign in with</span>
+                </div>
+
+                <div class="social-login">
+                    <a href="#" class="social-icon google" aria-label="Login with Google">
+                        <i class='bx bxl-google'></i>
+                    </a>
+                </div>
+                <div class="register-link">
+                    <p>Don't have an account? <a href="register.html">Sign up</a></p>
+                </div>
+                <!-- Note about browser extensions -->
+                <div class="extension-note" style="margin-top: 20px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; font-size: 14px; color: #856404;">
+                    <strong>Note:</strong> If you encounter errors or issues, try disabling browser extensions (e.g., ad blockers) or use incognito mode. Some extensions may interfere with the login process.
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

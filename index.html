@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Fix for favicon.ico 404 error -->
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <title>OSIAN - The Ultimate Quiz Platform</title>
+    <link rel="stylesheet" href="style-landing.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <header class="header">
+        <nav class="navbar">
+            <a href="index.html" class="nav-logo">OSIAN</a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="#features" class="nav-link">Features</a></li>
+                <li class="nav-item"><a href="#categories" class="nav-link">Categories</a></li>
+                <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-light">Login</a>
+                <a href="register.html" class="btn btn-primary">Sign Up</a>
+            </div>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h1>Welcome to OSIAN</h1>
+                <h2>The Ultimate Quiz Platform</h2>
+                <p>Challenge your knowledge, compete with peers, and explore quizzes across dozens of fields. Your journey to mastery starts here.</p>
+                <a href="register.html" class="btn btn-primary btn-lg">Get Started Now</a>
+            </div>
+            <div class="hero-image">
+                <img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Quiz Illustration">
+            </div>
+        </section>
+
+        <section class="features" id="features">
+            <h2>Why Choose OSIAN?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class='bx bx-broadcast'></i>
+                    <h3>Live Quizzes</h3>
+                    <p>Participate in real-time quiz events and compete on a live leaderboard.</p>
+                </div>
+                <div class="feature-card">
+                    <i class='bx bx-trophy'></i>
+                    <h3>Paid Challenges</h3>
+                    <p>Join paid quizzes for a chance to win rewards and prove your expertise.</p>
+                </div>
+                <div class="feature-card">
+                    <i class='bx bx-video'></i>
+                    <h3>Expert Mentorship</h3>
+                    <p>Access exclusive video content and guidance from experts in various fields.</p>
+                </div>
+                <div class="feature-card">
+                    <i class='bx bx-category-alt'></i>
+                    <h3>Diverse Categories</h3>
+                    <p>From technical and law to general knowledge, we have a quiz for everyone.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="categories" id="categories">
+            <h2>Explore Our Categories</h2>
+            <div class="category-grid">
+                <div class="category-card"><span>Technical</span></div>
+                <div class="category-card"><span>Law</span></div>
+                <div class="category-card"><span>Engineering</span></div>
+                <div class="category-card"><span>General Knowledge</span></div>
+                <div class="category-card"><span>Sports</span></div>
+                <div class="category-card"><span>Coding</span></div>
+                <div class="category-card"><span>Social Studies</span></div>
+                <div class="category-card"><span>And More...</span></div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <h2>Ready to Test Your Knowledge?</h2>
+            <p>Join thousands of users, create your own quizzes, and start your learning journey today.</p>
+            <a href="register.html" class="btn btn-primary btn-lg">Sign Up for Free</a>
+        </section>
+    </main>
+
+    <footer class="footer" id="contact">
+        <div class="footer-container">
+            <div class="footer-about">
+                <h3>OSIAN</h3>
+                <p>The ultimate platform to learn, compete, and grow through quizzes.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="register.html">Sign Up</a></li>
+                    <li><a href="login.html">Login</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h4>Contact Us</h4>
+                <form id="contact-form" action="/send-email" method="POST">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                    <textarea name="message" placeholder="Your Message" rows="4" required></textarea>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+                <p id="form-status" style="margin-top: 10px;"></p>
+                <div class="social-media">
+                    <a href="#" aria-label="Facebook"><i class='bx bxl-facebook'></i></a>
+                    <a href="#" aria-label="Twitter"><i class='bx bxl-twitter'></i></a>
+                    <a href="#" aria-label="Instagram"><i class='bx bxl-instagram'></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class='bx bxl-linkedin'></i></a>
+                </div>
+                <p style="margin-top: 20px;">Email: contact@osian.com</p>
+                <p>Phone: +1 234 567 890</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 OSIAN. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script-landing.js"></script>
+</body>
+</html>

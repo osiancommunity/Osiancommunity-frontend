@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - Mentorship</title>
+    <link rel="stylesheet" href="style-dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="dashboard-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-user.html" class="logo">OSIAN</a>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard-user.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li><a href="quiz-progress.html"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
+                <li class="active"><a href="mentorship-user.html" class="active"><i class='bx bx-video'></i><span>Mentorship</span></a></li>
+                <li><a href="notifications.html"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
+                <li><a href="profile.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+
+            </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+                <div class="support-chat">
+                    <i class='bx bx-support'></i>
+                    <div>
+                        <strong>Support 24/7</strong>
+                        <p>Need help? Super Chat</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Mentorship Videos</h1>
+                    <p>Watch helpful videos to improve your quiz performance.</p>
+                </div>
+                <div class="header-profile">
+                    <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
+                    <a href="profile.html"><img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar"></a>
+                </div>
+            </header>
+
+            <section class="content-card full-page">
+                <div class="video-grid" id="video-grid">
+                    <!-- Videos will be loaded here dynamically -->
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Video+Thumbnail" alt="Video Thumbnail">
+                            <div class="play-button">
+                                <i class='bx bx-play'></i>
+                            </div>
+                        </div>
+                        <div class="video-info">
+                            <h3>How to Prepare for Technical Quizzes</h3>
+                            <p>Essential strategies for core subjects and technical topics.</p>
+                            <div class="video-meta">
+                                <span><i class='bx bx-time'></i> 15 min</span>
+                                <span><i class='bx bx-show'></i> 1.2k views</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="https://via.placeholder.com/300x200/2196F3/FFFFFF?text=Video+Thumbnail" alt="Video Thumbnail">
+                            <div class="play-button">
+                                <i class='bx bx-play'></i>
+                            </div>
+                        </div>
+                        <div class="video-info">
+                            <h3>General Knowledge Quiz Tips</h3>
+                            <p>Improve your GK scores with these proven techniques.</p>
+                            <div class="video-meta">
+                                <span><i class='bx bx-time'></i> 12 min</span>
+                                <span><i class='bx bx-show'></i> 890 views</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="https://via.placeholder.com/300x200/FF9800/FFFFFF?text=Video+Thumbnail" alt="Video Thumbnail">
+                            <div class="play-button">
+                                <i class='bx bx-play'></i>
+                            </div>
+                        </div>
+                        <div class="video-info">
+                            <h3>Time Management in Quizzes</h3>
+                            <p>Learn how to manage your time effectively during quizzes.</p>
+                            <div class="video-meta">
+                                <span><i class='bx bx-time'></i> 10 min</span>
+                                <span><i class='bx bx-show'></i> 654 views</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pagination">
+                    <span class="page-info" id="page-info">Page 1 of 1</span>
+                    <button class="page-btn" id="prev-btn" disabled>Previous</button>
+                    <button class="page-btn" id="next-btn" disabled>Next</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard-user.html" id="nav-dashboard"><i class='bx bxs-dashboard'></i><span>Home</span></a>
+        <a href="quiz-progress.html" id="nav-quizzes"><i class='bx bx-file-blank'></i><span>Quizzes</span></a>
+        <a href="mentorship-user.html" id="nav-mentorship"><i class='bx bx-video'></i><span>Mentor</span></a>
+        <a href="notifications.html" id="nav-notifs"><i class='bx bx-bell'></i><span>Alerts</span></a>
+        <a href="profile.html" id="nav-profile"><i class='bx bxs-user'></i><span>Profile</span></a>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="video-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="video-player">
+                <div id="video-thumbnail-container" class="video-thumbnail-container">
+                    <img id="modal-video-thumbnail" src="" alt="Video Thumbnail" class="modal-thumbnail">
+                    <button id="watch-now-btn" class="watch-now-btn">Watch Now</button>
+                </div>
+                <iframe id="video-iframe" width="100%" height="400" src="" frameborder="0" allowfullscreen style="display: none;"></iframe>
+            </div>
+            <div class="video-details">
+                <h3 id="modal-video-title"></h3>
+                <p id="modal-video-description"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script-mentorship-user.js"></script>
+    <script>
+    (function(){
+        var el = document.getElementById('nav-mentorship');
+        if (el) el.classList.add('active');
+    })();
+    </script>
+    <script>
+    (function(){
+        const toggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        if (toggle && sidebar) {
+            toggle.addEventListener('click', function(){
+                sidebar.classList.toggle('open');
+            });
+        }
+    })();
+    </script>
+</body>
+</html>

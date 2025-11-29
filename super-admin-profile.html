@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Profile - OSIAN</title>
+    <link rel="stylesheet" href="style-admin.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-superadmin.html" class="logo">OSIAN</a>
+                <span class="logo-tag">Super Admin</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard-superadmin.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li><a href="user-management.html"><i class='bx bxs-user-detail'></i><span>User Management</span></a></li>
+                <li><a href="admin-management.html"><i class='bx bxs-user-account'></i><span>Admin Management</span></a></li>
+                <li><a href="create-notification.html"><i class='bx bxs-bell'></i><span>Notifications</span></a></li>
+                <li><a href="mentorship.html"><i class='bx bxs-video'></i><span>Mentorship Videos</span></a></li>
+                <li><a href="contact-us-admin.html"><i class='bx bxs-contact'></i><span>Contact Us Page</span></a></li>
+                <li><a href="site-analytics.html"><i class='bx bxs-bar-chart-alt-2'></i><span>Site Analytics</span></a></li>
+                <li class="active"><a href="super-admin-profile.html" class="active"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>My Profile</h1>
+                    <p>Manage your account settings.</p>
+                </div>
+                <div class="header-profile">
+                    <img id="header-avatar" src="https://via.placeholder.com/40" alt="Admin Avatar">
+                    <span>Super Admin</span>
+                </div>
+            </header>
+            <section class="content-card full-page">
+                <div class="profile-card" style="display:flex;gap:16px;align-items:center;">
+                    <div class="avatar" style="position:relative;width:96px;height:96px;border-radius:50%;overflow:hidden;">
+                        <img id="profile-avatar" src="https://via.placeholder.com/96" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">
+                        <label for="avatar-upload" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);color:#fff;text-align:center;padding:6px;font-size:12px;cursor:pointer;">Change</label>
+                        <input type="file" id="avatar-upload" accept="image/*" style="display:none;">
+                    </div>
+                    <div>
+                        <h3 id="profile-name">Super Admin</h3>
+                        <p id="profile-username">@superadmin</p>
+                    </div>
+                </div>
+                <div class="form-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:16px;">
+                    <div class="form-group" style="display:flex;flex-direction:column;">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group" style="display:flex;flex-direction:column;">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" readonly>
+                    </div>
+                    <div class="form-group" style="display:flex;flex-direction:column;">
+                        <label for="mobile">Mobile</label>
+                        <input type="tel" id="mobile" placeholder="Enter mobile">
+                    </div>
+                    <div class="form-group" style="display:flex;flex-direction:column;">
+                        <label for="city">City</label>
+                        <input type="text" id="city" placeholder="Enter city">
+                    </div>
+                    <div class="form-group" style="display:flex;flex-direction:column;">
+                        <label for="organization">Organization</label>
+                        <input type="text" id="organization" placeholder="Enter organization">
+                    </div>
+                </div>
+                <button id="save-btn" class="btn-create" style="margin-top:16px;">Save Changes</button>
+                <div id="form-status" style="margin-top:8px;font-size:14px;"></div>
+            </section>
+        </main>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const backendUrl = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:5000/api' : '/api';
+        const token = localStorage.getItem('token');
+        let user = null;
+        try { user = JSON.parse(localStorage.getItem('user')); } catch(e) { user = null; }
+        if (!token || !user || !user.role || String(user.role).toLowerCase() !== 'superadmin') { window.location.replace('login.html'); return; }
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const orgInput = document.getElementById('organization');
+        const phoneInput = document.getElementById('mobile');
+        const cityInput = document.getElementById('city');
+        const avatarImg = document.getElementById('profile-avatar');
+        const avatarUpload = document.getElementById('avatar-upload');
+        const formStatus = document.getElementById('form-status');
+        const profileName = document.getElementById('profile-name');
+        const profileUsername = document.getElementById('profile-username');
+        const headerAvatar = document.getElementById('header-avatar');
+        async function loadProfile() {
+          try {
+            const r = await fetch(`${backendUrl}/users/profile`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!r.ok) throw new Error('failed');
+            const data = await r.json();
+            const u = data.user || {};
+            if (nameInput) nameInput.value = u.name || '';
+            if (emailInput) emailInput.value = u.email || '';
+            const p = u.profile || {};
+            if (orgInput) orgInput.value = p.organization || '';
+            if (phoneInput) phoneInput.value = p.phone || '';
+            if (cityInput) cityInput.value = p.city || '';
+            if (avatarImg && p.avatar) avatarImg.src = p.avatar;
+            if (headerAvatar && p.avatar) headerAvatar.src = p.avatar;
+            if (profileName) profileName.textContent = u.name || 'Super Admin';
+            const baseName = (u.name || 'superadmin').replace(/\s+/g,'').toLowerCase();
+            if (profileUsername) profileUsername.textContent = `@${baseName}`;
+          } catch(e) { formStatus.textContent = 'Failed to load profile'; formStatus.style.color = 'red'; }
+        }
+        function status(msg, ok) { formStatus.textContent = msg; formStatus.style.color = ok ? 'green' : 'red'; setTimeout(function(){ formStatus.textContent=''; }, 3000); }
+        document.getElementById('save-btn').addEventListener('click', async function(){
+          const body = { name: nameInput.value, profile: { organization: orgInput.value, phone: (phoneInput.value||'').replace(/\D/g,''), city: cityInput.value } };
+          try {
+            const r = await fetch(`${backendUrl}/users/profile`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(body) });
+            if (!r.ok) throw new Error('failed');
+            await loadProfile();
+            status('Changes saved successfully', true);
+          } catch(e) { status('Failed to save changes', false); }
+        });
+        avatarUpload.addEventListener('change', function(e){
+          const file = e.target.files && e.target.files[0]; if (!file) return;
+          if (file.size > 1048576) { status('Image exceeds 1MB', false); e.target.value=''; return; }
+          const reader = new FileReader();
+          reader.onload = async function(evt){
+            const dataUrl = evt.target.result;
+            try {
+              const r = await fetch(`${backendUrl}/users/profile`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ profilePicture: dataUrl }) });
+              if (!r.ok) throw new Error('failed');
+              await loadProfile();
+              status('Avatar updated', true);
+            } catch(e) { status('Failed to update avatar', false); }
+          };
+          reader.readAsDataURL(file);
+        });
+        loadProfile();
+      });
+    </script>
+</body>
+</html>

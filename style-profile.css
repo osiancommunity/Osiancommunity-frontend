@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+@import url('style-dashboard.css'); /* Import dashboard styles */
+
+:root {
+    --primary-color: #4a00e0;
+    --secondary-color: #f8f7f5;
+    --text-color: #333;
+    --bg-color: #f4f7fc;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    color: var(--text-color);
+}
+
+/* General Button Styles from other CSS files for consistency */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+
+/* Profile Specific Styles */
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.profile-card, .profile-stats, .profile-settings {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+}
+
+
+.profile-header {
+    text-align: center;
+}
+
+.avatar-label {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.avatar-label:hover .avatar-overlay {
+    opacity: 1;
+}
+
+#profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--primary-color);
+    margin-bottom: 1rem;
+    object-fit: cover;
+}
+
+.profile-header #change-pic-btn {
+    margin-top: 1rem;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+    background-color: var(--secondary-color);
+}
+
+.profile-stats h3, .profile-settings h3 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.stats-grid {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.stat-item i {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+}
+
+.stat-item span {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.profile-settings form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.profile-settings .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-settings label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.profile-settings input, .profile-settings small {
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.profile-settings input[readonly] {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}
+
+.profile-settings small { border: none; padding: 0; color: #777; font-size: 12px; }
+
+#form-status {
+    margin-top: 1rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #e9eef2;
+    color: #333;
+    border: 1px solid #d1d9e0;
+}

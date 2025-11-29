@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - Checkout</title>
+    <link rel="stylesheet" href="style-dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="dashboard-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-user.html" class="logo">OSIAN</a>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard-user.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li><a href="quiz-progress.html"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
+               <li><a href="mentorship-user.html"><i class='bx bx-video'></i><span>Mentorship</span></a></li>
+                <li><a href="notifications.html"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
+             <li><a href="profile.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+ </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Payment Checkout</h1>
+                    <p>Securely complete your registration for the paid quiz.</p>
+                </div>
+                <div class="header-profile">
+                    <img src="https://via.placeholder.com/40" alt="Profile Picture">
+                </div>
+            </header>
+
+            <section class="payment-container">
+                
+                <div class="content-card order-summary">
+                    <h3>Order Summary</h3>
+                    
+                    <div class="quiz-item">
+                        <div class="item-info">
+                            <h4>Constitutional Law Championship</h4>
+                            <p>Paid Quiz Registration</p>
+                        </div>
+                        <span class="item-price">₹5.00</span>
+                    </div>
+
+                    <div class="total-line">
+                        <span>Total</span>
+                        <span class="total-price">₹5.00</span>
+                    </div>
+                </div>
+
+                <div class="content-card payment-form">
+                    <h3>Payment Details</h3>
+                    <p>Complete your payment securely using Razorpay. Choose from PhonePe, Paytm, Google Pay, or other UPI options.</p>
+
+                    <form id="checkout-form">
+                        <div class="payment-options">
+                            <p><strong>Available Payment Methods:</strong></p>
+                            <ul>
+                                <li><i class='bx bx-mobile'></i> PhonePe</li>
+                                <li><i class='bx bx-wallet'></i> Paytm</li>
+                                <li><i class='bx bx-credit-card'></i> Google Pay</li>
+                                <li><i class='bx bx-qr-scan'></i> QR Code</li>
+                                <li><i class='bx bx-credit-card'></i> Credit/Debit Cards</li>
+                                <li><i class='bx bx-bank'></i> Net Banking</li>
+                            </ul>
+                        </div>
+
+                        <button type="submit" id="pay-btn" class="btn-save" style="width: 100%; text-align: center;">
+                            Pay ₹0.00
+                        </button>
+
+                        <div id="payment-checking" style="display: none; text-align: center; margin-top: 20px;">
+                            <i class='bx bx-loader-alt bx-spin' style="font-size: 24px; color: var(--primary-color);"></i>
+                            <p style="color: var(--text-light);">Processing payment... Please wait.</p>
+                        </div>
+                    </form>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="script-payment.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - Contact Info Management</title>
+    <link rel="stylesheet" href="style-admin.css"> 
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+     <div class="admin-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-superadmin.html" class="logo">OSIAN</a>
+                <span class="logo-tag">Super Admin</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard-superadmin.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li><a href="user-management.html"><i class='bx bxs-user-detail'></i><span>User Management</span></a></li>
+                <li><a href="admin-management.html"><i class='bx bxs-user-account'></i><span>Admin Management</span></a></li>
+                <li><a href="create-notification.html"><i class='bx bxs-bell'></i><span>Notifications</span></a></li>
+                <li><a href="mentorship.html"><i class='bx bxs-video'></i><span>Mentorship Videos</span></a></li>
+                <li class="active"><a href="contact-us-admin.html" class="active"><i class='bx bxs-contact'></i><span>Contact Us Page</span></a></li>
+                <li><a href="site-analytics.html"><i class='bx bxs-bar-chart-alt-2'></i><span>Site Analytics</span></a></li>
+                 <li><a href="super-admin-profile.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Contact Information Management</h1>
+                    <p>Update the public contact details and social links.</p>
+                </div>
+            </header>
+
+            <div class="content-card full-page">
+                <h3>Contact Details</h3>
+                <form id="contact-info-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="support-email">Support Email</label>
+                            <input type="email" id="support-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="support-phone">Support Phone</label>
+                            <input type="tel" id="support-phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="office-address">Office Address</label>
+                            <input type="text" id="office-address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="facebook-url">Facebook URL</label>
+                            <input type="url" id="facebook-url">
+                        </div>
+                        <div class="form-group">
+                            <label for="twitter-url">Twitter URL</label>
+                            <input type="url" id="twitter-url">
+                        </div>
+                        <div class="form-group">
+                            <label for="linkedin-url">LinkedIn URL</label>
+                            <input type="url" id="linkedin-url">
+                        </div>
+                    </div>
+                    <button class="btn-submit btn-create" type="submit" style="margin-top: 20px;">
+                        Save Contact Information
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+    <script src="script-contact-admin.js"></script>
+</body>
+</html>

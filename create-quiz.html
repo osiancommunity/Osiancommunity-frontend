@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - Create New Quiz</title>
+    <link rel="stylesheet" href="style-admin.css"> 
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="admin-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-admin.html" class="logo">OSIAN</a>
+                <span class="logo-tag">Admin</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard-admin.html" ><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+               <li class="active"><a href="create-quiz.html" class="active"><i class='bx bxs-file-plus'></i><span>Create New Quiz</span></a></li>
+                <li><a href="my-quizzes.html"><i class='bx bxs-file-blank'></i><span>My Quizzes</span></a></li>
+                <li><a href="quiz-results.html"><i class='bx bxs-bar-chart-alt-2'></i><span>Quiz Results</span></a></li>
+                <li><a href="profile-admin.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+             </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+        <main class="main-content">
+            
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Create a New Quiz</h1>
+                    <p>Fill in the details to build and launch your quiz.</p>
+                </div>
+                <div class="header-profile">
+                    <img src="https://via.placeholder.com/40" alt="Admin Profile Picture">
+                    <span>Admin User</span>
+                </div>
+            </header>
+
+            <form id="create-quiz-form">
+                <div class="content-card">
+                    <h3>Quiz Details</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="quiz-title">Quiz Title</label>
+                            <input type="text" id="quiz-title" placeholder="e.g., Technical Quiz #009" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="quiz-category">Quiz Category / Field</label>
+                            <select id="quiz-category" title="Select a quiz category" required>
+                                <option value="" disabled selected>Select a category</option>
+                                <option value="technical">Technical</option>
+                                <option value="law">Law</option>
+                                <option value="engineering">Engineering</option>
+                                <option value="gk">General Knowledge</option>
+                                <option value="sports">Sports</option>
+                                <option value="coding">Coding</option>
+                                <option value="studies">Social Studies</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quiz-type">Quiz Type</label>
+                            <select id="quiz-type" title="Select a quiz type" required>
+                                <option value="regular">Regular</option>
+                                <option value="live">Live Quiz</option>
+                                <option value="upcoming">Upcoming Quiz</option>
+                                <option value="paid">Paid Quiz</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quiz-visibility">Quiz Visibility</label>
+                            <select id="quiz-visibility" title="Select quiz visibility" required>
+                                <option value="public">Public</option>
+                                <option value="private">Private</option>
+                                <option value="unlisted">Unlisted</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quiz-duration">Duration (in minutes)</label>
+                            <input type="number" id="quiz-duration" placeholder="e.g., 30" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="quiz-limit">Registration Limit</label>
+                            <input type="number" id="quiz-limit" placeholder="e.g., 500 (0 for unlimited)">
+                        </div>
+                        <div class="form-group">
+                            <label for="quiz-schedule">Schedule Time (Optional)</label>
+                            <input type="datetime-local" id="quiz-schedule" placeholder="Select start time">
+                            <small>Leave empty for immediate availability</small>
+                        </div>
+                        <div class="form-group" id="quiz-price-group">
+                            <label for="quiz-price">Quiz Price (in ₹)</label>
+                            <input type="number" id="quiz-price" placeholder="e.g., 5.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="quiz-cover">Quiz Cover Image</label>
+                            <input type="file" id="quiz-cover" accept="image/*" required>
+                            <small>Image will be automatically converted to 16:9 aspect ratio</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>Quiz Questions</h3>
+                    <div id="questions-container">
+                        <div class="question-block">
+                            <h4>Question 1</h4>
+                            <div class="form-group">
+                                <label>Question Type</label>
+                                <select class="question-type" required>
+                                    <option value="mcq">Multiple Choice Question (MCQ)</option>
+                                    <option value="written">Written Question</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Question Text</label>
+                                <textarea class="question-text" placeholder="Enter the question here..." required></textarea>
+                            </div>
+                            <div class="options-grid mcq-only">
+                                <div class="form-group">
+                                    <label>Option 1</label>
+                                    <input type="text" class="option-text" placeholder="Option 1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Option 2</label>
+                                    <input type="text" class="option-text" placeholder="Option 2" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Option 3</label>
+                                    <input type="text" class="option-text" placeholder="Option 3" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Option 4</label>
+                                    <input type="text" class="option-text" placeholder="Option 4" required>
+                                </div>
+                            </div>
+                            <div class="form-group mcq-only">
+                                <label>Correct Answer</label>
+                                <select class="correct-answer" required>
+                                    <option value="0">Option 1</option>
+                                    <option value="1">Option 2</option>
+                                    <option value="2">Option 3</option>
+                                    <option value="3">Option 4</option>
+                                </select>
+                            </div>
+                        </div>
+                        </div>
+                    <button type="button" id="add-question-btn" class="btn-action">
+                        <i class='bx bx-plus'></i> Add Another Question
+                    </button>
+                </div>
+
+                <button type="submit" class="btn-create btn-submit">
+                    Create Quiz
+                </button>
+            </form>
+
+        </main>
+    </div>
+
+    <script src="script-create-quiz.js"></script>
+</body>
+</html>
