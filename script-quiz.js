@@ -1,7 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
 
     // --- Backend URL ---
-const backendUrl = 'http://localhost:5000/api';
+const backendUrl = (location.hostname.endsWith('vercel.app'))
+    ? 'https://osiancommunity-backend.vercel.app/api'
+    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        ? 'http://localhost:5000/api'
+        : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- Authentication ---
     const user = JSON.parse(localStorage.getItem('user'));
