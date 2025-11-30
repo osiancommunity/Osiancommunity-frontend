@@ -32,8 +32,6 @@ body {
     background-color: var(--bg-color);
 }
 
-.logout-btn { display: none !important; }
-
 .admin-container {
     display: flex;
     min-height: 100vh;
