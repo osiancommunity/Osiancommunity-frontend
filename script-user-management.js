@@ -1,186 +1,160 @@
-document.addEventListener('DOMContentLoaded', function () {
-const backendUrl = 'http://localhost:5000/api';
-    const token = localStorage.getItem('token');
-    const userTableBody = document.getElementById('user-list-body');
-    const searchInput = document.getElementById('user-search');
-    const roleFilter = document.getElementById('role-filter');
+document.addEventListener('DOMContentLoaded', () => {
+  const backendUrl = (location.hostname.endsWith('vercel.app'))
+    ? 'https://osiancommunity-backend.vercel.app/api'
+    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        ? 'http://localhost:5000/api'
+        : 'https://osiancommunity-backend.vercel.app/api');
 
-    // Modal elements
-    const modal = document.getElementById('change-role-modal');
-    const modalUserName = document.getElementById('modal-user-name');
-    const modalRoleSelect = document.getElementById('modal-role-select');
-    const modalCancelBtn = document.getElementById('modal-cancel-btn');
-    const modalSaveBtn = document.getElementById('modal-save-btn');
-    let currentUserId = null;
+  const token = localStorage.getItem('token');
+  let user = null;
+  try { user = JSON.parse(localStorage.getItem('user')); } catch(_) { user = null; }
 
-    if (!token) {
-        window.location.href = 'login.html';
-        return;
+  if (!token || !user || (user.role || '').toLowerCase() !== 'superadmin') {
+    alert('Access Denied');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  const logoutBtn = document.querySelector('.logout-btn');
+  if (logoutBtn) { logoutBtn.style.display = 'none'; }
+
+  const tbody = document.getElementById('user-list-body');
+  const searchInput = document.getElementById('user-search');
+  const roleFilter = document.getElementById('role-filter');
+
+  let users = [];
+  let filtered = [];
+
+  async function fetchUsers() {
+    try {
+      const res = await fetch(`${backendUrl}/users?page=1&limit=100`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      users = (data.users || []).map(u => ({
+        id: u._id,
+        name: u.name,
+        email: u.email,
+        role: (u.role || 'user'),
+        isActive: u.isActive !== false,
+        joined: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '--'
+      }));
+      filtered = [...users];
+      render();
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="6">Failed to load users.</td></tr>';
+    }
+  }
+
+  function render() {
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6">No users found.</td></tr>';
+      return;
+    }
+    filtered.forEach(u => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${u.name}</td>
+        <td>${u.email}</td>
+        <td><span class="role-tag ${u.role === 'admin' ? 'admin' : (u.role === 'superadmin' ? 'superadmin' : 'user')}">${u.role}</span></td>
+        <td>${u.joined}</td>
+        <td><span class="status-tag ${u.isActive ? 'active' : 'inactive'}">${u.isActive ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <button class="btn-edit" data-action="role" data-id="${u.id}" data-name="${u.name}" data-role="${u.role}">Change Role</button>
+          <button class="btn-edit" data-action="status" data-id="${u.id}" data-active="${u.isActive}">${u.isActive ? 'Deactivate' : 'Activate'}</button>
+          <button class="btn-delete" data-action="delete" data-id="${u.id}">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function applyFilters() {
+    const q = (searchInput?.value || '').toLowerCase();
+    const rf = roleFilter?.value || 'all';
+    filtered = users.filter(u => (
+      (q ? (u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)) : true)
+      && (rf === 'all' ? true : (u.role === rf))
+    ));
+    render();
+  }
+
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const action = btn.getAttribute('data-action');
+    const id = btn.getAttribute('data-id');
+    if (!action || !id) return;
+
+    if (action === 'role') {
+      const name = btn.getAttribute('data-name') || 'User';
+      const select = document.getElementById('modal-role-select');
+      const modalName = document.getElementById('modal-user-name');
+      const modal = document.getElementById('change-role-modal');
+      if (modalName) modalName.textContent = name;
+      if (select) select.value = btn.getAttribute('data-role') || 'user';
+      if (modal) modal.style.display = 'block';
+      const save = document.getElementById('modal-save-btn');
+      const cancel = document.getElementById('modal-cancel-btn');
+      const onSave = async () => {
+        const newRole = select.value;
+        try {
+          const res = await fetch(`${backendUrl}/users/role`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ userId: id, newRole })
+          });
+          const data = await res.json();
+          alert(data.message || (res.ok ? 'Role updated' : 'Failed'));
+          modal.style.display = 'none';
+          fetchUsers();
+        } catch(err) {
+          alert('Failed to update role');
+        }
+        save.removeEventListener('click', onSave);
+        cancel.removeEventListener('click', onCancel);
+      };
+      const onCancel = () => { modal.style.display = 'none'; save.removeEventListener('click', onSave); cancel.removeEventListener('click', onCancel); };
+      save.addEventListener('click', onSave);
+      cancel.addEventListener('click', onCancel);
     }
 
-    let allUsers = [];
-
-    const fetchUsers = async () => {
-        try {
-            const response = await fetch(`${backendUrl}/users`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    localStorage.clear();
-                    window.location.href = 'login.html';
-                }
-                throw new Error('Failed to fetch users');
-            }
-
-            const data = await response.json();
-            allUsers = data.users || [];
-            renderUsers(allUsers);
-        } catch (error) {
-            console.error('Error fetching users:', error);
-            userTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Error loading users. Please try again later.</td></tr>`;
-        }
-    };
-
-    const renderUsers = (users) => {
-        userTableBody.innerHTML = '';
-        if (users.length === 0) {
-            userTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No users found.</td></tr>`;
-            return;
-        }
-
-        users.forEach(user => {
-            const userRow = document.createElement('tr');
-            userRow.innerHTML = `
-                <td>${user.name || user.fullname || ''}</td>
-                <td>${user.email || ''}</td>
-                <td><span class="role-tag ${user.role}">${user.role}</span></td>
-                <td>${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}</td>
-                <td><span class="status-tag ${user.isActive ? 'active' : 'inactive'}">${user.isActive ? 'active' : 'inactive'}</span></td>
-                <td>
-                    <button class="btn-edit change-role-btn" data-userid="${user._id}" data-username="${user.name || user.fullname || ''}">Change Role</button>
-                    <button class="btn-${user.isActive ? 'delete' : 'create'} toggle-status-btn" data-userid="${user._id}" data-status="${user.isActive ? 'active' : 'inactive'}">
-                        ${user.isActive ? 'Deactivate' : 'Activate'}
-                    </button>
-                </td>
-            `;
-            userTableBody.appendChild(userRow);
+    if (action === 'status') {
+      const current = btn.getAttribute('data-active') === 'true';
+      const next = !current;
+      try {
+        const res = await fetch(`${backendUrl}/users/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ userId: id, isActive: next })
         });
-    };
+        const data = await res.json();
+        alert(data.message || (res.ok ? 'Status updated' : 'Failed'));
+        fetchUsers();
+      } catch(err) {
+        alert('Failed to update status');
+      }
+    }
 
-    const filterAndSearchUsers = () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const role = roleFilter.value;
+    if (action === 'delete') {
+      if (!confirm('Delete this user?')) return;
+      try {
+        const res = await fetch(`${backendUrl}/users/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        alert(data.message || (res.ok ? 'Deleted' : 'Failed'));
+        fetchUsers();
+      } catch(err) {
+        alert('Failed to delete');
+      }
+    }
+  });
 
-        let filteredUsers = allUsers;
+  searchInput?.addEventListener('input', applyFilters);
+  roleFilter?.addEventListener('change', applyFilters);
 
-        if (role !== 'all') {
-            filteredUsers = filteredUsers.filter(user => user.role === role);
-        }
-
-        if (searchTerm) {
-            filteredUsers = filteredUsers.filter(user =>
-                user.fullname.toLowerCase().includes(searchTerm) ||
-                user.email.toLowerCase().includes(searchTerm)
-            );
-        }
-
-        renderUsers(filteredUsers);
-    };
-
-    const openRoleModal = (userId, userName) => {
-        currentUserId = userId;
-        modalUserName.textContent = userName;
-        modal.style.display = 'flex';
-    };
-
-    const closeRoleModal = () => {
-        modal.style.display = 'none';
-        currentUserId = null;
-    };
-
-    const saveRoleChange = async () => {
-        const newRole = modalRoleSelect.value;
-        if (!currentUserId || !newRole) return;
-
-        try {
-            const response = await fetch(`${backendUrl}/users/role`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ userId: currentUserId, newRole })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update role');
-            }
-
-            // Refresh user list
-            await fetchUsers();
-            closeRoleModal();
-
-        } catch (error) {
-            console.error('Error updating role:', error);
-            alert('Could not update user role. Please try again.');
-        }
-    };
-
-    const toggleUserStatus = async (userId, currentStatus) => {
-        const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-        try {
-            const response = await fetch(`${backendUrl}/users/status`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ userId: userId, isActive: newStatus === 'active' })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update status');
-            }
-
-            await fetchUsers();
-
-        } catch (error) {
-            console.error('Error updating status:', error);
-            alert('Could not update user status. Please try again.');
-        }
-    };
-
-    // Event Listeners
-    searchInput.addEventListener('input', filterAndSearchUsers);
-    roleFilter.addEventListener('change', filterAndSearchUsers);
-
-    userTableBody.addEventListener('click', (e) => {
-        if (e.target.classList.contains('change-role-btn')) {
-            const userId = e.target.dataset.userid;
-            const userName = e.target.dataset.username;
-            openRoleModal(userId, userName);
-        }
-        if (e.target.classList.contains('toggle-status-btn')) {
-            const userId = e.target.dataset.userid;
-            const status = e.target.dataset.status;
-            if (confirm(`Are you sure you want to ${status === 'active' ? 'deactivate' : 'activate'} this user?`)) {
-                toggleUserStatus(userId, status);
-            }
-        }
-    });
-
-    modalCancelBtn.addEventListener('click', closeRoleModal);
-    modalSaveBtn.addEventListener('click', saveRoleChange);
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeRoleModal();
-        }
-    });
-
-    // Initial fetch
-    fetchUsers();
+  fetchUsers();
 });
+

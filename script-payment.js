@@ -1,7 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-    const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
+    // Define the location of your backend
+const backendUrl = (location.hostname.endsWith('vercel.app'))
+    ? 'https://osiancommunity-backend.vercel.app/api'
+    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        ? 'http://localhost:5000/api'
+        : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- Authentication ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -30,7 +34,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const checkoutForm = document.getElementById('checkout-form');
     const payButton = document.getElementById('pay-btn');
     const paymentChecking = document.getElementById('payment-checking');
-    const headerAvatarEl = document.getElementById('header-avatar');
 
     let currentOrderId = null; // To store the order ID from the backend
     let razorpayOrderId = null; // To store the Razorpay order ID
@@ -121,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function() {
             name: 'Osian Quiz Platform',
             description: `Payment for ${orderData.quiz.title}`,
             order_id: orderData.razorpayOrder.id, // Correctly pass the Razorpay Order ID string
-            image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%233399cc"/><text x="50" y="55" font-size="20" text-anchor="middle" fill="white">OSIAN</text></svg>',
+            image: 'https://via.placeholder.com/100x100?text=Osian', // Optional logo
             notes: {
                 quizId: quizId,
                 userId: user._id
@@ -185,12 +188,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // --- Initial Page Load ---
     // Hide form until we create an order
     checkoutForm.style.display = 'none'; 
-    if (headerAvatarEl) {
-        try {
-            const localUserData = JSON.parse(localStorage.getItem('osianUserData')) || {};
-            if (localUserData.avatar) headerAvatarEl.src = localUserData.avatar;
-        } catch(e) {}
-    }
     getRazorpayKey().then(() => {
         createPaymentOrder();
     });

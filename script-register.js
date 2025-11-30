@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-    const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
+const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
 
     const registerForm = document.getElementById("register-form");
     const registerBtn = document.getElementById("register-btn");
@@ -94,12 +94,19 @@ document.addEventListener("DOMContentLoaded", function() {
             if (!response.ok) {
                 alert(`OTP verification failed: ${data.message}`);
             } else {
-                // --- SUCCESS: Save token and redirect ---
+                // --- SUCCESS: Save token and redirect based on role ---
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
 
+                const role = String((data.user && data.user.role) || 'user').toLowerCase();
                 alert('Registration and verification successful! Redirecting to Dashboard.');
-                window.location.href = "dashboard-user.html";
+                if (role === 'superadmin') {
+                    window.location.href = 'dashboard-superadmin.html';
+                } else if (role === 'admin') {
+                    window.location.href = 'dashboard-admin.html';
+                } else {
+                    window.location.href = 'dashboard-user.html';
+                }
             }
 
         } catch (error) {

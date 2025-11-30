@@ -1,11 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-    const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
+    const backendUrl = (location.hostname.endsWith('vercel.app'))
+        ? 'https://osiancommunity-backend.vercel.app/api'
+        : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+            ? 'http://localhost:5000/api'
+            : 'https://osiancommunity-backend.vercel.app/api');
 
     const settingsForm = document.getElementById('settings-form');
     const formStatus = document.getElementById('form-status');
-    const passwordForm = document.getElementById('password-form');
-    const passwordStatus = document.getElementById('password-status');
 
     const avatarUpload = document.getElementById('avatar-upload');
     const changePicBtn = document.getElementById('change-pic-btn');
@@ -26,9 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizzesTaken = document.getElementById('quizzes-taken');
     const winRate = document.getElementById('win-rate');
     const totalPoints = document.getElementById('total-points');
-    const currentPasswordInput = document.getElementById('current-password');
-    const newPasswordInput = document.getElementById('new-password');
-    const confirmPasswordInput = document.getElementById('confirm-password');
 
     // Default data if nothing is in localStorage
     const defaultData = {
@@ -308,57 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Handle Change Password submission
-    if (passwordForm) passwordForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = 'login.html';
-            return;
-        }
-        const currentPassword = currentPasswordInput ? currentPasswordInput.value : '';
-        const newPassword = newPasswordInput ? newPasswordInput.value : '';
-        const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
-
-        if (!currentPassword || !newPassword || !confirmPassword) {
-            if (passwordStatus) { passwordStatus.textContent = 'All fields are required.'; passwordStatus.style.color = 'red'; }
-            return;
-        }
-        if (newPassword.length < 6) {
-            if (passwordStatus) { passwordStatus.textContent = 'New password must be at least 6 characters.'; passwordStatus.style.color = 'red'; }
-            return;
-        }
-        if (newPassword !== confirmPassword) {
-            if (passwordStatus) { passwordStatus.textContent = 'New password and confirmation do not match.'; passwordStatus.style.color = 'red'; }
-            return;
-        }
-
-        try {
-            const response = await fetch(`${backendUrl}/auth/change-password`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ currentPassword, newPassword })
-            });
-            const data = await response.json().catch(() => ({}));
-            if (!response.ok || (data && data.success === false)) {
-                const msg = (data && data.message) ? data.message : 'Failed to change password';
-                if (passwordStatus) { passwordStatus.textContent = msg; passwordStatus.style.color = 'red'; }
-                return;
-            }
-            if (passwordStatus) { passwordStatus.textContent = 'Password changed successfully.'; passwordStatus.style.color = 'green'; }
-            if (currentPasswordInput) currentPasswordInput.value = '';
-            if (newPasswordInput) newPasswordInput.value = '';
-            if (confirmPasswordInput) confirmPasswordInput.value = '';
-        } catch (error) {
-            if (passwordStatus) { passwordStatus.textContent = 'Network error while changing password.'; passwordStatus.style.color = 'red'; }
-        } finally {
-            setTimeout(() => { if (passwordStatus) passwordStatus.textContent = ''; }, 4000);
-        }
-    });
-
     // Event listener for the new "Change Picture" button
     if(changePicBtn) changePicBtn.addEventListener('click', () => {
         if(avatarUpload) avatarUpload.click(); // Programmatically click the hidden file input
@@ -427,15 +374,4 @@ avatarUpload.addEventListener('change', async (e) => {
     const userRole = getRoleFromURL();
     updateSidebarLinks(userRole);
     loadUserData(userRole);
-
-    // Attach logout handlers to any logout buttons (including header)
-    const logoutButtons = document.querySelectorAll('.logout-btn');
-    logoutButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = 'login.html';
-        });
-    });
 });

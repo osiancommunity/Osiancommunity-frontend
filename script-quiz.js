@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
+    // --- Backend URL ---
+const backendUrl = 'http://localhost:5000/api';
 
     // --- Authentication ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -294,6 +294,11 @@ const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommuni
         // Show the correct modal
         if (wasAutoSubmitted) {
             autoSubmitModal.classList.add('active');
+            const heading = autoSubmitModal.querySelector('h2');
+            const paras = autoSubmitModal.querySelectorAll('p');
+            if (heading) heading.textContent = 'Quiz Auto-Submitted';
+            if (paras && paras[0]) paras[0].textContent = `Quiz auto-submitted because: ${reason || 'Policy violation'}.`;
+            if (paras && paras[1]) paras[1].textContent = 'You cannot re-take this quiz. Please return to the dashboard.';
         } else {
             // Show a "submitting" message in the final modal
             finalSubmitModal.classList.add('active');

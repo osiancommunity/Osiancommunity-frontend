@@ -1,22 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-    const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
+    const backendUrl = (location.hostname.endsWith('vercel.app'))
+        ? 'https://osiancommunity-backend.vercel.app/api'
+        : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+            ? 'http://localhost:5000/api'
+            : 'https://osiancommunity-backend.vercel.app/api');
+
     const form = document.getElementById('reset-password-form');
+    const emailInput = document.getElementById('email');
+    const otpInput = document.getElementById('otp');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirm-password');
     const formStatus = document.getElementById('form-status');
     const loginLink = document.getElementById('login-link');
-
-    // Get the token from the URL
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-
-    if (!token) {
-        formStatus.textContent = 'Invalid or missing reset token.';
-        formStatus.style.color = 'red';
-        form.style.display = 'none';
-        return;
-    }
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -30,10 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`${backendUrl}/reset-password`, {
+            const response = await fetch(`${backendUrl}/auth/reset-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token, newPassword: passwordInput.value })
+                body: JSON.stringify({ email: emailInput.value, otp: otpInput.value, newPassword: passwordInput.value })
             });
 
             const result = await response.json();

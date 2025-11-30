@@ -1,7 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-    const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
+    // Define the location of your backend
+const backendUrl = (location.hostname.endsWith('vercel.app'))
+    ? 'https://osiancommunity-backend.vercel.app/api'
+    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        ? 'http://localhost:5000/api'
+        : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -17,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Handle Logout
     const logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) {
+        logoutBtn.style.display = 'none';
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             localStorage.removeItem('token');

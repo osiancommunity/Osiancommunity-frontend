@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", async function() {
-    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-    const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
+const backendUrl = 'http://localhost:5000/api';
     const token = localStorage.getItem('token');
     let analyticsData = { months: [], userCount: [], categories: { labels: [], data: [], colors: [] } };
     try {

@@ -32,6 +32,8 @@ body {
     background-color: var(--bg-color);
 }
 
+.logout-btn { display: none !important; }
+
 .admin-container {
     display: flex;
     min-height: 100vh;
@@ -54,6 +56,26 @@ body {
     padding: 25px 20px;
     border-bottom: 1px solid #444;
     text-align: center;
+}
+
+.auth-links {
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+.auth-links a {
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 10px;
+    border: 1px solid #555;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+.auth-links a:hover {
+    color: var(--white);
+    border-color: var(--white);
 }
 
 .logo {

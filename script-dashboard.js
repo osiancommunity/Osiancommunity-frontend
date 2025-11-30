@@ -1,7 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
     
-    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
+    // Define the location of your backend
+const backendUrl = (location.hostname.endsWith('vercel.app'))
+    ? 'https://osiancommunity-backend.vercel.app/api'
+    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        ? 'http://localhost:5000/api'
+        : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -13,13 +17,11 @@ const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommuni
         window.location.href = 'login.html';
         return; // Stop the script
     }
-
     // Display user's name in the header
     const welcomeHeader = document.querySelector('.header-title h1');
     if (welcomeHeader) {
         welcomeHeader.textContent = `Welcome Back, ${user.name}!`;
     }
-
     // Load user avatar from profile data
     const userData = JSON.parse(localStorage.getItem('osianUserData')) || {};
     const headerAvatar = document.getElementById('header-avatar');
@@ -28,9 +30,9 @@ const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommuni
     }
     
     // Handle Logout
-    // Find all logout buttons (in sidebar and sidebar-footer)
     const logoutButtons = document.querySelectorAll('.logout-btn');
     logoutButtons.forEach(button => {
+        button.style.display = 'none';
         button.addEventListener('click', (e) => {
             e.preventDefault();
             localStorage.removeItem('token');
@@ -101,7 +103,7 @@ const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommuni
 
         return `
             <div class="quiz-card">
-                <img src="${quiz.coverImage || 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'320\' height=\'200\'><rect width=\'320\' height=\'200\' fill=\'%23dddddd\'/><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-size=\'20\' fill=\'%23666\'>No Image</text></svg>'}" alt="${quiz.title}" class="quiz-card-img">
+                <img src="${quiz.coverImage || 'https://via.placeholder.com/320x200?text=No+Image'}" alt="${quiz.title}" class="quiz-card-img">
                 <div class="quiz-card-header">
                     <span class="quiz-tag ${isPaid ? 'paid' : 'live'}">${isPaid ? 'Paid' : 'Free'}</span>
                     <span class="quiz-category">${quiz.category}</span>
@@ -119,27 +121,49 @@ const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommuni
 
     // --- Handle Quiz Registration Buttons ---
     async function getProfileCompleteness() {
+        if (localStorage.getItem('profileComplete') === '1') {
+            return 100;
+        }
         const token = localStorage.getItem('token');
         try {
             const res = await fetch(`${backendUrl}/users/profile`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (!res.ok) return 0;
+            if (!res.ok) throw new Error('profile fetch failed');
             const data = await res.json();
             const u = data.user || {};
             const p = u.profile || {};
-            const required = [u.name, u.email, p.phone, p.city, p.college, p.course, p.state];
+            const pctServer = Number((p && p.completionPercentage) ?? u.profileCompletion);
+            if (!Number.isNaN(pctServer) && pctServer > 0) {
+                const pctVal = Math.round(pctServer);
+                if (pctVal >= 100) localStorage.setItem('profileComplete', '1');
+                return pctVal;
+            }
+            const required = [u.name, u.email, p.phone, p.city, p.state];
             const filled = required.filter(v => v && String(v).trim().length > 0).length;
-            return Math.round((filled / required.length) * 100);
+            const pctVal = Math.round((filled / required.length) * 100);
+            if (pctVal >= 100) localStorage.setItem('profileComplete', '1');
+            return pctVal;
         } catch (_) {
-            return 0;
+            // Fallback to locally cached profile to avoid false negatives
+            try {
+                const cached = JSON.parse(localStorage.getItem('osianUserData')) || {};
+                const required = [cached.name, cached.email, cached.mobile, cached.city, cached.state];
+                const filled = required.filter(v => v && String(v).trim().length > 0).length;
+                const pctVal = Math.round((filled / required.length) * 100);
+                if (pctVal >= 100) localStorage.setItem('profileComplete', '1');
+                return pctVal;
+            } catch (e) {
+                return 0;
+            }
         }
     }
 
     document.addEventListener('click', async function(e) {
-        if (e.target.classList.contains('quiz-btn') && e.target.classList.contains('paid')) {
+        const paidBtn = e.target.closest('.quiz-btn.paid');
+        if (paidBtn) {
             e.preventDefault();
-            const quizId = e.target.getAttribute('data-quiz-id');
+            const quizId = paidBtn.getAttribute('data-quiz-id');
             if (quizId) {
                 const pct = await getProfileCompleteness();
                 if (pct < 100) {
