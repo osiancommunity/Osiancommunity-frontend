@@ -1,7 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
 
     // --- Backend URL ---
-const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osiancommunity-backend.vercel.app/api' : 'http://localhost:5000/api';
+    const backendUrl = (location.hostname.endsWith('vercel.app'))
+        ? 'https://osiancommunity-backend.vercel.app/api'
+        : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+            ? 'http://localhost:5000/api'
+            : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- Authentication ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -77,14 +81,26 @@ const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osianco
             });
 
             if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
+                if (response.status === 401) {
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
                     window.location.href = 'login.html';
-                    return; // Silently redirect
+                    return;
                 }
-                const data = await response.json();
-                throw new Error(data.message);
+                try {
+                    const data = await response.json();
+                    if (response.status === 403 && data && (data.startsAt || data.code === 'SCHEDULED_NOT_STARTED')) {
+                        const startsAt = data.startsAt ? new Date(data.startsAt) : null;
+                        startQuizBtn.disabled = true;
+                        startQuizBtn.textContent = startsAt ? `Starts at ${startsAt.toLocaleString()}` : (data.message || 'Scheduled to start later');
+                        alert(data.message || 'This quiz is scheduled to start later.');
+                        isLoading = false;
+                        return;
+                    }
+                    throw new Error(data.message || 'Failed to load quiz');
+                } catch (e) {
+                    throw e;
+                }
             }
 
             currentQuizData = await response.json();
@@ -93,10 +109,18 @@ const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osianco
             document.querySelector('.quiz-info h3').textContent = currentQuizData.title;
             timeLeftDisplay.textContent = `${currentQuizData.duration}:00`;
 
-            // Enable start button
+            // Enforce schedule: disable start until scheduled time
+            const now = Date.now();
+            const startAt = currentQuizData.scheduleTime ? new Date(currentQuizData.scheduleTime).getTime() : now;
             isLoading = false;
-            startQuizBtn.disabled = false;
-            startQuizBtn.textContent = 'I Understand, Start the Quiz';
+            if (startAt > now) {
+                startQuizBtn.disabled = true;
+                const dt = new Date(startAt);
+                startQuizBtn.textContent = `Starts at ${dt.toLocaleString()}`;
+            } else {
+                startQuizBtn.disabled = false;
+                startQuizBtn.textContent = 'I Understand, Start the Quiz';
+            }
 
         } catch (error) {
             console.error('Error loading quiz:', error);
