@@ -163,3 +163,21 @@ body {
     color: #333;
     border: 1px solid #d1d9e0;
 }
+
+/* Header Logout Button */
+.header-logout-btn {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--primary-color);
+    color: #fff;
+    text-decoration: none;
+}
+.header-logout-btn i { font-size: 18px; }
+.header-logout-btn span { font-size: 14px; }
+
+@media (max-width: 768px) {
+    .header-logout-btn { display: inline-flex; }
+}

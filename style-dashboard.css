@@ -205,6 +205,20 @@ body {
     cursor: pointer;
 }
 
+/* Header Logout Button (hidden on desktop, visible on mobile) */
+.header-logout-btn {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--primary-color);
+    color: var(--white);
+    text-decoration: none;
+}
+.header-logout-btn i { font-size: 18px; }
+.header-logout-btn span { font-size: 14px; }
+
 /* ------------------------- */
 /* Featured Quizzes Slider */
 /* ------------------------- */
@@ -421,6 +435,7 @@ body {
     .header-profile {
         width: 100%;
     }
+    .header-logout-btn { display: inline-flex; }
     .header-profile input {
         flex-grow: 1;
     }

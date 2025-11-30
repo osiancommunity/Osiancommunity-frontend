@@ -6,8 +6,8 @@ document.addEventListener("DOMContentLoaded", function() {
         notificationModal.classList.remove('active');
     }
 
-    // Define the location of your backend
-const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osiancommunity-backend.vercel.app/api' : 'http://localhost:5000/api';
+    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+    const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -507,7 +507,7 @@ async function fetchAllResults() {
 
     // --- Global Functions for Buttons ---
     window.viewDetailedResult = async function(resultId) {
-        const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osiancommunity-backend.vercel.app/api' : 'http://localhost:5000/api';
+        const backendUrl = 'http://localhost:5000/api';
         const token = localStorage.getItem('token');
         const modal = document.getElementById('result-modal');
         const modalBody = document.getElementById('result-modal-body');

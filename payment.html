@@ -37,7 +37,8 @@
                     <p>Securely complete your registration for the paid quiz.</p>
                 </div>
                 <div class="header-profile">
-                    <img src="https://via.placeholder.com/40" alt="Profile Picture">
+                    <img id="header-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><rect width='40' height='40' fill='%23999'/></svg>'" alt="Profile Picture">
+                    <a href="#" class="header-logout-btn logout-btn" onclick="localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href='login.html'"><i class='bx bx-log-out'></i><span>Logout</span></a>
                 </div>
             </header>
 

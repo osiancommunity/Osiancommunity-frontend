@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osiancommunity-backend.vercel.app/api' : 'http://localhost:5000/api';
+    const backendUrl = 'http://localhost:5000/api';
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
 

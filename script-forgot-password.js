@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+    const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
     const form = document.getElementById('forgot-password-form');
     const emailInput = document.getElementById('email');
     const formStatus = document.getElementById('form-status');
@@ -9,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formStatus.style.color = '#555';
 
         try {
-            const response = await fetch((location.hostname.endsWith('vercel.app') ? 'https://osiancommunity-backend.vercel.app' : 'http://localhost:5000') + '/api/forgot-password', {
+            const response = await fetch(`${backendUrl}/forgot-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: emailInput.value })

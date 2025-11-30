@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+    const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
     const form = document.getElementById('reset-password-form');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirm-password');
@@ -28,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch((location.hostname.endsWith('vercel.app') ? 'https://osiancommunity-backend.vercel.app' : 'http://localhost:5000') + '/api/reset-password', {
+            const response = await fetch(`${backendUrl}/reset-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token, newPassword: passwordInput.value })
