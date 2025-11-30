@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     
-    // Define the location of your backend
-const backendUrl = 'http://localhost:5000/api';
+    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -101,7 +101,7 @@ const backendUrl = 'http://localhost:5000/api';
 
         return `
             <div class="quiz-card">
-                <img src="${quiz.coverImage || 'https://via.placeholder.com/320x200?text=No+Image'}" alt="${quiz.title}" class="quiz-card-img">
+                <img src="${quiz.coverImage || 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'320\' height=\'200\'><rect width=\'320\' height=\'200\' fill=\'%23dddddd\'/><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-size=\'20\' fill=\'%23666\'>No Image</text></svg>'}" alt="${quiz.title}" class="quiz-card-img">
                 <div class="quiz-card-header">
                     <span class="quiz-tag ${isPaid ? 'paid' : 'live'}">${isPaid ? 'Paid' : 'Free'}</span>
                     <span class="quiz-category">${quiz.category}</span>
