@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - OSIAN</title>
+    <link rel="stylesheet" href="style-profile.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-user.html" class="logo" id="sidebar-logo-link">OSIAN</a>
+            </div>
+            <ul class="sidebar-menu">
+                <li id="dashboard-link-li"><a href="dashboard-user.html" id="dashboard-link"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li id="my-quizzes-link-li"><a href="quiz-progress.html" id="my-quizzes-link"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
+                <li id="mentorship-link-li"><a href="mentorship-user.html" id="mentorship-link"><i class='bx bx-video'></i><span>Mentorship</span></a></li>
+                <li id="notifications-link-li"><a href="notifications.html" id="notifications-link"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
+               <li class="active"><a href="profile.html" class="active"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+
+            </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>User Profile</h1>
+                    <p>Manage your account settings and view your statistics.</p>
+                </div>
+                <div class="header-profile">
+                    <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
+                    <a href="profile.html"><img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar"></a>
+                </div>
+            </header>
+
+            <div class="profile-grid">
+            <!-- 1. User Profile Card -->
+            <section class="profile-card">
+                <div class="profile-header">
+                    <label for="avatar-upload" class="avatar-label">
+                        <img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="User Avatar" id="profile-avatar">
+                        <div class="avatar-overlay"><i class='bx bx-camera'></i></div>
+                    </label>
+                    <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                    <h2 id="profile-name">Diljot Singh</h2>
+                    <p id="profile-username">@diljotsingh</p>
+                    <button id="change-pic-btn" class="btn btn-secondary">Change Picture</button>
+
+                </div>
+                <div class="profile-bio">
+                    <p>Quiz enthusiast and lifelong learner. Ready to take on any challenge!</p>
+                </div>
+            </section>
+            <!-- 3. Account Settings -->
+            <section class="profile-settings">
+                <h3>Account Settings</h3>
+                <form id="settings-form">
+                    <!-- Common Fields -->
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" readonly>
+                        <small>Email cannot be changed.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">Mobile No</label>
+                        <input type="tel" id="mobile" name="mobile" placeholder="Enter your mobile number">
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" name="city" placeholder="Enter your city">
+                    </div>
+
+                    <!-- User-Specific Fields -->
+                    <div id="user-fields" class="role-specific-fields">
+                        <div class="form-group"><label for="college">College/University</label><input type="text" id="college" name="college" placeholder="Enter your college"></div>
+                        <div class="form-group"><label for="branch">Branch</label><input type="text" id="branch" name="branch" placeholder="Enter your branch"></div>
+                        <div class="form-group"><label for="state">State</label><input type="text" id="state" name="state" placeholder="Enter your state"></div>
+                    </div>
+
+                    <!-- Admin/Superadmin-Specific Fields -->
+                    <div id="admin-fields" class="role-specific-fields">
+                        <div class="form-group"><label for="organization">Organization</label><input type="text" id="organization" name="organization" placeholder="Enter your organization"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+                <p id="form-status"></p>
+            </section>
+            </div>
+        </main>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard-user.html" id="nav-dashboard"><i class='bx bxs-dashboard'></i><span>Home</span></a>
+        <a href="quiz-progress.html" id="nav-quizzes"><i class='bx bx-file-blank'></i><span>Quizzes</span></a>
+        <a href="mentorship-user.html" id="nav-mentorship"><i class='bx bx-video'></i><span>Mentor</span></a>
+        <a href="notifications.html" id="nav-notifs"><i class='bx bx-bell'></i><span>Alerts</span></a>
+        <a href="profile.html" id="nav-profile"><i class='bx bxs-user'></i><span>Profile</span></a>
+    </div>
+
+    <script src="script-profile.js"></script>
+    <script>
+    (function(){
+        var el = document.getElementById('nav-profile');
+        if (el) el.classList.add('active');
+    })();
+    </script>
+    <script>
+    (function(){
+        const toggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        if (toggle && sidebar) {
+            toggle.addEventListener('click', function(){
+                sidebar.classList.toggle('open');
+            });
+        }
+    })();
+    </script>
+</body>
+</html>

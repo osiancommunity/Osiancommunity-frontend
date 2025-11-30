@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - My Quiz Progress</title>
+    <link rel="stylesheet" href="style-dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="dashboard-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-user.html" class="logo">OSIAN</a>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard-user.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li class="active"><a href="quiz-progress.html"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
+              <li><a href="mentorship-user.html"><i class='bx bx-video'></i><span>Mentorship</span></a></li>
+                 <li><a href="notifications.html"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
+                <li><a href="profile.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+
+                </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+                <div class="support-chat">
+                    <i class='bx bx-support'></i>
+                    <div>
+                        <strong>Support 24/7</strong>
+                        <p>Need help? Super Chat</p>
+                    </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>My Quiz Progress</h1>
+                    <p>Track your scores, attempts, and performance over time.</p>
+                </div>
+                <div class="header-profile">
+                    <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
+                    <a href="profile.html"><img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar"></a>
+                </div>
+            </header>
+
+            <section class="kpi-grid-user">
+                <div class="kpi-card-user">
+                    <i class='bx bx-file-blank'></i>
+                    <div class="card-info">
+                        <h2>14</h2>
+                        <p>Quizzes Attempted</p>
+                    </div>
+                </div>
+                <div class="kpi-card-user">
+                    <i class='bx bx-check-double'></i>
+                    <div class="card-info">
+                        <h2>9</h2>
+                        <p>Quizzes Passed</p>
+                    </div>
+                </div>
+                <div class="kpi-card-user">
+                    <i class='bx bxs-bar-chart-alt-2'></i>
+                    <div class="card-info">
+                        <h2>82%</h2>
+                        <p>Average Score</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Registered Quizzes Section -->
+            <section class="content-card full-width-table">
+                <h3>My Registered Quizzes</h3>
+                <div class="quiz-grid" id="registered-quizzes">
+                    <!-- Registered quizzes will be loaded here -->
+                </div>
+                <div class="table-controls" style="margin-top:12px;display:flex;align-items:center;gap:12px;">
+                    <button class="btn-edit" id="reg-prev">Prev</button>
+                    <span id="reg-page-info">Page 1 of 1</span>
+                    <button class="btn-edit" id="reg-next">Next</button>
+                </div>
+            </section>
+
+            <!-- Quiz History Section -->
+            <section class="content-card full-width-table">
+                <h3>My Quiz History</h3>
+                <table class="quiz-history-table">
+                    <thead>
+                        <tr>
+                            <th>Quiz Title</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Date Attempted</th>
+                            <th>Score</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quiz-history-body">
+                        <!-- Quiz history will be loaded here -->
+                    </tbody>
+                </table>
+                <div class="table-controls" style="margin-top:12px;display:flex;align-items:center;gap:12px;">
+                    <button class="btn-edit" id="hist-prev">Prev</button>
+                    <span id="hist-page-info">Page 1 of 1</span>
+                    <button class="btn-edit" id="hist-next">Next</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard-user.html" id="nav-dashboard"><i class='bx bxs-dashboard'></i><span>Home</span></a>
+        <a href="quiz-progress.html" id="nav-quizzes"><i class='bx bx-file-blank'></i><span>Quizzes</span></a>
+        <a href="mentorship-user.html" id="nav-mentorship"><i class='bx bx-video'></i><span>Mentor</span></a>
+        <a href="notifications.html" id="nav-notifs"><i class='bx bx-bell'></i><span>Alerts</span></a>
+        <a href="profile.html" id="nav-profile"><i class='bx bxs-user'></i><span>Profile</span></a>
+    </div>
+
+   <script src="script-quiz-progress.js"></script>
+   <script>
+   (function(){
+       var el = document.getElementById('nav-quizzes');
+       if (el) el.classList.add('active');
+   })();
+   </script>
+   <script>
+   (function(){
+       const toggle = document.getElementById('sidebar-toggle');
+       const sidebar = document.querySelector('.sidebar');
+       if (toggle && sidebar) {
+           toggle.addEventListener('click', function(){
+               sidebar.classList.toggle('open');
+           });
+       }
+   })();
+   </script>
+</body>
+</html>

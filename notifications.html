@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - Notifications</title>
+    <link rel="stylesheet" href="style-dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        .notification-list-page {
+            list-style: none;
+            padding: 0;
+        }
+        .notification-item {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--primary-color);
+        }
+        .notification-item h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .notification-item p {
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+        .notification-item .timestamp {
+            font-size: 12px;
+            color: var(--text-light);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-user.html" class="logo">OSIAN</a>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard-user.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li><a href="quiz-progress.html"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
+               <li><a href="mentorship-user.html"><i class='bx bx-video'></i><span>Mentorship</span></a></li>
+                <li class="active"><a href="notifications.html" class="active"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
+                 <li><a href="profile.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+
+            </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Notifications</h1>
+                    <p>Stay updated with the latest announcements and system messages.</p>
+                </div>
+                <div class="header-profile">
+                    <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
+                </div>
+            </header>
+
+            <ul class="notification-list-page" id="notification-list-container">
+                <!-- Notifications will be loaded here by JavaScript -->
+            </ul>
+        </main>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard-user.html" id="nav-dashboard"><i class='bx bxs-dashboard'></i><span>Home</span></a>
+        <a href="quiz-progress.html" id="nav-quizzes"><i class='bx bx-file-blank'></i><span>Quizzes</span></a>
+        <a href="mentorship-user.html" id="nav-mentorship"><i class='bx bx-video'></i><span>Mentor</span></a>
+        <a href="notifications.html" id="nav-notifs"><i class='bx bx-bell'></i><span>Alerts</span></a>
+        <a href="profile.html" id="nav-profile"><i class='bx bxs-user'></i><span>Profile</span></a>
+    </div>
+
+    <script src="script-notifications.js"></script>
+    <script>
+    (function(){
+        var el = document.getElementById('nav-notifs');
+        if (el) el.classList.add('active');
+    })();
+    </script>
+    <script>
+    (function(){
+        const toggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        if (toggle && sidebar) {
+            toggle.addEventListener('click', function(){
+                sidebar.classList.toggle('open');
+            });
+        }
+    })();
+    </script>
+</body>
+</html>

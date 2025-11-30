@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - Admin Panel</title>
+    <link rel="stylesheet" href="style-admin.css"> 
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="admin-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-admin.html" class="logo">OSIAN</a>
+                <span class="logo-tag">Admin</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active"><a href="dashboard-admin.html" class="active"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li><a href="create-quiz.html"><i class='bx bxs-file-plus'></i><span>Create New Quiz</span></a></li>
+                <li><a href="my-quizzes.html"><i class='bx bxs-file-blank'></i><span>My Quizzes</span></a></li>
+                <li><a href="quiz-results.html"><i class='bx bxs-bar-chart-alt-2'></i><span>Quiz Results</span></a></li>
+                <li><a href="profile-admin.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Admin Dashboard</h1>
+                    <p>Manage your quizzes and track their performance.</p>
+                </div>
+                <div class="header-profile">
+                    <a href="create-quiz.html" class="btn-create"><i class='bx bx-plus'></i> Create New Quiz</a>
+                    <img src="https://via.placeholder.com/40" alt="Admin Profile Picture">
+                    <span>Admin User</span>
+                </div>
+            </header>
+
+            <section class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="card-icon blue">
+                        <i class='bx bx-file-blank'></i>
+                    </div>
+                    <div class="card-info">
+                        <h2 id="kpi-total-quizzes">0</h2>
+                        <p>Total Quizzes Created</p>
+                        <span class="change positive">+15% this month</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="card-icon purple">
+                        <i class='bx bx-broadcast'></i>
+                    </div>
+                    <div class="card-info">
+                        <h2 id="kpi-active-quizzes">0</h2>
+                        <p>Active Quizzes</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="card-icon green">
+                        <i class='bx bx-user-check'></i>
+                    </div>
+                    <div class="card-info">
+                        <h2 id="kpi-total-participants">0</h2>
+                        <p>Total Participants</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="card-icon orange">
+                        <i class='bx bx-dollar-circle'></i>
+                    </div>
+                    <div class="card-info">
+                        <h2 id="kpi-paid-quizzes">0</h2>
+                        <p>Paid Quizzes</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-grid">
+                
+                <div class="content-card large">
+                    <h3>My Recent Quizzes</h3>
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Registered Users</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Technical Quiz #008</td>
+                                <td>Technical</td>
+                                <td><span class="role-tag user">Live</span></td>
+                                <td>800 / 1000</td>
+                                <td>Active</td>
+                                <td><button class="btn-edit">View Results</button></td>
+                            </tr>
+                            <tr>
+                                <td>Law Fundamentals</td>
+                                <td>Law</td>
+                                <td><span class="role-tag admin">Paid</span></td>
+                                <td>450 / 500</td>
+                                <td>Active</td>
+                                <td><button class="btn-edit">View Results</button></td>
+                            </tr>
+                            <tr>
+                                <td>GK Quiz #012</td>
+                                <td>General Knowledge</td>
+                                <td><span class="role-tag">Upcoming</span></td>
+                                <td>250</td>
+                                <td>Upcoming</td>
+                                <td><button class="btn-edit">View Details</button></td>
+                            </tr>
+                            <tr>
+                                <td>Sports Trivia</td>
+                                <td>Sports</td>
+                                <td><span class="role-tag" style="background: #777;">Draft</span></td>
+                                <td>0</td>
+                                <td>Draft</td>
+                                <td><button class="btn-edit">Edit</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="content-card medium">
+                    <h3>Quiz Performance Overview</h3>
+                    <div class="chart-placeholder">
+                        <img src="https://via.placeholder.com/400x200/f0f2f5/333?text=Quiz+Participation+Chart" alt="Quiz Performance Chart Placeholder">
+                    </div>
+                </div>
+                
+            </section>
+        </main>
+    </div>
+
+    <script src="script-admin.js"></script>
+</body>
+</html>

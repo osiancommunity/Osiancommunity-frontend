@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - Create Notification</title>
+    <link rel="stylesheet" href="style-admin.css"> 
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="admin-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-superadmin.html" class="logo">OSIAN</a>
+                <span class="logo-tag">Super Admin</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard-superadmin.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li><a href="user-management.html"><i class='bx bxs-user-detail'></i><span>User Management</span></a></li>
+                <li><a href="admin-management.html"><i class='bx bxs-user-account'></i><span>Admin Management</span></a></li>                <li class="active"><a href="create-notification.html" class="active"><i class='bx bxs-bell'></i><span>Notifications</span></a></li>
+                <li><a href="mentorship.html"><i class='bx bxs-video'></i><span>Mentorship Videos</span></a></li>
+                <li><a href="contact-us-admin.html"><i class='bx bxs-contact'></i><span>Contact Us Page</span></a></li>
+                <li><a href="site-analytics.html"><i class='bx bxs-bar-chart-alt-2'></i><span>Site Analytics</span></a></li>
+                <li><a href="super-admin-profile.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Create New Notification</h1>
+                    <p>Send a message to all users, all admins, or both.</p>
+                </div>
+            </header>
+
+            <div class="content-card full-page">
+                <h3>Notification Composer</h3>
+                <form id="notification-form">
+                    <div class="form-group">
+                        <label for="recipient">Select Recipients</label>
+                        <select id="recipient" required>
+                            <option value="all">All Users & Admins</option>
+                            <option value="users">Only Users</option>
+                            <option value="admins">Only Admins</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Notification Subject / Title</label>
+                        <input type="text" id="subject" required placeholder="e.g., System Update Scheduled">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message Content</label>
+                        <textarea id="message" required rows="6" placeholder="Enter the full notification message here..."></textarea>
+                    </div>
+                    
+                    <button class="btn-submit btn-create" type="submit" style="margin-top: 20px;">
+                        <i class='bx bx-send'></i> Send Notification Now
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+    <script src="script-notification-admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - User Dashboard</title>
+    <link rel="stylesheet" href="style-dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="dashboard-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-user.html" class="logo">OSIAN</a>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active"><a href="dashboard-user.html" class="active"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li><a href="quiz-progress.html"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
+               <li><a href="mentorship-user.html"><i class='bx bx-video'></i><span>Mentorship</span></a></li>
+                <li><a href="notifications.html"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
+             <li><a href="profile.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+
+            </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+                <div class="support-chat">
+                    <i class='bx bx-support'></i>
+                    <div>
+                        <strong>Support 24/7</strong>
+                        <p>Need help? Super Chat</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Welcome Back, User!</h1>
+                    <p>Let's find a quiz for you</p>
+                </div>
+                <div class="header-profile">
+                    <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
+                    <a href="profile.html"><img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar"></a>
+                </div>
+            </header>
+
+            <!-- New Category-Based Sections -->
+            <section class="quiz-list-section" id="technical-section">
+                <h2><i class='bx bx-code-alt'></i> Technical Quizzes</h2>
+                <div class="quiz-list-grid" id="technical-quizzes-container">
+                    <p>Loading quizzes...</p>
+                </div>
+            </section>
+
+            <section class="quiz-list-section" id="gk-section">
+                <h2><i class='bx bx-brain'></i> General Knowledge Quizzes</h2>
+                <div class="quiz-list-grid" id="gk-quizzes-container">
+                    <p>Loading quizzes...</p>
+                </div>
+            </section>
+
+            <section class="quiz-list-section" id="engineering-section">
+                <h2><i class='bx bx-building-house'></i> Engineering Quizzes</h2>
+                <div class="quiz-list-grid" id="engineering-quizzes-container">
+                    <p>Loading quizzes...</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard-user.html" id="nav-dashboard"><i class='bx bxs-dashboard'></i><span>Home</span></a>
+        <a href="quiz-progress.html" id="nav-quizzes"><i class='bx bx-file-blank'></i><span>Quizzes</span></a>
+        <a href="mentorship-user.html" id="nav-mentorship"><i class='bx bx-video'></i><span>Mentor</span></a>
+        <a href="notifications.html" id="nav-notifs"><i class='bx bx-bell'></i><span>Alerts</span></a>
+        <a href="profile.html" id="nav-profile"><i class='bx bxs-user'></i><span>Profile</span></a>
+    </div>
+
+    <script src="script-dashboard.js"></script>
+    <script>
+    (function(){
+        var el = document.getElementById('nav-dashboard');
+        if (el) el.classList.add('active');
+    })();
+    </script>
+    <script>
+    (function(){
+        const toggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        if (toggle && sidebar) {
+            toggle.addEventListener('click', function(){
+                sidebar.classList.toggle('open');
+            });
+        }
+    })();
+    </script>
+</body>
+</html>

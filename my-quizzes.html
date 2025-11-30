@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - My Quizzes</title>
+    <link rel="stylesheet" href="style-admin.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="admin-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-admin.html" class="logo">OSIAN</a>
+                <span class="logo-tag">Admin</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard-admin.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li><a href="create-quiz.html"><i class='bx bxs-file-plus'></i><span>Create New Quiz</span></a></li>
+                <li class="active"><a href="my-quizzes.html" class="active"><i class='bx bxs-file-blank'></i><span>My Quizzes</span></a></li>
+                <li><a href="quiz-results.html"><i class='bx bxs-bar-chart-alt-2'></i><span>Quiz Results</span></a></li>
+                <li><a href="profile-admin.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>My Quizzes</h1>
+                    <p>Manage and track all your created quizzes.</p>
+                </div>
+                <div class="header-profile">
+                    <a href="create-quiz.html" class="btn-create"><i class='bx bx-plus'></i> Create New Quiz</a>
+                    <img src="https://via.placeholder.com/40" alt="Admin Profile Picture">
+                    <span>Admin User</span>
+                </div>
+            </header>
+
+            <section class="content-card full-page">
+                <div class="table-controls">
+                    <div class="search-bar">
+                        <i class='bx bx-search'></i>
+                        <input type="text" placeholder="Search quizzes..." id="search-input">
+                    </div>
+                    <div class="filter-group">
+                        <label for="status-filter">Filter by Status:</label>
+                        <select id="status-filter">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="upcoming">Upcoming</option>
+                            <option value="draft">Draft</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <table class="full-page-table" id="quizzes-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Registered Users</th>
+                            <th>Status</th>
+                            <th>Schedule Time</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Quizzes will be loaded here -->
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <span class="page-info" id="page-info">Page 1 of 1</span>
+                    <button class="page-btn" id="prev-btn" disabled>Previous</button>
+                    <button class="page-btn" id="next-btn" disabled>Next</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="script-my-quizzes.js"></script>
+</body>
+</html>

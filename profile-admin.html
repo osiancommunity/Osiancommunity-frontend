@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - Admin Panel</title>
+    <link rel="stylesheet" href="style-admin.css"> 
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="admin-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-admin.html" class="logo">OSIAN</a>
+                <span class="logo-tag">Admin</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard-admin.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li><a href="create-quiz.html"><i class='bx bxs-file-plus'></i><span>Create New Quiz</span></a></li>
+                <li><a href="my-quizzes.html"><i class='bx bxs-file-blank'></i><span>My Quizzes</span></a></li>
+                <li><a href="quiz-results.html"><i class='bx bxs-bar-chart-alt-2'></i><span>Quiz Results</span></a></li>
+                <li class="active"><a href="profile-admin.html" class="active"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Admin User Profile</h1>
+                    <p>Manage your account settings and view your statistics.</p>
+                </div>
+                <div class="header-profile">
+                    <a href="profile-admin.html"><img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar"></a>
+                </div>
+            </header>
+
+            <div class="profile-grid">
+            <!-- 1. User Profile Card -->
+            <section class="profile-card">
+                <div class="profile-header">
+                    <label for="avatar-upload" class="avatar-label">
+                        <img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="User Avatar" id="profile-avatar">
+                        <div class="avatar-overlay"><i class='bx bx-camera'></i></div>
+                    </label>
+                    <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                    <h2 id="profile-name">Diljot Singh</h2>
+                    <p id="profile-username">@diljotsingh</p>
+                    <button id="change-pic-btn" class="btn btn-secondary">Change Picture</button>
+                </div>
+                <div class="profile-bio">
+                    <p>Quiz enthusiast and lifelong learner. Ready to take on any challenge!</p>
+                </div>
+            </section>
+            <!-- 3. Account Settings -->
+            <section class="profile-settings">
+                <h3>Account Settings</h3>
+                <form id="settings-form">
+                    <!-- Common Fields -->
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" readonly>
+                        <small>Email cannot be changed.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">Mobile No</label>
+                        <input type="tel" id="mobile" name="mobile" placeholder="Enter your mobile number">
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" name="city" placeholder="Enter your city">
+                    </div>
+
+                    <!-- Admin-Specific Fields -->
+                    <div id="admin-fields" class="role-specific-fields">
+                        <div class="form-group"><label for="organization">Organization</label><input type="text" id="organization" name="organization" placeholder="Enter your organization"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+                <p id="form-status"></p>
+            </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="script-profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - Contact Us</title>
+    <link rel="stylesheet" href="style-dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="dashboard-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard-user.html" class="logo">OSIAN</a>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard-user.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+                <li><a href="live-quizzes.html"><i class='bx bx-book-content'></i><span>Live Quizzes</span></a></li>
+                <li><a href="#"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
+                <li><a href="#"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
+                <li class="active"><a href="contact.html" class="active"><i class='bx bx-support'></i><span>Contact & Support</span></a></li>
+                <li><a href="profile.html"><i class='bx bx-user'></i><span>Profile</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="login.html" class="logout-btn">
+                    <i class='bx bx-log-out'></i><span>Log Out</span>
+                </a>
+                <div class="support-chat">
+                    <i class='bx bx-support'></i>
+                    <div>
+                        <strong>Support 24/7</strong>
+                        <p>Need help? Super Chat</p>
+                    </div>
+                </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Contact & Support</h1>
+                    <p>Have questions? We're here to help.</p>
+                </div>
+                <div class="header-profile">
+                    <input type="text" placeholder="Search...">
+                    <i class='bx bx-search'></i>
+                    <img src="https://via.placeholder.com/40" alt="Profile Picture">
+                </div>
+            </header>
+
+            <section class="contact-container">
+                
+                <div class="content-card contact-details-card">
+                    <h3>Contact Information</h3>
+                    <p>Get in touch with us through the following channels. (These details are managed by the Super Admin).</p>
+                    <ul class="contact-list">
+                        <li>
+                            <i class='bx bxs-envelope'></i>
+                            <div>
+                                <strong>Email</strong>
+                                <p>support@osian.com</p>
+                            </div>
+                        </li>
+                        <li>
+                            <i class='bx bxs-phone'></i>
+                            <div>
+                                <strong>Phone</strong>
+                                <p>+1 234 567 890</p>
+                            </div>
+                        </li>
+                        <li>
+                            <i class='bx bxs-map'></i>
+                            <div>
+                                <strong>Address</strong>
+                                <p>123 Quiz Street, Knowledge City, IN</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="content-card contact-form-card">
+                    <h3>Super Chat</h3>
+                    <p>Send a message directly to the Super Admin team.</p>
+                    <form id="super-chat-form">
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" placeholder="What is your query about?" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" rows="8" placeholder="Please describe your issue or query in detail..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-save" style="width: 100%; text-align: center;">Send Message</button>
+                    </form>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="script-contact.js"></script>
+</body>
+</html>
