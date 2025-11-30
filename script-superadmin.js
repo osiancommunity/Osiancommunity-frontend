@@ -74,6 +74,16 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         });
     }
 
+    const headerLogout = document.getElementById('header-logout');
+    if (headerLogout) {
+        headerLogout.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        });
+    }
+
     // --- 3. Fetch Dashboard Statistics (KPIs) ---
     // (Existing code to fetch data and populate KPI cards goes here)
     

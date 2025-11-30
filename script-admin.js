@@ -29,6 +29,16 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         });
     }
 
+    const headerLogout = document.getElementById('header-logout');
+    if (headerLogout) {
+        headerLogout.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        });
+    }
+
     // --- Fetch and Display Recent Quizzes ---
     const recentQuizzesTableBody = document.querySelector('.user-table tbody');
 
