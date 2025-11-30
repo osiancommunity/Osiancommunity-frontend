@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-    // Define the location of your backend
-const backendUrl = 'http://localhost:5000/api';
+    const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osiancommunity-backend.vercel.app/api' : 'http://localhost:5000/api';
 
     // --- Authentication ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -186,5 +185,15 @@ const backendUrl = 'http://localhost:5000/api';
     checkoutForm.style.display = 'none'; 
     getRazorpayKey().then(() => {
         createPaymentOrder();
+    });
+
+    const logoutButtons = document.querySelectorAll('.logout-btn');
+    logoutButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        });
     });
 });
