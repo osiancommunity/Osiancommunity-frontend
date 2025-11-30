@@ -1,7 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
     
     // Define the location of your backend
+<<<<<<< HEAD
 const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osiancommunity-backend.vercel.app/api' : 'http://localhost:5000/api';
+=======
+const backendUrl = 'http://localhost:5000/api';
+>>>>>>> d43daba (feat(auth): harden registration, add diagnostics; dev routing guard; bcryptjs consistency; demo user creation)
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -61,10 +65,20 @@ const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osianco
                 return;
             }
 
-            // NEW: Populate category-based sections
-            renderQuizzes(data.categories.technical, 'technical-quizzes-container', 'technical-section');
-            renderQuizzes(data.categories.gk, 'gk-quizzes-container', 'gk-section');
-            renderQuizzes(data.categories.engineering, 'engineering-quizzes-container', 'engineering-section');
+            // Featured Paid
+            if (data.featured && Array.isArray(data.featured.paid)) {
+                renderQuizzes(data.featured.paid, 'paid-quizzes-container', 'paid-section');
+            }
+
+            // Populate category-based sections (include all known categories)
+            const cat = data.categories || {};
+            renderQuizzes(cat.technical, 'technical-quizzes-container', 'technical-section');
+            renderQuizzes(cat.gk, 'gk-quizzes-container', 'gk-section');
+            renderQuizzes(cat.engineering, 'engineering-quizzes-container', 'engineering-section');
+            renderQuizzes(cat.sports, 'sports-quizzes-container', 'sports-section');
+            renderQuizzes(cat.coding, 'coding-quizzes-container', 'coding-section');
+            renderQuizzes(cat.law, 'law-quizzes-container', 'law-section');
+            renderQuizzes(cat.studies, 'studies-quizzes-container', 'studies-section');
 
         } catch (error) {
             console.error('Error fetching quizzes:', error);
