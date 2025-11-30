@@ -93,10 +93,18 @@ const backendUrl = 'http://localhost:5000/api';
             document.querySelector('.quiz-info h3').textContent = currentQuizData.title;
             timeLeftDisplay.textContent = `${currentQuizData.duration}:00`;
 
-            // Enable start button
+            // Enforce schedule: disable start until scheduled time
+            const now = Date.now();
+            const startAt = currentQuizData.scheduleTime ? new Date(currentQuizData.scheduleTime).getTime() : now;
             isLoading = false;
-            startQuizBtn.disabled = false;
-            startQuizBtn.textContent = 'I Understand, Start the Quiz';
+            if (startAt > now) {
+                startQuizBtn.disabled = true;
+                const dt = new Date(startAt);
+                startQuizBtn.textContent = `Starts at ${dt.toLocaleString()}`;
+            } else {
+                startQuizBtn.disabled = false;
+                startQuizBtn.textContent = 'I Understand, Start the Quiz';
+            }
 
         } catch (error) {
             console.error('Error loading quiz:', error);
@@ -294,11 +302,6 @@ const backendUrl = 'http://localhost:5000/api';
         // Show the correct modal
         if (wasAutoSubmitted) {
             autoSubmitModal.classList.add('active');
-            const heading = autoSubmitModal.querySelector('h2');
-            const paras = autoSubmitModal.querySelectorAll('p');
-            if (heading) heading.textContent = 'Quiz Auto-Submitted';
-            if (paras && paras[0]) paras[0].textContent = `Quiz auto-submitted because: ${reason || 'Policy violation'}.`;
-            if (paras && paras[1]) paras[1].textContent = 'You cannot re-take this quiz. Please return to the dashboard.';
         } else {
             // Show a "submitting" message in the final modal
             finalSubmitModal.classList.add('active');
