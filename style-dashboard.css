@@ -49,6 +49,26 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
+.auth-links {
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+.auth-links a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+.auth-links a:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
 .logo {
     font-size: 28px;
     font-weight: 700;

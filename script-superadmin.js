@@ -66,7 +66,6 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // Handle Logout
     const logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) {
-        logoutBtn.style.display = 'none';
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             localStorage.removeItem('token');
