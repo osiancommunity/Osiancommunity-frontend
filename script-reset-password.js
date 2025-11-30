@@ -28,7 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const base = (location.hostname.endsWith('vercel.app') ? 'https://osiancommunity-backend.vercel.app' : 'http://localhost:5000');
+            const isProd = (location.hostname.endsWith('vercel.app') || location.hostname.endsWith('github.io') || location.hostname.includes('osiancommunity'));
+            const base = isProd ? 'https://osiancommunity-backend.vercel.app' : 'http://localhost:5000';
             const response = await fetch(base + '/api/auth/reset-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
