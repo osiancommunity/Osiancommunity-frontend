@@ -1,12 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-const backendUrl = 'http://localhost:5000/api';
+const backendUrl = (location.hostname.endsWith('vercel.app'))
+  ? 'https://osiancommunity-backend.vercel.app/api'
+  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:5000/api'
+      : 'https://osiancommunity-backend.vercel.app/api');
 
   // Periodically refresh the JWT token to prevent session expiration
   async function refreshToken() {
     const token = localStorage.getItem('token');
-    if (!token) {
-      return; // No token to refresh
-    }
+    if (!token) return;
 
     try {
       const response = await fetch(`${backendUrl}/auth/refresh-token`, {
@@ -19,23 +21,20 @@ const backendUrl = 'http://localhost:5000/api';
 
       if (response.ok) {
         const data = await response.json();
-        if (data.token) {
+        if (data && data.token) {
           localStorage.setItem('token', data.token);
-          console.log('Token refreshed successfully');
-        } else {
-          console.warn('No token received on refresh');
         }
-      } else {
-        console.warn('Token refresh failed, clearing token');
+        return;
+      }
+
+      // Only force logout on explicit 401; otherwise ignore to avoid breaking the session
+      if (response.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = 'login.html';
       }
-    } catch (error) {
-      console.error('Error refreshing token:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = 'login.html';
+    } catch (_) {
+      // Network or endpoint missing: do nothing
     }
   }
 
