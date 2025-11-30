@@ -36,7 +36,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             e.preventDefault();
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         });
     });
 
@@ -46,7 +46,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             e.preventDefault();
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         });
     }
 
