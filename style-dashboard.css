@@ -24,7 +24,6 @@ body {
     background-color: var(--secondary-color);
 }
 
-.logout-btn { display: none !important; }
 
 .dashboard-container {
     display: flex;

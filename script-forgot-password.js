@@ -23,13 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: emailInput.value })
             });
-            if (response.status === 404) {
-                response = await fetch(`${backendUrl}/forgot-password`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: emailInput.value })
-                });
-            }
+            
             const result = await response.json();
             if (!response.ok) {
                 throw new Error(result.message || 'An error occurred.');
@@ -62,17 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     newPassword: newPasswordInput.value
                 })
             });
-            if (response.status === 404) {
-                response = await fetch(`${backendUrl}/reset-password`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: emailInput.value,
-                        otp: otpInput.value,
-                        newPassword: newPasswordInput.value
-                    })
-                });
-            }
             const result = await response.json();
             formStatus.textContent = result.message || 'Done';
             if (response.ok) {

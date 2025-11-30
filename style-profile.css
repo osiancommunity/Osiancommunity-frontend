@@ -21,7 +21,6 @@ body {
     color: var(--text-color);
 }
 
-.logout-btn { display: none !important; }
 
 /* General Button Styles from other CSS files for consistency */
 .btn {
