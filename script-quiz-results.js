@@ -505,11 +505,7 @@ async function fetchAllResults() {
 
     // --- Global Functions for Buttons ---
     window.viewDetailedResult = async function(resultId) {
-<<<<<<< HEAD
-        const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osiancommunity-backend.vercel.app/api' : 'http://localhost:5000/api';
-=======
-        const backendUrl = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:5000/api' : '/api';
->>>>>>> d43daba (feat(auth): harden registration, add diagnostics; dev routing guard; bcryptjs consistency; demo user creation)
+        
         const token = localStorage.getItem('token');
         const modal = document.getElementById('result-modal');
         const modalBody = document.getElementById('result-modal-body');

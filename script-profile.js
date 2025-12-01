@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-    const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
+    const backendUrl = (location.hostname.endsWith('vercel.app'))
+      ? 'https://osiancommunity-backend.vercel.app/api'
+      : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+          ? 'http://localhost:5000/api'
+          : 'https://osiancommunity-backend.vercel.app/api');
 
     const settingsForm = document.getElementById('settings-form');
     const formStatus = document.getElementById('form-status');
@@ -24,12 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizzesTaken = document.getElementById('quizzes-taken');
     const winRate = document.getElementById('win-rate');
     const totalPoints = document.getElementById('total-points');
-    const sendPasswordOtpBtn = document.getElementById('send-password-otp');
-    const changePasswordOtpBtn = document.getElementById('change-password-otp-btn');
-    const otpPasswordStatus = document.getElementById('otp-password-status');
-    const resetOtpInput = document.getElementById('reset-otp');
-    const resetNewPasswordInput = document.getElementById('reset-new-password');
-    const resetConfirmPasswordInput = document.getElementById('reset-confirm-password');
 
     // Default data if nothing is in localStorage
     const defaultData = {
@@ -309,67 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    if (sendPasswordOtpBtn) {
-        sendPasswordOtpBtn.addEventListener('click', async () => {
-            const token = localStorage.getItem('token');
-            if (!token) { window.location.href = 'login.html'; return; }
-            sendPasswordOtpBtn.disabled = true;
-            otpPasswordStatus.textContent = 'Sending OTP...';
-            otpPasswordStatus.style.color = 'inherit';
-            try {
-                const resp = await fetch(`${backendUrl}/auth/request-password-otp`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
-                });
-                const data = await resp.json();
-                if (!resp.ok) throw new Error(data.message || 'Failed to send OTP');
-                otpPasswordStatus.textContent = 'OTP sent. Check your email.';
-                otpPasswordStatus.style.color = 'green';
-            } catch (err) {
-                otpPasswordStatus.textContent = `Error: ${err.message}`;
-                otpPasswordStatus.style.color = 'red';
-            } finally {
-                sendPasswordOtpBtn.disabled = false;
-            }
-        });
-    }
-
-    if (changePasswordOtpBtn) {
-        changePasswordOtpBtn.addEventListener('click', async () => {
-            const token = localStorage.getItem('token');
-            if (!token) { window.location.href = 'login.html'; return; }
-            const otpVal = resetOtpInput ? resetOtpInput.value.trim() : '';
-            const newPass = resetNewPasswordInput ? resetNewPasswordInput.value : '';
-            const confirmPass = resetConfirmPasswordInput ? resetConfirmPasswordInput.value : '';
-            if (!otpVal || otpVal.length !== 6) { otpPasswordStatus.textContent = 'Enter a valid 6-digit OTP.'; otpPasswordStatus.style.color = 'red'; return; }
-            if (!newPass || newPass.length < 6) { otpPasswordStatus.textContent = 'Password must be at least 6 characters.'; otpPasswordStatus.style.color = 'red'; return; }
-            if (newPass !== confirmPass) { otpPasswordStatus.textContent = 'Passwords do not match.'; otpPasswordStatus.style.color = 'red'; return; }
-            changePasswordOtpBtn.disabled = true;
-            changePasswordOtpBtn.textContent = 'Changing...';
-            otpPasswordStatus.textContent = '';
-            try {
-                const resp = await fetch(`${backendUrl}/auth/change-password-otp`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ otp: otpVal, newPassword: newPass })
-                });
-                const data = await resp.json();
-                if (!resp.ok) throw new Error(data.message || 'Failed to change password');
-                otpPasswordStatus.textContent = 'Password changed successfully.';
-                otpPasswordStatus.style.color = 'green';
-                if (resetOtpInput) resetOtpInput.value = '';
-                if (resetNewPasswordInput) resetNewPasswordInput.value = '';
-                if (resetConfirmPasswordInput) resetConfirmPasswordInput.value = '';
-            } catch (err) {
-                otpPasswordStatus.textContent = `Error: ${err.message}`;
-                otpPasswordStatus.style.color = 'red';
-            } finally {
-                changePasswordOtpBtn.disabled = false;
-                changePasswordOtpBtn.textContent = 'Change Password';
-            }
-        });
-    }
-
     // Event listener for the new "Change Picture" button
     if(changePicBtn) changePicBtn.addEventListener('click', () => {
         if(avatarUpload) avatarUpload.click(); // Programmatically click the hidden file input
@@ -438,14 +374,4 @@ avatarUpload.addEventListener('change', async (e) => {
     const userRole = getRoleFromURL();
     updateSidebarLinks(userRole);
     loadUserData(userRole);
-
-    const logoutButtons = document.querySelectorAll('.logout-btn');
-    logoutButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = 'login.html';
-        });
-    });
 });

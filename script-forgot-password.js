@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailInput = document.getElementById('email');
     const formStatus = document.getElementById('form-status');
     const sendOtpBtn = document.getElementById('send-otp-btn');
+    const resendOtpBtn = document.getElementById('resend-otp-btn');
     const otpSection = document.getElementById('otp-section');
     const otpResetForm = document.getElementById('otp-reset-form');
     const otpInput = document.getElementById('otp');
@@ -14,27 +15,33 @@ document.addEventListener('DOMContentLoaded', () => {
         return isProd ? 'https://osiancommunity-backend.vercel.app' : 'http://localhost:5000';
     }
 
-    sendOtpBtn.addEventListener('click', async () => {
-        formStatus.textContent = 'Sending OTP...';
-        formStatus.style.color = '#555';
-        try {
-            const response = await fetch(apiBase() + '/api/auth/forgot-password-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: emailInput.value })
-            });
-            const result = await response.json();
-            if (!response.ok) {
-                throw new Error(result.message || 'An error occurred.');
+    function sendOtp() {
+        return (async () => {
+            formStatus.textContent = 'Sending OTP...';
+            formStatus.style.color = '#555';
+            try {
+                const response = await fetch(apiBase() + '/api/auth/forgot-password-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailInput.value })
+                });
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    // If server falls back to link-based reset
+                    const msg = (result && result.message) || 'Failed to send OTP. Please try again.';
+                    throw new Error(msg);
+                }
+                formStatus.textContent = 'If the email exists, a reset OTP has been sent. Check your inbox.';
+                formStatus.style.color = 'green';
+                otpSection.style.display = 'block';
+            } catch (error) {
+                formStatus.textContent = error.message;
+                formStatus.style.color = 'red';
             }
-            formStatus.textContent = result.message;
-            formStatus.style.color = 'green';
-            otpSection.style.display = 'block';
-        } catch (error) {
-            formStatus.textContent = error.message;
-            formStatus.style.color = 'red';
-        }
-    });
+        })();
+    }
+    sendOtpBtn.addEventListener('click', sendOtp);
+    if (resendOtpBtn) resendOtpBtn.addEventListener('click', sendOtp);
 
     otpResetForm.addEventListener('submit', async (e) => {
         e.preventDefault();
