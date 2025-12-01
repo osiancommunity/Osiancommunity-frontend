@@ -1,5 +1,15 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
+
     // Define the location of your backend API
 const backendUrl = (location.hostname.endsWith('vercel.app'))
   ? 'https://osiancommunity-backend.vercel.app/api'
@@ -18,7 +28,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     
     // --- FIX: Made the role check case-insensitive ---
     if (!token || !user || !user.role || user.role.toLowerCase() !== 'superadmin') {
-        alert('Access Denied: You do not have permission to view this page.');
+        showToast('Access Denied: You do not have permission to view this page.', 'warning');
         window.location.replace('login.html'); // Redirect to login
         return;
     }

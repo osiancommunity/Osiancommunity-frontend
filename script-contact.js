@@ -1,4 +1,13 @@
 document.addEventListener("DOMContentLoaded", function() {
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
 
     // --- Sidebar Active Link Logic ---
     // (This is already in script-dashboard.js, but if you want
@@ -29,10 +38,10 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("Subject:", subject);
             console.log("Message:", message);
 
-            alert('Your message has been sent to the Super Admin! (Demo)');
+            showToast('Your message has been sent to the Super Admin! (Demo)', 'success');
             chatForm.reset();
         } else {
-            alert('Please fill out all fields.');
+            showToast('Please fill out all fields.', 'warning');
         }
     });
 

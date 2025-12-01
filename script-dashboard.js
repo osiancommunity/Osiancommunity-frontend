@@ -1,4 +1,13 @@
 document.addEventListener("DOMContentLoaded", function() {
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
     
     // Define the location of your backend
 const backendUrl = (location.hostname.endsWith('vercel.app'))
@@ -60,7 +69,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             const notifyAt = startTs - 3600000;
             const key = `quizReminder_${q._id}_${startTs}`;
             if (now >= notifyAt && now < startTs && !localStorage.getItem(key)) {
-                alert(`Reminder: "${q.title}" starts at ${new Date(startTs).toLocaleString()}`);
+                showToast(`Reminder: "${q.title}" starts at ${new Date(startTs).toLocaleString()}`, 'info');
                 try { localStorage.setItem(key, '1'); } catch (_) {}
             }
         });
@@ -105,7 +114,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         } catch (error) {
             console.error('Error fetching quizzes:', error);
-            alert('Could not load quizzes. Server may be down.');
+            showToast('Could not load quizzes. Server may be down.', 'error');
         }
     }
     
@@ -202,7 +211,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             if (quizId) {
                 const pct = await getProfileCompleteness();
                 if (pct < 100) {
-                    alert('Please complete your profile 100% before purchasing paid quizzes.');
+                    showToast('Please complete your profile 100% before purchasing paid quizzes.', 'warning');
                     window.location.href = 'profile.html?role=user';
                     return;
                 }

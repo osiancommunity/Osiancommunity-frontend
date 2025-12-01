@@ -1,4 +1,13 @@
 document.addEventListener("DOMContentLoaded", function() {
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
 
     const backendUrl = (location.hostname.endsWith('vercel.app'))
         ? 'https://osiancommunity-backend.vercel.app/api'
@@ -10,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Security Check
     if (!token || !user || user.role.toLowerCase() !== 'superadmin') {
-        alert('Access Denied.');
+        showToast('Access Denied.', 'warning');
         window.location.href = 'login.html';
         return;
     }
@@ -55,12 +64,12 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             const result = await response.json();
-            alert('Notification sent successfully!');
+            showToast('Notification sent successfully!', 'success');
             form.reset();
 
         } catch (error) {
             console.error('Error sending notification:', error);
-            alert(`Error: ${error.message}`);
+            showToast(`Error: ${error.message}`, 'error');
         } finally {
             submitButton.disabled = false;
             submitButton.innerHTML = `<i class='bx bx-send'></i> Send Notification Now`;

@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
 const backendUrl = (location.hostname.endsWith('vercel.app'))
   ? 'https://osiancommunity-backend.vercel.app/api'
   : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
@@ -130,7 +139,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         } catch (error) {
             console.error('Error updating role:', error);
-            alert('Could not update user role. Please try again.');
+            showToast('Could not update user role. Please try again.', 'error');
         }
     };
 
@@ -154,7 +163,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         } catch (error) {
             console.error('Error updating status:', error);
-            alert('Could not update user status. Please try again.');
+            showToast('Could not update user status. Please try again.', 'error');
         }
     };
 
@@ -171,9 +180,21 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         if (e.target.classList.contains('toggle-status-btn')) {
             const userId = e.target.dataset.userid;
             const status = e.target.dataset.status;
-            if (confirm(`Are you sure you want to ${status === 'active' ? 'deactivate' : 'activate'} this user?`)) {
-                toggleUserStatus(userId, status);
+            function showToastConfirm(message, onConfirm){
+                let el = document.getElementById('osian-toast');
+                if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+                el.className = 'osian-toast warning';
+                el.innerHTML = `${message} <span class="actions"><button id="toast-confirm">Confirm</button> <button id="toast-cancel">Cancel</button></span>`;
+                el.classList.add('show');
+                const confirmBtn = document.getElementById('toast-confirm');
+                const cancelBtn = document.getElementById('toast-cancel');
+                const hide = ()=>{ el.classList.remove('show'); el.innerHTML=''; };
+                if (confirmBtn) confirmBtn.onclick = function(){ hide(); if (onConfirm) onConfirm(); };
+                if (cancelBtn) cancelBtn.onclick = function(){ hide(); };
             }
+            showToastConfirm(`Are you sure you want to ${status === 'active' ? 'deactivate' : 'activate'} this user?`, function(){
+                toggleUserStatus(userId, status);
+            });
         }
     });
 

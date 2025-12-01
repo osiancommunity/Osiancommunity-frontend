@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OSIAN - Quiz in Progress</title>
+    <link rel="preconnect" href="https://osiancommunity-backend.vercel.app">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="stylesheet" href="style-quiz.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
 </head>
 <body oncontextmenu="return false;">
 
@@ -100,6 +99,15 @@
         <div id="proctor-status"></div>
     </div>
 
+    <div id="proctor-loader" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <i class='bx bx-loader-circle'></i>
+            <h2>Preparing Quiz</h2>
+            <p>Initializing camera and security checks...</p>
+        </div>
+    </div>
+
+    <script src="script-toast-helper.js"></script>
     <script src="script-quiz.js"></script>
 </body>
 </html>

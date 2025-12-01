@@ -21,6 +21,11 @@
     --border-color: #e0e0e0;
     --white: #fff;
     --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    --toast-bg: #1f2937;
+    --toast-text: #fff;
+    --toast-success: #10b981;
+    --toast-error: #ef4444;
+    --toast-warning: #f59e0b;
 
     --blue: #3498db;
     --green: #2ecc71;
@@ -31,6 +36,25 @@
 body {
     background-color: var(--bg-color);
 }
+
+.osian-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    background: var(--toast-bg);
+    color: var(--toast-text);
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    display: none;
+    z-index: 9999;
+    max-width: 80vw;
+}
+.osian-toast.show { display: block; }
+.osian-toast.success { border-left: 4px solid var(--toast-success); }
+.osian-toast.error { border-left: 4px solid var(--toast-error); }
+.osian-toast.warning { border-left: 4px solid var(--toast-warning); }
 
 .admin-container {
     display: flex;

@@ -1,4 +1,13 @@
 document.addEventListener("DOMContentLoaded", function() {
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
     const backendUrl = (location.hostname.endsWith('vercel.app'))
       ? 'https://osiancommunity-backend.vercel.app/api'
       : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
@@ -9,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Authentication Check
     if (!token || !user || user.role !== 'user') {
-        alert('Access Denied. Please log in.');
+        showToast('Access Denied. Please log in.', 'warning');
         window.location.href = 'login.html';
         return;
     }
@@ -119,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         } catch (error) {
             console.error('Error loading profile:', error);
-            alert(`Could not load your profile: ${error.message}`);
+            showToast(`Could not load your profile: ${error.message}`, 'error');
         } // No finally block needed here as it's just loading
     }
 
@@ -129,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (file) {
             // Check file size (e.g., limit to 2MB)
             if (file.size > 2 * 1024 * 1024) {
-                alert('File is too large. Please select an image under 2MB.');
+                showToast('File is too large. Please select an image under 2MB.', 'warning');
                 return;
             }
             const reader = new FileReader();
@@ -191,11 +200,11 @@ document.addEventListener("DOMContentLoaded", function() {
             updatedUser.profile = result.user.profile; // Explicitly update profile object
             localStorage.setItem('user', JSON.stringify(updatedUser));
 
-            alert('Profile updated successfully!');
-            loadProfile(); // Refresh data on page
+            showToast('Profile updated successfully!', 'success');
+            loadProfile();
         } catch (error) {
             console.error('Error updating profile:', error);
-            alert('Failed to update profile. Please try again.');
+            showToast('Failed to update profile. Please try again.', 'error');
         } finally {
             saveButton.disabled = false;
             saveButton.textContent = 'Save Changes';
@@ -217,14 +226,14 @@ document.addEventListener("DOMContentLoaded", function() {
             const confirmNewPassword = document.getElementById('confirm-new-password').value;
 
             if (newPassword !== confirmNewPassword) {
-                alert('New passwords do not match.');
+                showToast('New passwords do not match.', 'warning');
                 passwordSaveButton.disabled = false;
                 passwordSaveButton.textContent = 'Update Password';
                 return;
             }
 
             if (newPassword.length < 6) {
-                alert('New password must be at least 6 characters long.');
+                showToast('New password must be at least 6 characters long.', 'warning');
                 passwordSaveButton.disabled = false;
                 passwordSaveButton.textContent = 'Update Password';
                 return;
@@ -255,11 +264,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     throw new Error(errorMessage);
                 }
 
-                alert('Password changed successfully!');
+                showToast('Password changed successfully!', 'success');
                 passwordForm.reset();
             } catch (error) {
                 console.error('Error changing password:', error);
-                alert(`Failed to change password: ${error.message}`);
+                showToast(`Failed to change password: ${error.message}`, 'error');
             } finally {
                 passwordSaveButton.disabled = false;
                 passwordSaveButton.textContent = 'Update Password';

@@ -6,6 +6,16 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         ? 'http://localhost:5000/api'
         : 'https://osiancommunity-backend.vercel.app/api');
 
+function showToast(message, type){
+    let el = document.getElementById('osian-toast');
+    if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+    el.className = 'osian-toast ' + (type || '');
+    el.textContent = message;
+    el.classList.add('show');
+    clearTimeout(el._hideTimer);
+    el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+}
+
     const registerForm = document.getElementById("register-form");
     const registerBtn = document.getElementById("register-btn");
     const otpSection = document.getElementById("otp-section");
@@ -24,12 +34,12 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         const confirmPassword = document.getElementById("confirm-password").value;
 
         if (password !== confirmPassword) {
-            alert("Passwords do not match!");
+            showToast("Passwords do not match!", 'warning');
             return;
         }
 
         if (password.length < 6) {
-            alert("Password must be at least 6 characters long!");
+            showToast("Password must be at least 6 characters long!", 'warning');
             return;
         }
 
@@ -52,7 +62,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             if (!response.ok) {
                 // Handle backend errors (e.g., email already in use)
-                alert(`Registration failed: ${data.message}`);
+                showToast(`Registration failed: ${data.message}`, 'error');
             } else {
                 // --- SUCCESS: Show OTP Section ---
                 currentUserId = data.userId;
@@ -63,7 +73,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         } catch (error) {
             console.error('Registration Error:', error);
-            alert('A network error occurred. Please ensure the backend server is running.');
+            showToast('A network error occurred. Please ensure the backend server is running.', 'error');
         } finally {
             registerBtn.disabled = false;
             registerBtn.textContent = "Register";
@@ -75,7 +85,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         const otp = document.getElementById('otp-input').value;
 
         if (!otp || otp.length !== 6) {
-            alert('Please enter a valid 6-digit OTP');
+            showToast('Please enter a valid 6-digit OTP', 'warning');
             return;
         }
 
@@ -95,14 +105,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             const data = await response.json();
 
             if (!response.ok) {
-                alert(`OTP verification failed: ${data.message}`);
+                showToast(`OTP verification failed: ${data.message}`, 'error');
             } else {
                 // --- SUCCESS: Save token and redirect based on role ---
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
 
                 const role = String((data.user && data.user.role) || 'user').toLowerCase();
-                alert('Registration and verification successful! Redirecting to Dashboard.');
+                showToast('Registration and verification successful! Redirecting to Dashboard.', 'success');
                 if (role === 'superadmin') {
                     window.location.href = 'dashboard-superadmin.html';
                 } else if (role === 'admin') {
@@ -114,7 +124,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         } catch (error) {
             console.error('OTP Verification Error:', error);
-            alert('A network error occurred during verification.');
+            showToast('A network error occurred during verification.', 'error');
         } finally {
             this.disabled = false;
             this.textContent = 'Verify OTP';
@@ -124,7 +134,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // --- Handle Resend OTP ---
     resendOtpBtn.addEventListener('click', async function() {
         if (!currentUserId) {
-            alert('No user ID available. Please register again.');
+            showToast('No user ID available. Please register again.', 'error');
             return;
         }
 
@@ -143,16 +153,16 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             const data = await response.json();
 
             if (!response.ok) {
-                alert(`Failed to resend OTP: ${data.message}`);
+                showToast(`Failed to resend OTP: ${data.message}`, 'error');
             } else {
-                alert('OTP sent successfully! Check your email.');
+                showToast('OTP sent successfully! Check your email.', 'success');
                 document.getElementById('otp-input').value = '';
                 document.getElementById('otp-input').focus();
             }
 
         } catch (error) {
             console.error('Resend OTP Error:', error);
-            alert('A network error occurred while resending OTP.');
+            showToast('A network error occurred while resending OTP.', 'error');
         } finally {
             this.disabled = false;
             this.textContent = 'Resend OTP';

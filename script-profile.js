@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
     const backendUrl = (location.hostname.endsWith('vercel.app'))
       ? 'https://osiancommunity-backend.vercel.app/api'
       : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
@@ -52,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('token');
         if (!token || token === 'profile') {
             // If token is missing or corrupted, force logout and redirect to login.
-            alert('Session expired or invalid token. Please login again.');
+            showToast('Session expired or invalid token. Please login again.', 'warning');
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = 'login.html';
@@ -317,9 +326,15 @@ avatarUpload.addEventListener('change', async (e) => {
         if (!file) return;
 
         // Validate file size before reading
-        const maxSizeBytes = 1048576; // 1MB
+        const maxSizeBytes = 1048576;
         if (file.size > maxSizeBytes) {
-            alert('File size exceeds 1MB limit. Please choose a smaller image.');
+            let el = document.getElementById('osian-toast');
+            if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+            el.className = 'osian-toast warning';
+            el.textContent = 'File size exceeds 1MB limit. Please choose a smaller image.';
+            el.classList.add('show');
+            clearTimeout(el._hideTimer);
+            el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
             e.target.value = ''; // Clear file input
             return;
         }
@@ -358,7 +373,13 @@ avatarUpload.addEventListener('change', async (e) => {
 
             } catch (error) {
                 console.error('Error updating avatar:', error);
-                alert('Failed to update avatar. Please try again.');
+                let el = document.getElementById('osian-toast');
+                if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+                el.className = 'osian-toast error';
+                el.textContent = 'Failed to update avatar. Please try again.';
+                el.classList.add('show');
+                clearTimeout(el._hideTimer);
+                el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
             }
         };
         reader.readAsDataURL(file);

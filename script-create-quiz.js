@@ -18,7 +18,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     // Security Check: Is user logged in and an admin?
     if (!token || !user || (user.role !== 'admin' && user.role !== 'superadmin')) {
-        alert("You are not authorized to view this page. Redirecting...");
+        showToast("You are not authorized to view this page. Redirecting...", 'warning');
         window.location.href = 'dashboard-user.html'; // or login.html
         return; // Stop the script
     }
@@ -106,7 +106,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 coverImageBase64 = canvas.toDataURL('image/jpeg', 0.9);
             };
             img.onerror = function() {
-                alert('Could not load image. Please ensure it is a valid image file.');
+                showToast('Could not load image. Please ensure it is a valid image file.', 'error');
                 quizCoverInput.value = '';
                 coverImageBase64 = null;
             };
@@ -239,7 +239,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             }
 
             if (questions.length === 0) {
-                alert("Please add at least one question.");
+                showToast("Please add at least one question.", 'warning');
             submitButton.disabled = false;
             submitButton.textContent = isEditing ? "Update Quiz" : "Create Quiz";
                 return;
@@ -262,13 +262,13 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             // Basic validation for required fields
             if (!quizData.title || !quizData.category || !quizData.quizType || !quizData.duration || !quizData.coverImage) {
-                alert('Please fill in all required quiz details and upload a cover image.');
+                showToast('Please fill in all required quiz details and upload a cover image.', 'warning');
                 submitButton.disabled = false;
                 submitButton.textContent = "Create Quiz";
                 return;
             }
             if (quizData.quizType === 'paid' && quizData.price <= 0) {
-                alert('Paid quizzes must have a price greater than 0.');
+                showToast('Paid quizzes must have a price greater than 0.', 'warning');
                 submitButton.disabled = false;
                 submitButton.textContent = "Create Quiz";
                 return;
@@ -289,7 +289,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             if (!response.ok) {
                 if (response.status === 401 || response.status === 403) {
-                    alert('Access denied. Please log in again.');
+                    showToast('Access denied. Please log in again.', 'warning');
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
                     window.location.href = 'login.html';
@@ -307,12 +307,12 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             }
 
             const data = await response.json();
-            alert(`Quiz ${isEditing ? 'updated' : 'created'} successfully!`);
+            showToast(`Quiz ${isEditing ? 'updated' : 'created'} successfully!`, 'success');
             window.location.href = 'my-quizzes.html'; // Redirect to quiz management list
 
         } catch (error) {
             console.error('Quiz Creation Error:', error);
-            alert(`Error creating quiz: ${error.message}`);
+            showToast(`Error creating quiz: ${error.message}`, 'error');
             submitButton.disabled = false;
             submitButton.textContent = "Create Quiz";
         }
@@ -329,14 +329,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    alert('Session expired. Please log in again.');
+                    showToast('Session expired. Please log in again.', 'warning');
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
                     window.location.href = 'login.html';
                     return;
                 }
                 if (response.status === 403) {
-                    alert('Access denied.');
+                    showToast('Access denied.', 'warning');
                     return;
                 }
                 throw new Error('Failed to load quiz for editing.');
@@ -441,7 +441,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         } catch (error) {
             console.error('Error loading quiz for editing:', error);
-            alert('Failed to load quiz for editing. Redirecting to create new quiz.');
+            showToast('Failed to load quiz for editing. Redirecting to create new quiz.', 'error');
             window.location.href = 'create-quiz.html';
         }
     }

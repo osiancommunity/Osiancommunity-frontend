@@ -1,5 +1,15 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
+
     // Define the location of your backend
 const backendUrl = (location.hostname.endsWith('vercel.app'))
   ? 'https://osiancommunity-backend.vercel.app/api'
@@ -176,7 +186,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // --- Global Functions for Buttons ---
     window.viewQuiz = function(quizId) {
         // Implement view quiz details
-        alert('View quiz functionality to be implemented');
+        showToast('View quiz details coming soon.', 'info');
     };
 
     window.editQuiz = function(quizId) {
@@ -187,8 +197,21 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         window.location.href = `quiz-results.html?quizId=${quizId}`;
     };
 
+    function showToastConfirm(message, onConfirm){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast warning';
+        el.innerHTML = `${message} <span class="actions"><button id="toast-confirm">Confirm</button> <button id="toast-cancel">Cancel</button></span>`;
+        el.classList.add('show');
+        const confirmBtn = document.getElementById('toast-confirm');
+        const cancelBtn = document.getElementById('toast-cancel');
+        const hide = ()=>{ el.classList.remove('show'); el.innerHTML=''; };
+        if (confirmBtn) confirmBtn.onclick = function(){ hide(); if (onConfirm) onConfirm(); };
+        if (cancelBtn) cancelBtn.onclick = function(){ hide(); };
+    }
+
     window.deleteQuiz = async function(quizId) {
-        if (confirm('Are you sure you want to delete this quiz? This action cannot be undone.')) {
+        showToastConfirm('Delete this quiz? This action cannot be undone.', async function(){
             try {
                 const response = await fetch(`${backendUrl}/quizzes/${quizId}`, {
                     method: 'DELETE',
@@ -199,7 +222,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
                 if (!response.ok) {
                     if (response.status === 401 || response.status === 403) {
-                        alert('Access denied. Please log in again.');
+                        showToast('Access denied. Please log in again.', 'warning');
                         localStorage.removeItem('user');
                         localStorage.removeItem('token');
                         window.location.href = 'login.html';
@@ -208,13 +231,13 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     throw new Error('Failed to delete quiz');
                 }
 
-                alert('Quiz deleted successfully.');
+                showToast('Quiz deleted successfully.', 'success');
                 fetchMyQuizzes(); // Refresh the list
             } catch (error) {
                 console.error('Error deleting quiz:', error);
-                alert('Failed to delete quiz. Please try again.');
+                showToast('Failed to delete quiz. Please try again.', 'error');
             }
-        }
+        });
     };
 
     // --- Initial Load ---

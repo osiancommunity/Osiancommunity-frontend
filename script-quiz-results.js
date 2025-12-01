@@ -1,5 +1,15 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
+
     // Ensure modal is hidden on page load
     const notificationModal = document.getElementById('notification-modal');
     if (notificationModal) {
@@ -70,7 +80,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     return;
                 }
                 if (response.status === 403) {
-                    alert('Access denied.');
+                    showToast('Access denied.', 'warning');
                     return;
                 }
                 throw new Error('Failed to fetch quizzes');
@@ -91,7 +101,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             }
         } catch (error) {
             console.error('Error fetching quizzes:', error);
-            alert('Failed to load quizzes. Please try again.');
+            showToast('Failed to load quizzes. Please try again.', 'error');
         }
     }
 
@@ -123,9 +133,9 @@ async function fetchAllResults() {
                 return;
             }
             if (response.status === 403) {
-                alert('Access denied.');
-                return;
-            }
+                    showToast('Access denied.', 'warning');
+                    return;
+                }
             const errorText = await response.text();
             console.error('Failed response text:', errorText);
             throw new Error(`Failed to fetch results: ${response.status}`);
@@ -161,7 +171,7 @@ async function fetchAllResults() {
                     return;
                 }
                 if (response.status === 403) {
-                    alert('Access denied.');
+                    showToast('Access denied.', 'warning');
                     return;
                 }
                 throw new Error('Failed to fetch quiz results');
@@ -336,7 +346,7 @@ async function fetchAllResults() {
     async function releaseResults() {
         const selectedCheckboxes = document.querySelectorAll('.result-checkbox:checked');
         if (selectedCheckboxes.length === 0) {
-            alert('Please select at least one result to release.');
+            showToast('Please select at least one result to release.', 'warning');
             return;
         }
 
@@ -365,7 +375,7 @@ async function fetchAllResults() {
                 throw new Error(`Failed to release results: ${response.status}`);
             }
 
-            alert('Results released successfully!');
+            showToast('Results released successfully!', 'success');
 
             // Auto-send notifications to selected users (optional)
             if (shouldSendNotify && userIdsForNotify.length > 0) {
@@ -412,21 +422,21 @@ async function fetchAllResults() {
             }
         } catch (error) {
             console.error('Error releasing results:', error);
-            alert(`Failed to release results: ${error.message}. Please try again.`);
+            showToast(`Failed to release results: ${error.message}. Please try again.`, 'error');
         }
     }
 
     async function sendNotification() {
         const selectedCheckboxes = document.querySelectorAll('.result-checkbox:checked');
         if (selectedCheckboxes.length === 0) {
-            alert('Please select at least one user to notify.');
+            showToast('Please select at least one user to notify.', 'warning');
             return;
         }
 
         const userIds = Array.from(selectedCheckboxes).map(cb => cb.getAttribute('data-user-id')).filter(id => id);
 
         if (userIds.length === 0) {
-            alert('No valid users selected for notification.');
+            showToast('No valid users selected for notification.', 'warning');
             return;
         }
 
@@ -443,7 +453,7 @@ async function fetchAllResults() {
         const handleSend = async () => {
             const notificationMessage = messageTextarea.value.trim();
             if (!notificationMessage) {
-                alert('Please enter a notification message.');
+                showToast('Please enter a notification message.', 'warning');
                 return;
             }
 
@@ -481,10 +491,10 @@ async function fetchAllResults() {
                     throw new Error(errorData.message || 'Failed to send notification');
                 }
 
-                alert('Notification sent successfully!');
+                showToast('Notification sent successfully!', 'success');
             } catch (error) {
                 console.error('Error sending notification:', error);
-                alert('Failed to send notification. Please try again.');
+                showToast('Failed to send notification. Please try again.', 'error');
             }
         };
 
@@ -569,7 +579,7 @@ async function fetchAllResults() {
             if (closeBtn) closeBtn.onclick = () => modal.classList.remove('active');
             window.onclick = (event) => { if (event.target === modal) modal.classList.remove('active'); };
         } catch (e) {
-            alert(`Failed to open result: ${e.message}`);
+            showToast(`Failed to open result: ${e.message}`, 'error');
         }
     };
 

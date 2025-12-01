@@ -1,5 +1,15 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
+
     // Backend URL
 const backendUrl = (location.hostname.endsWith('vercel.app'))
   ? 'https://osiancommunity-backend.vercel.app/api'
@@ -48,7 +58,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             videos.forEach((video, index) => renderVideoCard(video, index + 1));
         } catch (error) {
             console.error('Error loading videos:', error);
-            alert('Failed to load mentorship videos. Please try again.');
+            showToast('Failed to load mentorship videos. Please try again.', 'error');
         }
     }
 
@@ -105,7 +115,19 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // Remove Video Slot
     container.addEventListener('click', async (e) => {
         if (e.target.classList.contains('remove-video-btn')) {
-            if (confirm("Are you sure you want to remove this video?")) {
+            function showToastConfirm(message, onConfirm){
+                let el = document.getElementById('osian-toast');
+                if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+                el.className = 'osian-toast warning';
+                el.innerHTML = `${message} <span class="actions"><button id="toast-confirm">Confirm</button> <button id="toast-cancel">Cancel</button></span>`;
+                el.classList.add('show');
+                const confirmBtn = document.getElementById('toast-confirm');
+                const cancelBtn = document.getElementById('toast-cancel');
+                const hide = ()=>{ el.classList.remove('show'); el.innerHTML=''; };
+                if (confirmBtn) confirmBtn.onclick = function(){ hide(); if (onConfirm) onConfirm(); };
+                if (cancelBtn) cancelBtn.onclick = function(){ hide(); };
+            }
+            showToastConfirm("Remove this video?", async function(){
                 const card = e.target.closest('.video-editor-card');
                 const videoId = card.getAttribute('data-video-id');
 
@@ -128,13 +150,13 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                         throw new Error('Failed to delete video');
                     }
 
-                    alert('Video deleted successfully!');
+                    showToast('Video deleted successfully!', 'success');
                     loadContent(); // Refresh the list
                 } catch (error) {
                     console.error('Error deleting video:', error);
-                    alert('Failed to delete video. Please try again.');
+                    showToast('Failed to delete video. Please try again.', 'error');
                 }
-            }
+            });
         }
     });
 
@@ -152,7 +174,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             const duration = card.querySelector('.video-duration-input').value.trim();
 
             if (!title || !description || !url) {
-                alert('Please fill in all required fields (Title, Description, URL) for all videos.');
+                showToast('Please fill in all required fields (Title, Description, URL) for all videos.', 'warning');
                 hasErrors = true;
                 break;
             }
@@ -188,14 +210,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 }
             } catch (error) {
                 console.error('Error saving video:', error);
-                alert('Failed to save one or more videos. Please try again.');
+                showToast('Failed to save one or more videos. Please try again.', 'error');
                 hasErrors = true;
                 break;
             }
         }
 
         if (!hasErrors) {
-            alert('Mentorship videos updated and saved successfully!');
+            showToast('Mentorship videos updated and saved successfully!', 'success');
             loadContent(); // Refresh the list
         }
     });

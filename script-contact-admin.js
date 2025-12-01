@@ -1,4 +1,13 @@
 document.addEventListener("DOMContentLoaded", function() {
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
 
     const form = document.getElementById('contact-info-form');
     // Load initial content (Dummy function - replace with backend fetch)
@@ -34,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Save All Changes (Dummy function - replace with backend API call)
         localStorage.setItem('contactInfo', JSON.stringify(updatedInfo));
-        alert('Contact information updated successfully!');
+        showToast('Contact information updated successfully!', 'success');
     });
 
     loadContactInfo();

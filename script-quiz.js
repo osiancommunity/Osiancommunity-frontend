@@ -1,5 +1,14 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
     // --- Backend URL ---
 const backendUrl = (location.hostname.endsWith('vercel.app'))
     ? 'https://osiancommunity-backend.vercel.app/api'
@@ -13,7 +22,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     // Security Check: Is user logged in?
     if (!token || !user) {
-        alert("You must be logged in to take a quiz. Redirecting...");
+        showToast("You must be logged in to take a quiz.", 'warning');
         window.location.href = 'login.html';
         return;
     }
@@ -23,7 +32,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     const quizId = urlParams.get('id');
 
     if (!quizId) {
-        alert("Invalid quiz. No ID provided. Redirecting...");
+        showToast("Invalid quiz. No ID provided.", 'error');
         window.location.href = 'quiz-progress.html';
         return;
     }
@@ -59,6 +68,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     const proctorVideo = document.getElementById('proctor-video');
     const proctorWrapper = document.getElementById('proctor-video-wrapper');
     const proctorStatus = document.getElementById('proctor-status');
+    const proctorLoader = document.getElementById('proctor-loader');
     let mediaStream = null;
     let faceModel = null;
     let faceCheckInterval = null;
@@ -66,6 +76,28 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     let objectModel = null;
     let objectCheckInterval = null;
     let prohibitedDetectedSince = null;
+
+    async function loadScript(src){
+        return new Promise(function(resolve, reject){
+            var s = document.createElement('script');
+            s.src = src;
+            s.async = true;
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+        });
+    }
+
+    let proctorLibsLoaded = false;
+    async function ensureProctorLibs(){
+        if (proctorLibsLoaded) return;
+        if (typeof blazeface === 'undefined' || typeof cocoSsd === 'undefined') {
+            await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js');
+            await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js');
+            await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd');
+        }
+        proctorLibsLoaded = true;
+    }
 
     // ===================================
     // 1. LOAD QUIZ DATA
@@ -88,14 +120,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     if ((response.status === 403 || response.status === 401) && (startsAt || (data && (data.code === 'SCHEDULED_NOT_STARTED')))) {
                         startQuizBtn.disabled = true;
                         startQuizBtn.textContent = startsAt ? `Starts at ${startsAt.toLocaleString()}` : (data.message || 'Scheduled to start later');
-                        if (data && data.message) alert(data.message);
+                        if (data && data.message) showToast(data.message, 'info');
                         isLoading = false;
                         return;
                     }
                     if (response.status === 401) {
                         startQuizBtn.disabled = true;
                         startQuizBtn.textContent = 'Please login again to start';
-                        alert(data && data.message ? data.message : 'Your session has expired or is invalid. Please login again.');
+                        showToast(data && data.message ? data.message : 'Your session has expired or is invalid. Please login again.', 'warning');
                         isLoading = false;
                         return;
                     }
@@ -126,7 +158,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         } catch (error) {
             console.error('Error loading quiz:', error);
-            alert(`Error: ${error.message}. Redirecting...`);
+            showToast(`Error: ${error.message}.`, 'error');
             window.location.href = 'quiz-progress.html';
         }
     }
@@ -136,15 +168,19 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // ===================================
     startQuizBtn.addEventListener('click', async function() {
         if (!currentQuizData) {
-            alert('Quiz data not loaded. Please refresh the page.');
+            showToast('Quiz data not loaded. Please refresh the page.', 'error');
             return;
         }
         isProctoringEnabled = String(currentQuizData.quizType || '').toLowerCase() === 'paid';
         if (isProctoringEnabled) {
             try {
+                if (proctorLoader) { proctorLoader.style.display = 'block'; proctorLoader.classList.add('active'); }
+                await ensureProctorLibs();
                 await setupProctoring();
+                if (proctorLoader) { proctorLoader.classList.remove('active'); proctorLoader.style.display = 'none'; }
             } catch (e) {
-                alert('Camera access is required to start this paid quiz.');
+                if (proctorLoader) { proctorLoader.classList.remove('active'); proctorLoader.style.display = 'none'; }
+                showToast('Camera access is required to start this paid quiz.', 'warning');
                 return;
             }
         }
@@ -304,9 +340,16 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     }
 
     submitQuizBtn.addEventListener('click', () => {
-        if (confirm('Are you sure you want to submit?')) {
-            submitQuiz("User submitted");
-        }
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast warning';
+        el.innerHTML = `Confirm submission? <span class="actions"><button id="toast-confirm">Submit</button> <button id="toast-cancel">Cancel</button></span>`;
+        el.classList.add('show');
+        const confirmBtn = document.getElementById('toast-confirm');
+        const cancelBtn = document.getElementById('toast-cancel');
+        const hide = ()=>{ el.classList.remove('show'); el.innerHTML=''; };
+        if (confirmBtn) confirmBtn.onclick = function(){ hide(); submitQuiz("User submitted"); };
+        if (cancelBtn) cancelBtn.onclick = function(){ hide(); };
     });
 
     async function submitQuiz(reason, wasAutoSubmitted = false) {
@@ -354,7 +397,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    alert('Your session has expired or is invalid. Please login again before submitting.');
+                    showToast('Your session has expired or is invalid. Please login again before submitting.', 'warning');
                     return;
                 }
                 try {
@@ -424,7 +467,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     function disableEvent(e) {
         e.preventDefault();
-        alert("This action is disabled during the quiz.");
+        showToast("This action is disabled during the quiz.", 'warning');
         return false;
     }
     function disableKeydown(e) {

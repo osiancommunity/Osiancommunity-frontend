@@ -1,4 +1,13 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", async function() {
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
 
     // Define the location of your backend
 const backendUrl = (location.hostname.endsWith('vercel.app'))
@@ -66,10 +75,10 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     window.location.href = 'login.html';
                     return;
                 }
-                if (response.status === 403) {
-                    alert('Access denied.');
-                    return;
-                }
+            if (response.status === 403) {
+                showToast('Access denied.', 'warning');
+                return;
+            }
                 throw new Error('Failed to fetch videos');
             }
 

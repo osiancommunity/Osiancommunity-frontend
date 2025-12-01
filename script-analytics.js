@@ -1,5 +1,15 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
+
 const backendUrl = (location.hostname.endsWith('vercel.app'))
   ? 'https://osiancommunity-backend.vercel.app/api'
   : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
@@ -10,7 +20,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     // Security Check
     if (!token || !user || user.role.toLowerCase() !== 'superadmin') {
-        alert('Access Denied.');
+        showToast('Access Denied.', 'warning');
         window.location.href = 'login.html';
         return;
     }

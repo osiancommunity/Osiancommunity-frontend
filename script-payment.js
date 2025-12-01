@@ -1,5 +1,15 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
+
     // Define the location of your backend
 const backendUrl = (location.hostname.endsWith('vercel.app'))
   ? 'https://osiancommunity-backend.vercel.app/api'
@@ -13,7 +23,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     // Security Check: Is user logged in?
     if (!token || !user) {
-        alert("You must be logged in to make a payment. Redirecting...");
+        showToast("You must be logged in to make a payment.", 'warning');
         window.location.href = 'login.html';
         return;
     }
@@ -25,7 +35,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     const quizId = urlParams.get('quizId');
 
     if (!quizId) {
-        alert("Invalid payment page. No quiz selected. Redirecting...");
+        showToast("Invalid payment page. No quiz selected.", 'error');
         window.location.href = 'dashboard-user.html';
         return;
     }
@@ -50,7 +60,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             razorpayKeyId = data.keyId;
         } catch (error) {
             console.error('Razorpay Key Error:', error);
-            alert('Error initializing payment provider. Please try again later.');
+            showToast('Error initializing payment provider. Please try again later.', 'error');
         }
     }
 
@@ -98,7 +108,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         } catch (error) {
             console.error('Order Creation Error:', error);
-            alert(`Error: ${error.message}`);
+            showToast(`Error: ${error.message}`, 'error');
             // Send user back if order fails
             window.location.href = 'dashboard-user.html';
         }
@@ -108,7 +118,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     checkoutForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         if (!currentOrderId || !razorpayOrderId) {
-            alert("Error: Order ID is missing.");
+            showToast("Error: Order ID is missing.", 'error');
             return;
         }
 
@@ -158,7 +168,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
                 } catch (error) {
                     console.error('Payment Verification Error:', error);
-                    alert(`Payment verification failed: ${error.message}`);
+                    showToast(`Payment verification failed: ${error.message}`, 'error');
                     payButton.style.display = 'block';
                     paymentChecking.style.display = 'none';
                 }
@@ -176,7 +186,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     // Payment cancelled
                     payButton.style.display = 'block';
                     paymentChecking.style.display = 'none';
-                    alert('Payment cancelled by user.');
+                    showToast('Payment cancelled by user.', 'warning');
                 }
             }
         };

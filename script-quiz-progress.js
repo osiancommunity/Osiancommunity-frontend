@@ -1,5 +1,15 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+    function showToast(message, type){
+        let el = document.getElementById('osian-toast');
+        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
+        el.className = 'osian-toast ' + (type || '');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
+    }
+
     // Define the location of your backend
 const backendUrl = (location.hostname.endsWith('vercel.app'))
   ? 'https://osiancommunity-backend.vercel.app/api'
@@ -73,12 +83,11 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 try {
                     const data = await response.json();
                     if (response.status === 403) {
-                        alert(data && data.message ? data.message : 'Access denied or not available yet.');
+                        showToast(data && data.message ? data.message : 'Access denied or not available yet.', 'warning');
                         return;
                     }
                     if (response.status === 401) {
-                        // Treat potential schedule/visibility issues gracefully for this endpoint
-                        alert(data && data.message ? data.message : 'Unable to load your registered quizzes right now.');
+                        showToast(data && data.message ? data.message : 'Unable to load your registered quizzes right now.', 'warning');
                         return;
                     }
                     throw new Error(data.message || 'Failed to fetch registered quizzes');
@@ -120,13 +129,11 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
+                    showToast('Unable to load your registered quizzes right now.', 'warning');
                     return;
                 }
                 if (response.status === 403) {
-                    alert('Access denied or not available yet.');
+                    showToast('Access denied or not available yet.', 'warning');
                     return;
                 }
                 const data = await response.json();
@@ -260,14 +267,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             const notifyAt = startTs - 3600000;
             const key = `quizReminder_${q._id}_${startTs}`;
             if (now >= notifyAt && now < startTs && !localStorage.getItem(key)) {
-                alert(`Reminder: "${q.title}" starts at ${new Date(startTs).toLocaleString()}`);
+                showToast(`Reminder: "${q.title}" starts at ${new Date(startTs).toLocaleString()}`, 'info');
                 try { localStorage.setItem(key, '1'); } catch (_) {}
             } else if (now < notifyAt) {
                 const delay = notifyAt - now;
                 if (delay > 0 && delay < 2147483647) {
                     setTimeout(function(){
                         if (!localStorage.getItem(key)) {
-                            alert(`Reminder: "${q.title}" starts at ${new Date(startTs).toLocaleString()}`);
+                            showToast(`Reminder: "${q.title}" starts at ${new Date(startTs).toLocaleString()}`, 'info');
                             try { localStorage.setItem(key, '1'); } catch (_) {}
                         }
                     }, delay);
@@ -353,7 +360,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     window.viewQuizDetails = function(quizId) {
         // Implement view quiz details functionality
-        alert('View quiz details functionality to be implemented');
+        showToast('View quiz details coming soon.', 'info');
     };
 
     window.viewResults = function(quizId) {
