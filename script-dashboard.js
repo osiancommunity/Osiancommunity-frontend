@@ -147,6 +147,10 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         const isPaid = quiz.quizType === 'paid';
         // The link depends on whether the quiz is paid or free
         const destinationUrl = isPaid ? `payment.html?quizId=${quiz._id}` : `quiz.html?id=${quiz._id}`;
+        const participantsCount = (typeof quiz.registeredUsers === 'number')
+            ? quiz.registeredUsers
+            : (Array.isArray(quiz.participants) ? quiz.participants.length : 0);
+        const priceStr = isPaid ? ((quiz.price != null && !Number.isNaN(Number(quiz.price))) ? Number(quiz.price).toFixed(2) : '0.00') : null;
 
         return `
             <div class="quiz-card">
@@ -158,10 +162,10 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 <h3>${quiz.title}</h3>
                 <p class="quiz-details">${quiz.description || 'No description available.'}</p>
                 <div class="quiz-stats">
-                    <span><i class='bx bx-user'></i> ${quiz.participants || 0} Participants</span>
+                    <span><i class='bx bx-user'></i> ${participantsCount} Participants</span>
                     <span><i class='bx bx-time'></i> ${quiz.duration || 30} Mins</span>
                 </div>
-                <button class="quiz-btn ${isPaid ? 'paid' : 'live'}" data-quiz-id="${quiz._id}" onclick="window.location.href='${destinationUrl}'">${isPaid ? `Register (₹${quiz.price.toFixed(2)})` : 'Join Now'}</button>
+                <button class="quiz-btn ${isPaid ? 'paid' : 'live'}" data-quiz-id="${quiz._id}" onclick="window.location.href='${destinationUrl}'">${isPaid ? `Register (₹${priceStr})` : 'Join Now'}</button>
             </div>
         `;
     }
