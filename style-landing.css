@@ -363,6 +363,17 @@ ul {
     border-top: 1px solid #444;
 }
 
+@keyframes fadeUp {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.hero { animation: fadeUp 0.4s ease both; }
+.feature-card { animation: fadeUp 0.4s ease both; }
+.category-card { animation: fadeUp 0.4s ease both; }
+.social-media a { transition: color 0.3s ease, transform 0.3s ease; }
+.social-media a:hover { transform: translateY(-2px); }
+
 /* ------------------------- */
 /* Responsive Design */
 /* ------------------------- */

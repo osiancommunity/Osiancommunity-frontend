@@ -398,6 +398,17 @@ body {
     padding: 15px 0;
     border-bottom: 1px solid var(--border-color);
 }
+
+@keyframes fadeUp {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+a, button { transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease; }
+.content-card, .kpi-card { transition: transform 0.3s ease, box-shadow 0.3s ease; animation: fadeUp 0.4s ease both; }
+.content-card:hover, .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+.user-table tr:hover { background: #fafbfc; }
+.sidebar-menu a:hover { transform: translateX(3px); }
 .notification-list li:last-child {
     border-bottom: none;
 }

@@ -247,3 +247,27 @@ body, html {
 #otp-email {
     color: #4a00e0;
 }
+
+a, button {
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.input-group input {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.input-group input:focus {
+    box-shadow: 0 0 0 3px rgba(106,0,224,0.15);
+}
+
+.login-container {
+    animation: fadeIn 0.4s ease both;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.social-icon:hover { transform: translateY(-2px) scale(1.02); }
+.forgot-password:hover { color: #3e00b8; }
