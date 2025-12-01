@@ -6,8 +6,12 @@ document.addEventListener("DOMContentLoaded", function() {
         notificationModal.classList.remove('active');
     }
 
-    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-    const backendUrl = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
+    // Define the location of your backend
+const backendUrl = (location.hostname.endsWith('vercel.app'))
+    ? 'https://osiancommunity-backend.vercel.app/api'
+    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        ? 'http://localhost:5000/api'
+        : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -59,10 +63,8 @@ document.addEventListener("DOMContentLoaded", function() {
             });
 
             if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
+                if (response.status === 401) {
+                    alert('Your session has expired or is invalid. Please login again.');
                     return;
                 }
                 throw new Error('Failed to fetch quizzes');
@@ -108,10 +110,8 @@ async function fetchAllResults() {
         });
 
         if (!response.ok) {
-            if (response.status === 401 || response.status === 403) {
-                localStorage.removeItem('user');
-                localStorage.removeItem('token');
-                window.location.href = 'login.html';
+            if (response.status === 401) {
+                alert('Your session has expired or is invalid. Please login again.');
                 return;
             }
             const errorText = await response.text();
@@ -142,10 +142,8 @@ async function fetchAllResults() {
             });
 
             if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
+                if (response.status === 401) {
+                    alert('Your session has expired or is invalid. Please login again.');
                     return;
                 }
                 throw new Error('Failed to fetch quiz results');

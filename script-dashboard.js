@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
     
     // Define the location of your backend
-<<<<<<< HEAD
-const backendUrl = (location.hostname.endsWith('vercel.app')) ? 'https://osiancommunity-backend.vercel.app/api' : 'http://localhost:5000/api';
-=======
-const backendUrl = 'http://localhost:5000/api';
->>>>>>> d43daba (feat(auth): harden registration, add diagnostics; dev routing guard; bcryptjs consistency; demo user creation)
+const backendUrl = (location.hostname.endsWith('vercel.app'))
+    ? 'https://osiancommunity-backend.vercel.app/api'
+    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        ? 'http://localhost:5000/api'
+        : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -55,11 +55,9 @@ const backendUrl = 'http://localhost:5000/api';
             const data = await response.json();
 
             if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                    return; // Silently redirect
+                if (response.status === 401) {
+                    alert('Your session has expired or is invalid. Please login again.');
+                    return;
                 }
                 showErrorMessage(`Error fetching quizzes: ${data.message}`);
                 return;
