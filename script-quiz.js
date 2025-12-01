@@ -408,7 +408,8 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                         };
                     }),
                     timeTaken: currentQuizData.duration * 60 - timer,
-                    cheatingViolation: wasAutoSubmitted ? (reason || 'Proctoring violation') : undefined
+                    cheatingViolation: wasAutoSubmitted ? (reason || 'Proctoring violation') : undefined,
+                    violationCount: violationCount
                 })
             });
 
@@ -455,6 +456,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             console.error("Violation count display element missing.");
         }
         document.addEventListener("visibilitychange", handleVisibilityChange);
+        window.addEventListener('blur', handleWindowBlur);
         if (isProctoringEnabled) {
             document.body.addEventListener('copy', disableEvent);
             document.body.addEventListener('paste', disableEvent);
@@ -467,6 +469,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     function removeSecurityListeners() {
         console.log("Removing anti-cheating listeners.");
         document.removeEventListener("visibilitychange", handleVisibilityChange);
+        window.removeEventListener('blur', handleWindowBlur);
         document.body.removeEventListener('copy', disableEvent);
         document.body.removeEventListener('paste', disableEvent);
         document.removeEventListener('contextmenu', disableEvent);
@@ -485,13 +488,20 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     function disableEvent(e) {
         e.preventDefault();
         showToast("This action is disabled during the quiz.", 'warning');
+        triggerViolation('Disallowed action');
         return false;
     }
     function disableKeydown(e) {
         const k = e.key.toLowerCase();
-        if (e.ctrlKey && (k === 'c' || k === 'v' || k === 'x' || k === 'p')) {
-            e.preventDefault();
-        }
+        const ctrlCombos = ['c','v','x','p','r','l','k'];
+        if (e.ctrlKey && ctrlCombos.includes(k)) { e.preventDefault(); triggerViolation('Ctrl shortcut'); }
+        if (k === 'f12' || k === 'f11') { e.preventDefault(); triggerViolation('Function key'); }
+        if (e.altKey && k === 'tab') { e.preventDefault(); triggerViolation('Alt+Tab'); }
+        if ((e.metaKey || e.key === 'Meta') && k === 'tab') { e.preventDefault(); triggerViolation('Meta+Tab'); }
+    }
+
+    function handleWindowBlur(){
+        triggerViolation('Window lost focus');
     }
 
     function triggerViolation(reason) {

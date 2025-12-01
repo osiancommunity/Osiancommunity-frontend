@@ -16,6 +16,8 @@ body {
     -moz-user-select: none;
 }
 
+.quiz-main, .quiz-header, .options-container, .written-answer-container { user-select: none; }
+
 :root {
     --primary-color: #6a00e0;
     --primary-gradient: linear-gradient(135deg, #4a00e0, #8e2de2);
@@ -231,6 +233,7 @@ body {
 .option.selected {
     border-color: var(--primary-color);
     background: #f4eaff;
+    animation: pulse 0.6s ease;
 }
 .option span {
     font-size: 16px;
@@ -311,3 +314,4 @@ a, button { transition: background-color 0.3s ease, color 0.3s ease, box-shadow 
 .option:hover { transform: translateY(-1px); }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
 .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
