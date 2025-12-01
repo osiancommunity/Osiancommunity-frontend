@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('forgot-password-form');
     const emailInput = document.getElementById('email');
     const formStatus = document.getElementById('form-status');
-    const sendLinkBtn = document.getElementById('send-link-btn');
     const sendOtpBtn = document.getElementById('send-otp-btn');
     const otpSection = document.getElementById('otp-section');
     const otpResetForm = document.getElementById('otp-reset-form');
@@ -14,28 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const isProd = (location.hostname.endsWith('vercel.app') || location.hostname.endsWith('github.io') || location.hostname.includes('osiancommunity'));
         return isProd ? 'https://osiancommunity-backend.vercel.app' : 'http://localhost:5000';
     }
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        formStatus.textContent = 'Sending...';
-        formStatus.style.color = '#555';
-        try {
-            const response = await fetch(apiBase() + '/api/auth/forgot-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: emailInput.value })
-            });
-            const result = await response.json();
-            if (!response.ok) {
-                throw new Error(result.message || 'An error occurred.');
-            }
-            formStatus.textContent = result.message;
-            formStatus.style.color = 'green';
-        } catch (error) {
-            formStatus.textContent = error.message;
-            formStatus.style.color = 'red';
-        }
-    });
 
     sendOtpBtn.addEventListener('click', async () => {
         formStatus.textContent = 'Sending OTP...';
