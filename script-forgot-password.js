@@ -23,11 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: emailInput.value })
             });
-            const result = await response.json();
+            await response.json().catch(() => ({}));
             if (!response.ok) {
-                throw new Error(result.message || 'An error occurred.');
+                throw new Error('Failed to send OTP. Please try again.');
             }
-            formStatus.textContent = result.message;
+            formStatus.textContent = 'If the email exists, a reset OTP has been sent. Check your inbox.';
             formStatus.style.color = 'green';
             otpSection.style.display = 'block';
         } catch (error) {
