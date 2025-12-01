@@ -58,7 +58,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     let allResults = [];
     let filteredResults = [];
     let allQuizzes = [];
-    const userCache = {};
+    let userCache = {};
+    try {
+        const cached = sessionStorage.getItem('adminUserCache');
+        if (cached) {
+            const obj = JSON.parse(cached);
+            if (obj && typeof obj === 'object') userCache = obj;
+        }
+    } catch(_) {}
 
     // Get quiz ID from URL if specified
     const urlParams = new URLSearchParams(window.location.search);
@@ -210,7 +217,14 @@ async function fetchAllResults() {
             if (!res.ok) return null;
             const data = await res.json();
             const u = data.user || null;
-            if (u) userCache[userId] = u;
+            if (u) {
+                userCache[userId] = u;
+                try {
+                    const keys = Object.keys(userCache);
+                    if (keys.length > 500) delete userCache[keys[0]];
+                    sessionStorage.setItem('adminUserCache', JSON.stringify(userCache));
+                } catch(_) {}
+            }
             return u;
         } catch(_) { return null; }
     }
