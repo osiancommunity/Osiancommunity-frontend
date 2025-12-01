@@ -58,6 +58,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     let allResults = [];
     let filteredResults = [];
     let allQuizzes = [];
+    const userCache = {};
 
     // Get quiz ID from URL if specified
     const urlParams = new URLSearchParams(window.location.search);
@@ -190,7 +191,31 @@ async function fetchAllResults() {
     }
 
     // --- Render Results ---
-    function renderResults() {
+    function computeCompletionFromUser(u){
+        const p = (u && u.profile) || {};
+        const phoneDigits = String(p.phone||'').replace(/\D/g,'');
+        const isAdmin = (u && u.role && (u.role.toLowerCase() === 'admin' || u.role.toLowerCase() === 'superadmin'));
+        const fields = isAdmin ? [u.name, phoneDigits.length>=10, p.city, p.organization] : [u.name, phoneDigits.length>=10, p.city, p.college, p.course, p.state];
+        const total = fields.length;
+        let done = 0;
+        fields.forEach(f=>{ if (typeof f === 'boolean') { if (f) done++; } else if (f && String(f).trim()) done++; });
+        return Math.round((done/total)*100);
+    }
+
+    async function getUserProfile(userId){
+        if (!userId) return null;
+        if (userCache[userId]) return userCache[userId];
+        try {
+            const res = await fetch(`${backendUrl}/users/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) return null;
+            const data = await res.json();
+            const u = data.user || null;
+            if (u) userCache[userId] = u;
+            return u;
+        } catch(_) { return null; }
+    }
+
+    async function renderResults() {
         const startIndex = (currentPage - 1) * 10;
         const endIndex = startIndex + 10;
         const resultsToShow = filteredResults.slice(startIndex, endIndex);
@@ -203,7 +228,7 @@ async function fetchAllResults() {
             return;
         }
 
-        resultsToShow.forEach(result => {
+        const rowPromises = resultsToShow.map(async (result) => {
             const row = document.createElement('tr');
 
             // FIX: Safely access nested properties that might not exist.
@@ -217,6 +242,12 @@ async function fetchAllResults() {
                 <td><input type="checkbox" class="result-checkbox" data-result-id="${result._id}" data-user-id="${result.userId ? result.userId._id : ''}" data-quiz-title="${result.quizId ? (result.quizId.title || '') : ''}"></td>
                 <td>${result.userId ? result.userId.name : 'Unknown'}</td>
                 <td>${result.userId ? result.userId.email : 'Unknown'}</td>
+                <td class="cell-phone">-</td>
+                <td class="cell-city">-</td>
+                <td class="cell-org">-</td>
+                <td class="cell-branch">-</td>
+                <td class="cell-state">-</td>
+                <td class="cell-pct">-</td>
                 <td>${score} / ${totalQuestions}</td>
                 <td>${percentage}%</td>
                 <td><span class="status-tag ${result.status === 'completed' ? 'active' : 'inactive'}">${status}</span></td>
@@ -227,7 +258,29 @@ async function fetchAllResults() {
             `;
 
             resultsTableBody.appendChild(row);
+
+            const uid = result.userId && result.userId._id ? result.userId._id : null;
+            const u = await getUserProfile(uid);
+            if (u) {
+                const p = u.profile || {};
+                const phone = p.phone ? String(p.phone) : '';
+                const city = p.city || '';
+                const orgOrCollege = (u.role && (u.role.toLowerCase()==='admin'||u.role.toLowerCase()==='superadmin')) ? (p.organization||'') : (p.college||'');
+                const branch = p.course || '';
+                const state = p.state || '';
+                const pct = computeCompletionFromUser(u);
+                const setText = (sel, val)=>{ const el = row.querySelector(sel); if (el) el.textContent = val && String(val).trim() ? val : '-'; };
+                setText('.cell-phone', phone);
+                setText('.cell-city', city);
+                setText('.cell-org', orgOrCollege);
+                setText('.cell-branch', branch);
+                setText('.cell-state', state);
+                setText('.cell-pct', `${pct}%`);
+            }
+            return row;
         });
+
+        await Promise.all(rowPromises);
 
         updatePagination();
     }
@@ -556,10 +609,28 @@ async function fetchAllResults() {
             const status = r.status === 'completed' ? 'Completed' : (r.status === 'pending' ? 'Pending' : 'In Progress');
 
             modalTitle.textContent = r.quizId && r.quizId.title ? `Result: ${r.quizId.title}` : 'Result Details';
+            let u = r.userId || {};
+            let p = u.profile || {};
+            if (u && u._id && (!p || Object.keys(p).length === 0)) {
+                const fetched = await getUserProfile(u._id);
+                if (fetched) { u = fetched; p = fetched.profile || {}; }
+            }
+            const phone = p.phone || '';
+            const city = p.city || '';
+            const orgOrCollege = (u.role && (u.role.toLowerCase()==='admin'||u.role.toLowerCase()==='superadmin')) ? (p.organization||'') : (p.college||'');
+            const branch = p.course || '';
+            const state = p.state || '';
+            const pct = computeCompletionFromUser(u);
             modalBody.innerHTML = `
                 <div class="result-details-grid">
                     <div><strong>Name:</strong> ${r.userId ? r.userId.name : 'Unknown'}</div>
                     <div><strong>Email:</strong> ${r.userId ? r.userId.email : 'Unknown'}</div>
+                    <div><strong>Phone:</strong> ${phone || '--'}</div>
+                    <div><strong>City:</strong> ${city || '--'}</div>
+                    <div><strong>College/Org:</strong> ${orgOrCollege || '--'}</div>
+                    <div><strong>Branch:</strong> ${branch || '--'}</div>
+                    <div><strong>State:</strong> ${state || '--'}</div>
+                    <div><strong>Profile Completion:</strong> ${pct}%</div>
                     <div><strong>Score:</strong> ${score} / ${totalQuestions}</div>
                     <div><strong>Percentage:</strong> ${percentage}%</div>
                     <div><strong>Status:</strong> ${status}</div>
