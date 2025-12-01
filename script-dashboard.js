@@ -126,7 +126,10 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         container.innerHTML = ''; // Clear loading message
 
-        if (!quizzes || quizzes.length === 0) {
+        // Exclude unlisted quizzes from general discovery
+        const visibleQuizzes = (quizzes || []).filter(q => String(q.visibility || 'public').toLowerCase() !== 'unlisted');
+
+        if (!visibleQuizzes || visibleQuizzes.length === 0) {
             // Hide the entire section if there are no quizzes for that category
             section.style.display = 'none';
             return;
@@ -134,7 +137,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         // No duplication needed for square grid
 
-        quizzes.forEach(quiz => {
+        visibleQuizzes.forEach(quiz => {
             container.innerHTML += createQuizCard(quiz);
         });
     }
