@@ -29,9 +29,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
       // Only force logout on explicit 401; otherwise ignore to avoid breaking the session
       if (response.status === 401) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = 'login.html';
+        return;
       }
     } catch (_) {
       // Network or endpoint missing: do nothing

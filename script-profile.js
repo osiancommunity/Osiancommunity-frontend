@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const backendUrl = (location.hostname.endsWith('vercel.app'))
-        ? 'https://osiancommunity-backend.vercel.app/api'
-        : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-            ? 'http://localhost:5000/api'
-            : 'https://osiancommunity-backend.vercel.app/api');
+      ? 'https://osiancommunity-backend.vercel.app/api'
+      : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+          ? 'http://localhost:5000/api'
+          : 'https://osiancommunity-backend.vercel.app/api');
 
     const settingsForm = document.getElementById('settings-form');
     const formStatus = document.getElementById('form-status');
@@ -363,52 +363,6 @@ avatarUpload.addEventListener('change', async (e) => {
         };
         reader.readAsDataURL(file);
     });
-
-    const passwordForm = document.getElementById('password-form');
-    if (passwordForm) {
-        passwordForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const btn = passwordForm.querySelector('button[type="submit"]');
-            if (btn) { btn.disabled = true; btn.textContent = 'Updating...'; }
-            const currentPassword = document.getElementById('current-password').value;
-            const newPassword = document.getElementById('new-password').value;
-            const confirmNewPassword = document.getElementById('confirm-new-password').value;
-            if (newPassword !== confirmNewPassword) {
-                alert('New passwords do not match.');
-                if (btn) { btn.disabled = false; btn.textContent = 'Update Password'; }
-                return;
-            }
-            if (newPassword.length < 6) {
-                alert('New password must be at least 6 characters long.');
-                if (btn) { btn.disabled = false; btn.textContent = 'Update Password'; }
-                return;
-            }
-            try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${backendUrl}/auth/change-password`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ currentPassword, newPassword })
-                });
-                const result = await response.json();
-                if (!response.ok) {
-                    let msg = result.message || 'Failed to change password.';
-                    if (response.status === 401) {
-                        localStorage.clear();
-                        window.location.href = 'login.html';
-                        return;
-                    }
-                    throw new Error(msg);
-                }
-                alert('Password changed successfully!');
-                passwordForm.reset();
-            } catch (error) {
-                alert(`Failed to change password: ${error.message}`);
-            } finally {
-                if (btn) { btn.disabled = false; btn.textContent = 'Update Password'; }
-            }
-        });
-    }
 
     // Function to get role from URL
     function getRoleFromURL() {

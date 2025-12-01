@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-// Define the location of your backend
+    // Define the location of your backend
 const backendUrl = (location.hostname.endsWith('vercel.app'))
-    ? 'https://osiancommunity-backend.vercel.app/api'
-    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-        ? 'http://localhost:5000/api'
-        : 'https://osiancommunity-backend.vercel.app/api');
+  ? 'https://osiancommunity-backend.vercel.app/api'
+  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:5000/api'
+      : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- Authentication & Authorization ---
     let user = null;
@@ -328,11 +328,15 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             });
 
             if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
-                    alert('Access denied. Please log in again.');
+                if (response.status === 401) {
+                    alert('Session expired. Please log in again.');
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
                     window.location.href = 'login.html';
+                    return;
+                }
+                if (response.status === 403) {
+                    alert('Access denied.');
                     return;
                 }
                 throw new Error('Failed to load quiz for editing.');

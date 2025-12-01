@@ -7,10 +7,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const errorMessage = document.getElementById('error-message');
     
 const backendUrl = (location.hostname.endsWith('vercel.app'))
-    ? 'https://osiancommunity-backend.vercel.app/api'
-    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-        ? 'http://localhost:5000/api'
-        : 'https://osiancommunity-backend.vercel.app/api');
+  ? 'https://osiancommunity-backend.vercel.app/api'
+  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:5000/api'
+      : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- 1. Check if already logged in ---
     // If a user visits login.html but is already logged in, send them to their dashboard.
@@ -18,10 +18,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     const user = JSON.parse(localStorage.getItem('user'));
 
     if (token && user) {
-        const role = String(user.role || 'user').toLowerCase();
-        if (role === 'superadmin') {
+        if (user.role === 'superadmin') {
             window.location.href = 'dashboard-superadmin.html';
-        } else if (role === 'admin') {
+        } else if (user.role === 'admin') {
             window.location.href = 'dashboard-admin.html';
         } else {
             window.location.href = 'dashboard-user.html';
@@ -82,11 +81,10 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     // 2. Save the user object (as a string)
                     localStorage.setItem('user', JSON.stringify(data.user));
             
-                    // 3. Redirect to the correct dashboard based on role (normalized)
-                    const role = String(data.user.role || 'user').toLowerCase();
-                    if (role === 'superadmin') {
+                    // 3. Redirect to the correct dashboard based on role
+                    if (data.user.role === 'superadmin') {
                         window.location.href = 'dashboard-superadmin.html';
-                    } else if (role === 'admin') {
+                    } else if (data.user.role === 'admin') {
                         window.location.href = 'dashboard-admin.html';
                     } else {
                         window.location.href = 'dashboard-user.html';

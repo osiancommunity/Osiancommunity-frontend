@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailInput = document.getElementById('email');
     const formStatus = document.getElementById('form-status');
     const sendOtpBtn = document.getElementById('send-otp-btn');
+    const resendOtpBtn = document.getElementById('resend-otp-btn');
     const otpSection = document.getElementById('otp-section');
     const otpResetForm = document.getElementById('otp-reset-form');
     const otpInput = document.getElementById('otp');
@@ -14,7 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return isProd ? 'https://osiancommunity-backend.vercel.app' : 'http://localhost:5000';
     }
 
-    sendOtpBtn.addEventListener('click', async () => {
+    function sendOtp() {
+        return (async () => {
         formStatus.textContent = 'Sending OTP...';
         formStatus.style.color = '#555';
         try {
@@ -34,7 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
             formStatus.textContent = error.message;
             formStatus.style.color = 'red';
         }
-    });
+        })();
+    }
+    sendOtpBtn.addEventListener('click', sendOtp);
+    if (resendOtpBtn) resendOtpBtn.addEventListener('click', sendOtp);
 
     otpResetForm.addEventListener('submit', async (e) => {
         e.preventDefault();

@@ -1,116 +1,138 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const backendUrl = (location.hostname.endsWith('vercel.app'))
-    ? 'https://osiancommunity-backend.vercel.app/api'
-    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-        ? 'http://localhost:5000/api'
-        : 'https://osiancommunity-backend.vercel.app/api');
+document.addEventListener('DOMContentLoaded', function () {
+const backendUrl = (location.hostname.endsWith('vercel.app'))
+  ? 'https://osiancommunity-backend.vercel.app/api'
+  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:5000/api'
+      : 'https://osiancommunity-backend.vercel.app/api');
+    const token = localStorage.getItem('token');
+    const adminTableBody = document.getElementById('admin-list-body');
+    const searchInput = document.getElementById('user-search');
 
-  const token = localStorage.getItem('token');
-  let user = null;
-  try { user = JSON.parse(localStorage.getItem('user')); } catch(_) { user = null; }
-  if (!token || !user || (user.role || '').toLowerCase() !== 'superadmin') {
-    alert('Access Denied');
-    window.location.href = 'login.html';
-    return;
-  }
+    // Modal elements
+    const modal = document.getElementById('change-role-modal');
+    const modalUserName = document.getElementById('modal-user-name');
+    const modalRoleSelect = document.getElementById('modal-role-select');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalSaveBtn = document.getElementById('modal-save-btn');
+    let currentUserId = null;
 
-  const logoutBtn = document.querySelector('.logout-btn');
-  if (logoutBtn) { logoutBtn.style.display = 'none'; }
-
-  const tbody = document.getElementById('admin-list-body');
-  const searchInput = document.getElementById('user-search');
-
-  let admins = [];
-  let filtered = [];
-
-  async function fetchAdmins() {
-    try {
-      const res = await fetch(`${backendUrl}/users/admins`, { headers: { 'Authorization': `Bearer ${token}` } });
-      const data = await res.json();
-      admins = (Array.isArray(data) ? data : (data.users || [])).map(u => ({
-        id: u._id,
-        name: u.name,
-        email: u.email,
-        role: (u.role || 'admin'),
-        joined: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '--',
-        quizzesCreated: (u.quizzesCreated || 0)
-      }));
-      filtered = [...admins];
-      render();
-    } catch(e) {
-      tbody.innerHTML = '<tr><td colspan="6">Failed to load admins.</td></tr>';
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
     }
-  }
 
-  function render() {
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    if (filtered.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6">No admins found.</td></tr>';
-      return;
-    }
-    filtered.forEach(u => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${u.name}</td>
-        <td>${u.email}</td>
-        <td>${u.quizzesCreated}</td>
-        <td>${u.joined}</td>
-        <td><span class="role-tag ${u.role === 'superadmin' ? 'superadmin' : 'admin'}">${u.role}</span></td>
-        <td>
-          <button class="btn-edit" data-action="role" data-id="${u.id}" data-name="${u.name}" data-role="${u.role}">Change Role</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
+    let allAdmins = [];
 
-  function applyFilters() {
-    const q = (searchInput?.value || '').toLowerCase();
-    filtered = admins.filter(u => (q ? (u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)) : true));
-    render();
-  }
-
-  document.addEventListener('click', async (e) => {
-    const btn = e.target.closest('button');
-    if (!btn) return;
-    const action = btn.getAttribute('data-action');
-    const id = btn.getAttribute('data-id');
-    if (action === 'role' && id) {
-      const name = btn.getAttribute('data-name') || 'Admin';
-      const select = document.getElementById('modal-role-select');
-      const modalName = document.getElementById('modal-user-name');
-      const modal = document.getElementById('change-role-modal');
-      if (modalName) modalName.textContent = name;
-      if (select) select.value = btn.getAttribute('data-role') || 'admin';
-      if (modal) modal.style.display = 'block';
-      const save = document.getElementById('modal-save-btn');
-      const cancel = document.getElementById('modal-cancel-btn');
-      const onSave = async () => {
-        const newRole = select.value;
+    const fetchAdmins = async () => {
         try {
-          const res = await fetch(`${backendUrl}/users/role`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ userId: id, newRole })
-          });
-          const data = await res.json();
-          alert(data.message || (res.ok ? 'Role updated' : 'Failed'));
-          modal.style.display = 'none';
-          fetchAdmins();
-        } catch(err) {
-          alert('Failed to update role');
+            const response = await fetch(`${backendUrl}/users/admins`, { // Assuming an endpoint to get only admins
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                }
+                throw new Error('Failed to fetch admins');
+            }
+
+            allAdmins = await response.json();
+            renderAdmins(allAdmins);
+        } catch (error) {
+            console.error('Error fetching admins:', error);
+            adminTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Error loading admins. Please try again later.</td></tr>`;
         }
-        save.removeEventListener('click', onSave);
-        cancel.removeEventListener('click', onCancel);
-      };
-      const onCancel = () => { modal.style.display = 'none'; save.removeEventListener('click', onSave); cancel.removeEventListener('click', onCancel); };
-      save.addEventListener('click', onSave);
-      cancel.addEventListener('click', onCancel);
-    }
-  });
+    };
 
-  searchInput?.addEventListener('input', applyFilters);
-  fetchAdmins();
+    const renderAdmins = (admins) => {
+        adminTableBody.innerHTML = '';
+        if (admins.length === 0) {
+            adminTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No admin accounts found.</td></tr>`;
+            return;
+        }
+
+        admins.forEach(admin => {
+            const adminRow = document.createElement('tr');
+            adminRow.innerHTML = `
+                <td>${admin.fullname}</td>
+                <td>${admin.email}</td>
+                <td>${admin.quizzesCreated || 0}</td>
+                <td>${new Date(admin.createdAt).toLocaleDateString()}</td>
+                <td><span class="role-tag ${admin.role}">${admin.role}</span></td>
+                <td>
+                    <button class="btn-edit change-role-btn" data-userid="${admin._id}" data-username="${admin.fullname}">Manage Role</button>
+                </td>
+            `;
+            adminTableBody.appendChild(adminRow);
+        });
+    };
+
+    const filterAndSearchAdmins = () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        const filteredAdmins = allAdmins.filter(admin =>
+            admin.fullname.toLowerCase().includes(searchTerm) ||
+            admin.email.toLowerCase().includes(searchTerm)
+        );
+
+        renderAdmins(filteredAdmins);
+    };
+
+    const openRoleModal = (userId, userName) => {
+        currentUserId = userId;
+        modalUserName.textContent = userName;
+        modal.style.display = 'flex';
+    };
+
+    const closeRoleModal = () => {
+        modal.style.display = 'none';
+        currentUserId = null;
+    };
+
+    const saveRoleChange = async () => {
+        const newRole = modalRoleSelect.value;
+        if (!currentUserId || !newRole) return;
+
+        try {
+            const response = await fetch(`${backendUrl}/users/${currentUserId}/role`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ role: newRole })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update role');
+            }
+
+            await fetchAdmins();
+            closeRoleModal();
+
+        } catch (error) {
+            console.error('Error updating role:', error);
+            alert('Could not update user role. Please try again.');
+        }
+    };
+
+    // Event Listeners
+    searchInput.addEventListener('input', filterAndSearchAdmins);
+
+    adminTableBody.addEventListener('click', (e) => {
+        if (e.target.classList.contains('change-role-btn')) {
+            const userId = e.target.dataset.userid;
+            const userName = e.target.dataset.username;
+            openRoleModal(userId, userName);
+        }
+    });
+
+    modalCancelBtn.addEventListener('click', closeRoleModal);
+    modalSaveBtn.addEventListener('click', saveRoleChange);
+
+    // Initial fetch
+    fetchAdmins();
 });
-

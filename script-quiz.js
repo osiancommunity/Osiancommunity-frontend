@@ -81,24 +81,25 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             });
 
             if (!response.ok) {
-                if (response.status === 401) {
-                    startQuizBtn.disabled = true;
-                    startQuizBtn.textContent = 'Please login again to start';
-                    alert('Your session has expired or is invalid. Please login again.');
-                    isLoading = false;
-                    return;
-                }
                 try {
                     const data = await response.json();
-                    if (response.status === 403 && data && (data.startsAt || data.code === 'SCHEDULED_NOT_STARTED')) {
-                        const startsAt = data.startsAt ? new Date(data.startsAt) : null;
+                    const startsAtRaw = data.startsAt || data.scheduleTime || (data.quiz && data.quiz.scheduleTime);
+                    const startsAt = startsAtRaw ? new Date(startsAtRaw) : null;
+                    if ((response.status === 403 || response.status === 401) && (startsAt || (data && (data.code === 'SCHEDULED_NOT_STARTED')))) {
                         startQuizBtn.disabled = true;
                         startQuizBtn.textContent = startsAt ? `Starts at ${startsAt.toLocaleString()}` : (data.message || 'Scheduled to start later');
-                        alert(data.message || 'This quiz is scheduled to start later.');
+                        if (data && data.message) alert(data.message);
                         isLoading = false;
                         return;
                     }
-                    throw new Error(data.message || 'Failed to load quiz');
+                    if (response.status === 401) {
+                        startQuizBtn.disabled = true;
+                        startQuizBtn.textContent = 'Please login again to start';
+                        alert(data && data.message ? data.message : 'Your session has expired or is invalid. Please login again.');
+                        isLoading = false;
+                        return;
+                    }
+                    throw new Error((data && data.message) || 'Failed to load quiz');
                 } catch (e) {
                     throw e;
                 }

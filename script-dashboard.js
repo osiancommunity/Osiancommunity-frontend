@@ -50,6 +50,22 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         });
     }
 
+    try {
+        const cachedRegs = JSON.parse(localStorage.getItem('osianRegisteredQuizzes')) || [];
+        const now = Date.now();
+        cachedRegs.forEach(function(q){
+            if (!q || q.quizType !== 'paid' || !q.scheduleTime) return;
+            const startTs = new Date(q.scheduleTime).getTime();
+            if (!startTs || isNaN(startTs)) return;
+            const notifyAt = startTs - 3600000;
+            const key = `quizReminder_${q._id}_${startTs}`;
+            if (now >= notifyAt && now < startTs && !localStorage.getItem(key)) {
+                alert(`Reminder: "${q.title}" starts at ${new Date(startTs).toLocaleString()}`);
+                try { localStorage.setItem(key, '1'); } catch (_) {}
+            }
+        });
+    } catch (_) {}
+
 
     // --- Fetch and Display Quizzes ---
     async function fetchQuizzes() {
@@ -62,7 +78,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             const data = await response.json();
 
             if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
+                if (response.status === 401) {
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
                     window.location.href = 'login.html';

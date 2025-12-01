@@ -302,5 +302,5 @@ body {
     .quiz-header { padding: 15px 20px; }
     .question-header h2 { font-size: 18px; }
     .option { padding: 12px 14px; }
-    #proctor-video-wrapper { width: 160px; height: 100px; right: 8px; top: 8px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    #proctor-video-wrapper { width: 160px; height: 100px; right: 8px; bottom: 8px; }
 }

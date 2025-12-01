@@ -1,7 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
 
     // Define the location of your backend
-const backendUrl = 'http://localhost:5000/api';
+const backendUrl = (location.hostname.endsWith('vercel.app'))
+  ? 'https://osiancommunity-backend.vercel.app/api'
+  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:5000/api'
+      : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -27,7 +31,7 @@ const backendUrl = 'http://localhost:5000/api';
             e.preventDefault();
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         });
     }
 
@@ -56,10 +60,14 @@ const backendUrl = 'http://localhost:5000/api';
             });
 
             if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
+                if (response.status === 401) {
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
                     window.location.href = 'login.html';
+                    return;
+                }
+                if (response.status === 403) {
+                    alert('Access denied.');
                     return;
                 }
                 throw new Error('Failed to fetch videos');

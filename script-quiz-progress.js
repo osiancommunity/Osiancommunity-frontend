@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-// Define the location of your backend
+    // Define the location of your backend
 const backendUrl = (location.hostname.endsWith('vercel.app'))
-    ? 'https://osiancommunity-backend.vercel.app/api'
-    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-        ? 'http://localhost:5000/api'
-        : 'https://osiancommunity-backend.vercel.app/api');
+  ? 'https://osiancommunity-backend.vercel.app/api'
+  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:5000/api'
+      : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -70,14 +70,21 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             });
 
             if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                    return; // Silently redirect
+                try {
+                    const data = await response.json();
+                    if (response.status === 403) {
+                        alert(data && data.message ? data.message : 'Access denied or not available yet.');
+                        return;
+                    }
+                    if (response.status === 401) {
+                        // Treat potential schedule/visibility issues gracefully for this endpoint
+                        alert(data && data.message ? data.message : 'Unable to load your registered quizzes right now.');
+                        return;
+                    }
+                    throw new Error(data.message || 'Failed to fetch registered quizzes');
+                } catch (e) {
+                    throw e;
                 }
-                const data = await response.json();
-                throw new Error(data.message);
             }
 
             const data = await response.json();
@@ -112,10 +119,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             });
 
             if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
+                if (response.status === 401) {
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
                     window.location.href = 'login.html';
+                    return;
+                }
+                if (response.status === 403) {
+                    alert('Access denied or not available yet.');
                     return;
                 }
                 const data = await response.json();
@@ -124,9 +135,11 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             const data = await response.json();
             registeredAll = data.quizzes || [];
+            try { localStorage.setItem('osianRegisteredQuizzes', JSON.stringify(registeredAll)); } catch (_) {}
             regTotalPages = Math.max(1, Math.ceil(registeredAll.length / regPageSize));
             regCurrentPage = 1;
             renderRegisteredPage();
+            scheduleRemindersForQuizzes(registeredAll);
 
         } catch (error) {
             console.error('Error fetching registered quizzes:', error);
@@ -202,7 +215,10 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             const statusClass = getStatusClass(status);
             const typeText = quiz.quizType === 'paid' ? 'Paid' : 'Free';
             const typeClass = quiz.quizType === 'paid' ? 'admin' : 'user';
-            const scheduleTime = quiz.scheduleTime ? new Date(quiz.scheduleTime).toLocaleString() : 'Not Scheduled';
+            const scheduleDate = quiz.scheduleTime ? new Date(quiz.scheduleTime) : null;
+            const scheduleTime = scheduleDate ? scheduleDate.toLocaleString() : 'Not Scheduled';
+            const isUpcomingPaid = quiz.quizType === 'paid' && scheduleDate && scheduleDate.getTime() > Date.now();
+            const startedPaid = quiz.quizType === 'paid' && scheduleDate && scheduleDate.getTime() <= Date.now();
             const registeredUsers = quiz.registeredUsers || 0;
             const maxUsers = quiz.registrationLimit || '∞';
 
@@ -217,10 +233,11 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                         <span class="type-tag ${typeClass}">${typeText}</span>
                     </div>
                     <div class="quiz-details">
-                        <p><strong>Schedule:</strong> ${scheduleTime}</p>
+                        <p><strong>${startedPaid ? 'Started' : (isUpcomingPaid ? 'Starts' : 'Schedule')}:</strong> ${scheduleTime}</p>
                         <p><strong>Duration:</strong> ${quiz.duration} minutes</p>
                         <p><strong>Registered:</strong> ${registeredUsers} / ${maxUsers}</p>
                         ${quiz.quizType === 'paid' ? `<p><strong>Price:</strong> ₹${quiz.price}</p>` : ''}
+                        ${isUpcomingPaid ? `<p><em>You will be notified 1 hour before start.</em></p>` : ''}
                     </div>
                 </div>
                 <div class="quiz-card-actions">
@@ -231,6 +248,31 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             `;
 
             registeredQuizzesContainer.appendChild(quizCard);
+        });
+    }
+
+    function scheduleRemindersForQuizzes(quizzes) {
+        const now = Date.now();
+        quizzes.forEach(function(q){
+            if (!q || q.quizType !== 'paid' || !q.scheduleTime) return;
+            const startTs = new Date(q.scheduleTime).getTime();
+            if (!startTs || isNaN(startTs)) return;
+            const notifyAt = startTs - 3600000;
+            const key = `quizReminder_${q._id}_${startTs}`;
+            if (now >= notifyAt && now < startTs && !localStorage.getItem(key)) {
+                alert(`Reminder: "${q.title}" starts at ${new Date(startTs).toLocaleString()}`);
+                try { localStorage.setItem(key, '1'); } catch (_) {}
+            } else if (now < notifyAt) {
+                const delay = notifyAt - now;
+                if (delay > 0 && delay < 2147483647) {
+                    setTimeout(function(){
+                        if (!localStorage.getItem(key)) {
+                            alert(`Reminder: "${q.title}" starts at ${new Date(startTs).toLocaleString()}`);
+                            try { localStorage.setItem(key, '1'); } catch (_) {}
+                        }
+                    }, delay);
+                }
+            }
         });
     }
 
