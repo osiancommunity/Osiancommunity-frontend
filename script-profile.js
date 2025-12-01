@@ -40,6 +40,56 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressPercentEl = document.getElementById('profile-progress-percent');
     const profileMissingEl = document.getElementById('profile-missing');
 
+    function setFieldHint(inputEl, message) {
+        if (!inputEl) return;
+        var next = inputEl.nextElementSibling;
+        var hint = null;
+        if (next && next.classList && next.classList.contains('field-hint')) hint = next;
+        if (message) {
+            inputEl.classList.add('input-missing');
+            if (!hint) {
+                hint = document.createElement('small');
+                hint.className = 'field-hint';
+                inputEl.parentNode.insertBefore(hint, inputEl.nextSibling);
+            }
+            hint.textContent = message;
+        } else {
+            inputEl.classList.remove('input-missing');
+            if (hint) hint.remove();
+        }
+    }
+
+    function getDataFromForm(role){
+        return {
+            name: nameInput ? nameInput.value : '',
+            mobile: mobileInput ? mobileInput.value : '',
+            city: cityInput ? cityInput.value : '',
+            college: role === 'user' && collegeInput ? collegeInput.value : '',
+            branch: role === 'user' && branchInput ? branchInput.value : '',
+            state: role === 'user' && stateInput ? stateInput.value : '',
+            organization: role !== 'user' && organizationInput ? organizationInput.value : ''
+        };
+    }
+
+    function updateCompletionUI(userData, role){
+        var c = computeCompletion(userData, role);
+        if (progressBar) progressBar.style.width = c.percent + '%';
+        if (progressPercentEl) progressPercentEl.textContent = c.percent + '%';
+        if (profileMissingEl) profileMissingEl.textContent = c.missing.length ? ('Missing: ' + c.missing.join(', ')) : '';
+        localStorage.setItem('profileCompletion', JSON.stringify(c));
+        localStorage.setItem('profileComplete', c.percent === 100 ? 'true' : 'false');
+        setFieldHint(nameInput, c.missing.includes('name') ? 'Required' : '');
+        setFieldHint(mobileInput, c.missing.includes('phone') ? 'Enter 10+ digits' : '');
+        setFieldHint(cityInput, c.missing.includes('city') ? 'Required' : '');
+        if (role === 'user') {
+            setFieldHint(collegeInput, c.missing.includes('college') ? 'Required' : '');
+            setFieldHint(branchInput, c.missing.includes('branch') ? 'Required' : '');
+            setFieldHint(stateInput, c.missing.includes('state') ? 'Required' : '');
+        } else {
+            setFieldHint(organizationInput, c.missing.includes('organization') ? 'Required' : '');
+        }
+    }
+
     // Default data if nothing is in localStorage
     const defaultData = {
         name: 'please set your name',
@@ -157,12 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(winRate) winRate.textContent = `${userData.stats.winPercentage}%`;
             if(totalPoints) totalPoints.textContent = userData.stats.points.toLocaleString();
 
-            const completion = computeCompletion(userData, role);
-            if (progressBar) progressBar.style.width = `${completion.percent}%`;
-            if (progressPercentEl) progressPercentEl.textContent = `${completion.percent}%`;
-            if (profileMissingEl) profileMissingEl.textContent = completion.missing.length ? `Missing: ${completion.missing.join(', ')}` : '';
-            localStorage.setItem('profileCompletion', JSON.stringify(completion));
-            localStorage.setItem('profileComplete', completion.percent === 100 ? 'true' : 'false');
+            updateCompletionUI(userData, role);
 
         } catch (error) {
             console.error('Error loading user data:', error);
@@ -204,12 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(winRate) winRate.textContent = `${userData.stats.winPercentage}%`;
             if(totalPoints) totalPoints.textContent = userData.stats.points.toLocaleString();
 
-            const completion = computeCompletion(userData, role);
-            if (progressBar) progressBar.style.width = `${completion.percent}%`;
-            if (progressPercentEl) progressPercentEl.textContent = `${completion.percent}%`;
-            if (profileMissingEl) profileMissingEl.textContent = completion.missing.length ? `Missing: ${completion.missing.join(', ')}` : '';
-            localStorage.setItem('profileCompletion', JSON.stringify(completion));
-            localStorage.setItem('profileComplete', completion.percent === 100 ? 'true' : 'false');
+            updateCompletionUI(userData, role);
         }
     }
 
@@ -448,4 +488,16 @@ avatarUpload.addEventListener('change', async (e) => {
     const userRole = getRoleFromURL();
     updateSidebarLinks(userRole);
     loadUserData(userRole);
+
+    ;[nameInput, mobileInput, cityInput, collegeInput, branchInput, stateInput, organizationInput].forEach(function(el){
+        if (!el) return;
+        el.addEventListener('input', function(){
+            var data = getDataFromForm(userRole);
+            var storedRaw = localStorage.getItem('osianUserData');
+            var stored = {};
+            try { stored = storedRaw ? JSON.parse(storedRaw) : {}; } catch(e) { stored = {}; }
+            var merged = Object.assign({}, stored, data);
+            updateCompletionUI(merged, userRole);
+        });
+    });
 });

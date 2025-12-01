@@ -185,3 +185,13 @@ body {
     color: #555;
     text-align: right;
 }
+
+.input-missing {
+    border-color: #ef4444;
+    background: #fff5f5;
+}
+.field-hint {
+    color: #a94442;
+    font-size: 12px;
+    margin-top: 4px;
+}
