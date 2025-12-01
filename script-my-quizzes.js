@@ -104,6 +104,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 const registeredUsers = quiz.registeredUsers || 0;
                 const scheduleTime = quiz.scheduleTime ? new Date(quiz.scheduleTime).toLocaleString() : '--';
                 const createdDate = quiz.createdAt ? new Date(quiz.createdAt).toLocaleDateString() : '--';
+                const isUnlisted = String(quiz.visibility || '').toLowerCase() === 'unlisted';
 
                 row.innerHTML = `
                     <td>${quiz.title}</td>
@@ -118,6 +119,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                         <button class="btn-edit" onclick="editQuiz('${quiz._id}')">Edit</button>
                         <button class="btn-edit" onclick="viewResults('${quiz._id}')">Results</button>
                         <button class="btn-delete" onclick="deleteQuiz('${quiz._id}')">Delete</button>
+                        ${isUnlisted ? `<button class="btn-edit" onclick="copyQuizLink('${quiz._id}','${quiz.quizType}')">Copy Link</button>` : ''}
                     </td>
                 `;
 
@@ -195,6 +197,29 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     window.viewResults = function(quizId) {
         window.location.href = `quiz-results.html?quizId=${quizId}`;
+    };
+
+    window.copyQuizLink = async function(quizId, quizType){
+        try {
+            const dest = (String(quizType || '').toLowerCase() === 'paid')
+                ? `payment.html?quizId=${quizId}`
+                : `quiz.html?id=${quizId}`;
+            const base = location.origin.replace(/\/$/, '');
+            const link = `${base}/${dest}`;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(link);
+            } else {
+                const tmp = document.createElement('input');
+                tmp.value = link;
+                document.body.appendChild(tmp);
+                tmp.select();
+                document.execCommand('copy');
+                document.body.removeChild(tmp);
+            }
+            showToast('Unlisted quiz link copied to clipboard.', 'success');
+        } catch (e) {
+            showToast('Failed to copy link. Please try again.', 'error');
+        }
     };
 
     function showToastConfirm(message, onConfirm){
