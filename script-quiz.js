@@ -81,14 +81,27 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             });
 
             if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                    return; // Silently redirect
+                if (response.status === 401) {
+                    startQuizBtn.disabled = true;
+                    startQuizBtn.textContent = 'Please login again to start';
+                    alert('Your session has expired or is invalid. Please login again.');
+                    isLoading = false;
+                    return;
                 }
-                const data = await response.json();
-                throw new Error(data.message);
+                try {
+                    const data = await response.json();
+                    if (response.status === 403 && data && (data.startsAt || data.code === 'SCHEDULED_NOT_STARTED')) {
+                        const startsAt = data.startsAt ? new Date(data.startsAt) : null;
+                        startQuizBtn.disabled = true;
+                        startQuizBtn.textContent = startsAt ? `Starts at ${startsAt.toLocaleString()}` : (data.message || 'Scheduled to start later');
+                        alert(data.message || 'This quiz is scheduled to start later.');
+                        isLoading = false;
+                        return;
+                    }
+                    throw new Error(data.message || 'Failed to load quiz');
+                } catch (e) {
+                    throw e;
+                }
             }
 
             currentQuizData = await response.json();
@@ -340,10 +353,8 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                    return; // Silently redirect
+                    alert('Your session has expired or is invalid. Please login again before submitting.');
+                    return;
                 }
                 try {
                     const data = await response.json();
