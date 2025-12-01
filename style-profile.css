@@ -163,3 +163,25 @@ body {
     color: #333;
     border: 1px solid #d1d9e0;
 }
+
+.profile-progress {
+    margin-bottom: 1rem;
+}
+.progress-track {
+    width: 100%;
+    height: 10px;
+    background: #e9eef2;
+    border-radius: 999px;
+    overflow: hidden;
+}
+.progress-bar {
+    height: 10px;
+    width: 0%;
+    background: linear-gradient(90deg, #4a00e0, #6a5acd);
+}
+.progress-text {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #555;
+    text-align: right;
+}

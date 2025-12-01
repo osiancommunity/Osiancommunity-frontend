@@ -147,13 +147,24 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             const now = Date.now();
             const startAt = currentQuizData.scheduleTime ? new Date(currentQuizData.scheduleTime).getTime() : now;
             isLoading = false;
+            const completionRaw = localStorage.getItem('profileCompletion');
+            let completion = null;
+            try { completion = completionRaw ? JSON.parse(completionRaw) : null; } catch(e){ completion = null; }
+            const completeFlag = localStorage.getItem('profileComplete') === 'true';
             if (startAt > now) {
                 startQuizBtn.disabled = true;
                 const dt = new Date(startAt);
                 startQuizBtn.textContent = `Starts at ${dt.toLocaleString()}`;
             } else {
-                startQuizBtn.disabled = false;
-                startQuizBtn.textContent = 'I Understand, Start the Quiz';
+                if (!completeFlag) {
+                    startQuizBtn.disabled = true;
+                    const pct = completion && typeof completion.percent === 'number' ? completion.percent : 0;
+                    startQuizBtn.textContent = `Complete profile (${pct}%) to start`;
+                    showToast('Please complete your profile before starting the quiz.', 'warning');
+                } else {
+                    startQuizBtn.disabled = false;
+                    startQuizBtn.textContent = 'I Understand, Start the Quiz';
+                }
             }
 
         } catch (error) {
@@ -167,6 +178,12 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // 2. START QUIZ
     // ===================================
     startQuizBtn.addEventListener('click', async function() {
+        const completeFlag = localStorage.getItem('profileComplete') === 'true';
+        if (!completeFlag) {
+            showToast('Complete your profile to start the quiz.', 'warning');
+            window.location.href = 'profile.html?role=user';
+            return;
+        }
         if (!currentQuizData) {
             showToast('Quiz data not loaded. Please refresh the page.', 'error');
             return;

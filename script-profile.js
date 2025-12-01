@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizzesTaken = document.getElementById('quizzes-taken');
     const winRate = document.getElementById('win-rate');
     const totalPoints = document.getElementById('total-points');
+    const progressBar = document.getElementById('profile-progress-bar');
+    const progressPercentEl = document.getElementById('profile-progress-percent');
+    const profileMissingEl = document.getElementById('profile-missing');
 
     // Default data if nothing is in localStorage
     const defaultData = {
@@ -154,6 +157,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if(winRate) winRate.textContent = `${userData.stats.winPercentage}%`;
             if(totalPoints) totalPoints.textContent = userData.stats.points.toLocaleString();
 
+            const completion = computeCompletion(userData, role);
+            if (progressBar) progressBar.style.width = `${completion.percent}%`;
+            if (progressPercentEl) progressPercentEl.textContent = `${completion.percent}%`;
+            if (profileMissingEl) profileMissingEl.textContent = completion.missing.length ? `Missing: ${completion.missing.join(', ')}` : '';
+            localStorage.setItem('profileCompletion', JSON.stringify(completion));
+            localStorage.setItem('profileComplete', completion.percent === 100 ? 'true' : 'false');
+
         } catch (error) {
             console.error('Error loading user data:', error);
             // Fallback to localStorage if backend fails
@@ -193,6 +203,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if(quizzesTaken) quizzesTaken.textContent = userData.stats.quizzes;
             if(winRate) winRate.textContent = `${userData.stats.winPercentage}%`;
             if(totalPoints) totalPoints.textContent = userData.stats.points.toLocaleString();
+
+            const completion = computeCompletion(userData, role);
+            if (progressBar) progressBar.style.width = `${completion.percent}%`;
+            if (progressPercentEl) progressPercentEl.textContent = `${completion.percent}%`;
+            if (profileMissingEl) profileMissingEl.textContent = completion.missing.length ? `Missing: ${completion.missing.join(', ')}` : '';
+            localStorage.setItem('profileCompletion', JSON.stringify(completion));
+            localStorage.setItem('profileComplete', completion.percent === 100 ? 'true' : 'false');
         }
     }
 
@@ -305,6 +322,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             formStatus.textContent = 'Changes saved successfully!';
             formStatus.style.color = 'green';
+            const data = JSON.parse(localStorage.getItem('osianUserData')) || {};
+            const completion = computeCompletion(data, role);
+            if (progressBar) progressBar.style.width = `${completion.percent}%`;
+            if (progressPercentEl) progressPercentEl.textContent = `${completion.percent}%`;
+            if (profileMissingEl) profileMissingEl.textContent = completion.missing.length ? `Missing: ${completion.missing.join(', ')}` : '';
+            localStorage.setItem('profileCompletion', JSON.stringify(completion));
+            localStorage.setItem('profileComplete', completion.percent === 100 ? 'true' : 'false');
 
         } catch (error) {
             console.error('Error saving profile data:', error);
@@ -389,6 +413,35 @@ avatarUpload.addEventListener('change', async (e) => {
     function getRoleFromURL() {
         const params = new URLSearchParams(window.location.search);
         return params.get('role') || 'user'; // Default to 'user' if no role is specified
+    }
+
+    function computeCompletion(userData, role){
+        var fields = [];
+        var missing = [];
+        if (role === 'admin' || role === 'superadmin') {
+            fields = [
+                {k:'name', v:userData.name},
+                {k:'phone', v:(userData.mobile||'').replace(/\D/g,'')},
+                {k:'city', v:userData.city},
+                {k:'organization', v:userData.organization}
+            ];
+        } else {
+            fields = [
+                {k:'name', v:userData.name},
+                {k:'phone', v:(userData.mobile||'').replace(/\D/g,'')},
+                {k:'city', v:userData.city},
+                {k:'college', v:userData.college},
+                {k:'branch', v:userData.branch},
+                {k:'state', v:userData.state}
+            ];
+        }
+        var done = 0;
+        fields.forEach(function(f){
+            var ok = f.k === 'phone' ? (f.v && f.v.length >= 10) : !!(f.v && String(f.v).trim());
+            if (ok) done++; else missing.push(f.k);
+        });
+        var percent = Math.round((done / fields.length) * 100);
+        return { percent: percent, missing: missing };
     }
 
     // Initial load of user data
