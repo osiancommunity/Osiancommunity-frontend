@@ -82,9 +82,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
+                    startQuizBtn.disabled = true;
+                    startQuizBtn.textContent = 'Please login again to start';
+                    alert('Your session has expired or is invalid. Please login again.');
+                    isLoading = false;
                     return;
                 }
                 try {
@@ -352,10 +353,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                    return; // Silently redirect
+                    alert('Your session has expired or is invalid. Please login again before submitting.');
+                    return;
                 }
                 try {
                     const data = await response.json();
