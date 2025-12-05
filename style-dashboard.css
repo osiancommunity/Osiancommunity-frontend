@@ -1029,6 +1029,29 @@ body {
     border: 1px solid var(--primary-color);
 }
 
+/* Slide-down containers for progressive reveal */
+.slide-collapsible {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: max-height 0.3s ease, opacity 0.25s ease, transform 0.25s ease;
+}
+
+.slide-collapsible.open {
+    max-height: 300px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Mobile enhancements */
+@media (max-width: 768px) {
+    .pill-row { gap: 8px; }
+    .pill { padding: 6px 12px; font-size: 13px; }
+    .pill .pill-badge { padding: 2px 6px; font-size: 11px; }
+    .quiz-list-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+}
+
 /* ------------------------- */
 /* Square Grid for Paid Quizzes */
 /* ------------------------- */

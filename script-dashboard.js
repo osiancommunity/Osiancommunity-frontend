@@ -111,12 +111,16 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 selectedLevel = '';
                 renderCategoryPills();
                 renderFieldPills();
-                levelPillsRow.innerHTML = '';
+                if (levelPillsRow) { levelPillsRow.innerHTML = ''; levelPillsRow.classList.remove('open'); }
                 document.getElementById('filtered-section').style.display = 'none';
                 ['technical-section','gk-section','engineering-section','sports-section','coding-section','law-section','studies-section'].forEach(function(id){
                     const el = document.getElementById(id);
                     if (el) el.style.display = 'block';
                 });
+                if (fieldPillsRow) {
+                    // trigger slide open after rendering
+                    requestAnimationFrame(function(){ fieldPillsRow.classList.add('open'); });
+                }
             };
             categoryPillsRow.appendChild(el);
         });
@@ -150,6 +154,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 renderFieldPills();
                 renderLevelPills();
                 document.getElementById('filtered-section').style.display = 'none';
+                if (levelPillsRow) {
+                    requestAnimationFrame(function(){ levelPillsRow.classList.add('open'); });
+                }
             };
             fieldPillsRow.appendChild(el);
         });
@@ -168,6 +175,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 selectedLevel = l;
                 renderLevelPills();
                 applyFilter();
+                try { document.getElementById('filtered-section').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
             };
             levelPillsRow.appendChild(el);
         });
@@ -422,3 +430,12 @@ function showErrorMessage(message) {
         errorDiv.remove();
     });
 }
+    // Prepare slide containers
+    if (fieldPillsRow) {
+        fieldPillsRow.classList.add('slide-collapsible');
+        fieldPillsRow.classList.remove('open');
+    }
+    if (levelPillsRow) {
+        levelPillsRow.classList.add('slide-collapsible');
+        levelPillsRow.classList.remove('open');
+    }
