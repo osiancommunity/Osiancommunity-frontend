@@ -1028,6 +1028,51 @@ body {
     font-size: 12px;
 }
 
+/* Modern Header Enhancements */
+.main-header {
+    background: linear-gradient(90deg, rgba(74,144,226,0.08), rgba(74,144,226,0));
+    border-radius: 12px;
+    padding: 24px;
+}
+.header-title h1 { font-weight: 700; letter-spacing: 0.2px; }
+
+/* Profile Dropdown */
+.profile-menu { position: relative; display: inline-block; }
+.profile-avatar-btn { background: none; border: none; padding: 0; cursor: pointer; }
+.profile-avatar-btn img { width: 40px; height: 40px; border-radius: 50%; box-shadow: var(--shadow); }
+.profile-dropdown {
+    position: absolute; right: 0; top: 50px; background: var(--white); border: 1px solid var(--border-color);
+    border-radius: 10px; box-shadow: var(--shadow); min-width: 180px; padding: 8px; display: none;
+}
+.profile-dropdown.open { display: block; animation: fadeIn 0.15s ease; }
+.profile-dropdown a { display: flex; align-items: center; gap: 8px; padding: 10px 12px; color: var(--text-color); border-radius: 8px; }
+.profile-dropdown a:hover { background: #f6f9fc; color: var(--primary-color); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px);} to { opacity: 1; transform: translateY(0);} }
+
+/* Category Chips Grid */
+.category-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px;
+}
+.category-chip {
+    display: inline-flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 12px;
+    background: linear-gradient(180deg, #ffffff, #f7fafc); border: 1px solid var(--border-color);
+    color: var(--text-color); box-shadow: var(--shadow); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.category-chip i { font-size: 20px; color: var(--primary-color); }
+.category-chip:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(74,144,226,0.15); }
+.category-chip.active { border-color: var(--primary-color); background: linear-gradient(180deg, #f0f7ff, #ffffff); }
+
+/* Empty State Card */
+.empty-state { text-align: center; padding: 40px; border: 1px dashed var(--border-color); border-radius: 14px; background: #fbfdff; }
+.empty-illustration { font-size: 38px; margin-bottom: 8px; }
+.empty-state h3 { margin: 8px 0 4px; font-size: 18px; color: var(--text-color); }
+.empty-state p { color: var(--text-light); }
+
+/* Sidebar Hover & Active */
+.sidebar-menu a { transition: color 0.15s ease, transform 0.15s ease; }
+.sidebar-menu a:hover { color: var(--primary-color); transform: translateX(2px); }
+.sidebar-menu a.active { color: var(--primary-color); font-weight: 600; }
+
 .square-grid .quiz-card {
     aspect-ratio: 1 / 1; /* 1:1 ratio */
     display: flex;

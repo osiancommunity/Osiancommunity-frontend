@@ -12,13 +12,6 @@
     <div class="dashboard-container">
 
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <a href="dashboard-user.html" class="logo">OSIAN</a>
-                <div class="auth-links">
-                    <a href="login.html">Login</a>
-                    <a href="register.html">Register</a>
-                </div>
-            </div>
             <ul class="sidebar-menu">
                 <li class="active"><a href="dashboard-user.html" class="active"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
                 <li><a href="quiz-progress.html"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
@@ -50,14 +43,59 @@
                 <div class="header-profile">
                     <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
                     <button class="icon-btn" id="header-logout" title="Log Out"><i class='bx bx-log-out'></i></button>
-                    <a href="profile.html"><img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar"></a>
+                    <div class="profile-menu">
+                        <button id="profile-menu-btn" class="profile-avatar-btn">
+                            <img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar">
+                        </button>
+                        <div class="profile-dropdown" id="profile-dropdown">
+                            <a href="profile.html"><i class='bx bxs-user'></i> My Profile</a>
+                            <a href="#" id="dropdown-logout"><i class='bx bx-log-out'></i> Log Out</a>
+                        </div>
+                    </div>
                 </div>
             </header>
+
+            <section class="hero-card">
+                <div class="hero-left">
+                    <h2>Find your next challenge</h2>
+                    <p>Choose category, field and level to start practicing.</p>
+                    <div class="hero-actions">
+                        <a href="#category-select-panel" class="btn-primary">Get Started</a>
+                    </div>
+                </div>
+                <div class="hero-right">
+                    <div class="profile-progress">
+                        <span id="profile-progress-label">Profile 0%</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="profile-progress-fill" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="kpi-grid-user">
+                <div class="kpi-card-user">
+                    <i class='bx bx-file-blank'></i>
+                    <div class="card-info"><h2 id="stat-registered">0</h2><p>Registered</p></div>
+                </div>
+                <div class="kpi-card-user">
+                    <i class='bx bx-calendar'></i>
+                    <div class="card-info"><h2 id="stat-upcoming">0</h2><p>Upcoming</p></div>
+                </div>
+                <div class="kpi-card-user">
+                    <i class='bx bx-broadcast'></i>
+                    <div class="card-info"><h2 id="stat-live">0</h2><p>Live Now</p></div>
+                </div>
+                <div class="kpi-card-user">
+                    <i class='bx bx-user-check'></i>
+                    <div class="card-info"><h2 id="stat-profile">0%</h2><p>Profile Complete</p></div>
+                </div>
+            </section>
 
 
             
             <section class="content-card" id="category-select-panel">
-                <div class="pill-row" id="category-pills"></div>
+                <div class="category-grid" id="category-pills"></div>
                 <div class="pill-row" id="field-pills" style="margin-top:14px;"></div>
                 <div class="pill-row" id="level-pills" style="margin-top:14px;"></div>
             </section>
@@ -66,6 +104,16 @@
                 <h2><i class='bx bx-filter-alt'></i> Matching Quizzes</h2>
                 <div class="quiz-list-grid" id="filtered-quizzes-container">
                 </div>
+            </section>
+
+            <section class="quiz-list-section" id="paid-section">
+                <h2><i class='bx bx-rupee'></i> Featured Paid Quizzes</h2>
+                <div class="square-grid" id="paid-quizzes-container"></div>
+            </section>
+
+            <section class="quiz-list-section" id="recommended-section">
+                <h2><i class='bx bx-star'></i> Recommended For You</h2>
+                <div class="quiz-list-grid" id="recommended-quizzes-container"></div>
             </section>
 
             
