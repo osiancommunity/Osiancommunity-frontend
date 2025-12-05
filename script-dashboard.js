@@ -126,12 +126,24 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         if (!fieldPillsRow) return;
         fieldPillsRow.innerHTML = '';
         const opts = fieldOptionsByCategory[selectedCategory] || [];
+        const counts = {};
+        allQuizzesFlat.filter(function(q){ return String(q.category||'') === selectedCategory && String(q.visibility || 'public').toLowerCase() !== 'unlisted'; }).forEach(function(q){
+            const key = String(q.field||'');
+            counts[key] = (counts[key]||0) + 1;
+        });
         opts.forEach(function(f){
             const el = document.createElement('button');
             el.className = 'pill' + (selectedField === f ? ' active' : '');
             el.type = 'button';
             el.textContent = f.charAt(0).toUpperCase() + f.slice(1);
             el.dataset.field = f;
+            const c = counts[f]||0;
+            if (c > 0) {
+                const b = document.createElement('span');
+                b.className = 'pill-badge';
+                b.textContent = c;
+                el.appendChild(b);
+            }
             el.onclick = function(){
                 selectedField = f;
                 selectedLevel = '';
@@ -188,13 +200,6 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             // Populate category-based sections (include all known categories)
             const cat = data.categories || {};
-            renderQuizzes(cat.technical, 'technical-quizzes-container', 'technical-section');
-            renderQuizzes(cat.gk, 'gk-quizzes-container', 'gk-section');
-            renderQuizzes(cat.engineering, 'engineering-quizzes-container', 'engineering-section');
-            renderQuizzes(cat.sports, 'sports-quizzes-container', 'sports-section');
-            renderQuizzes(cat.coding, 'coding-quizzes-container', 'coding-section');
-            renderQuizzes(cat.law, 'law-quizzes-container', 'law-section');
-            renderQuizzes(cat.studies, 'studies-quizzes-container', 'studies-section');
 
             allQuizzesFlat = [];
             Object.keys(cat).forEach(function(k){
@@ -335,10 +340,6 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 filtered.forEach(function(q){ cont.innerHTML += createQuizCard(q); });
             }
             section.style.display = 'block';
-            ['technical-section','gk-section','engineering-section','sports-section','coding-section','law-section','studies-section'].forEach(function(id){
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
         }
     }
 
