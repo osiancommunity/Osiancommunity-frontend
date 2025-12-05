@@ -95,27 +95,15 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         studies: ['sociology','economics','politics','history']
     };
 
-    const categoryIcons = {
-        technical: 'bx bx-code-alt',
-        law: 'bx bx-book-alt',
-        engineering: 'bx bx-buildings',
-        gk: 'bx bx-brain',
-        sports: 'bx bx-football',
-        coding: 'bx bx-code',
-        studies: 'bx bx-library'
-    };
-
     function renderCategoryPills(){
         if (!categoryPillsRow) return;
         const cats = ['technical','law','engineering','gk','sports','coding','studies'];
         categoryPillsRow.innerHTML = '';
         cats.forEach(function(cat){
             const el = document.createElement('button');
-            el.className = 'category-card' + (selectedCategory === cat ? ' active' : '');
+            el.className = 'pill' + (selectedCategory === cat ? ' active' : '');
             el.type = 'button';
-            const label = (cat.charAt(0).toUpperCase() + cat.slice(1)).replace('Gk','General Knowledge');
-            const icon = categoryIcons[cat] || 'bx bx-category';
-            el.innerHTML = `<i class='${icon}'></i><div class="category-info"><span class="category-name">${label}</span></div>`;
+            el.textContent = (cat.charAt(0).toUpperCase() + cat.slice(1)).replace('Gk','General Knowledge');
             el.dataset.cat = cat;
             el.onclick = function(){
                 selectedCategory = cat;
@@ -125,6 +113,10 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 renderFieldPills();
                 levelPillsRow.innerHTML = '';
                 document.getElementById('filtered-section').style.display = 'none';
+                ['technical-section','gk-section','engineering-section','sports-section','coding-section','law-section','studies-section'].forEach(function(id){
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'block';
+                });
             };
             categoryPillsRow.appendChild(el);
         });
@@ -141,7 +133,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         });
         opts.forEach(function(f){
             const el = document.createElement('button');
-            el.className = 'field-chip' + (selectedField === f ? ' active' : '');
+            el.className = 'pill' + (selectedField === f ? ' active' : '');
             el.type = 'button';
             el.textContent = f.charAt(0).toUpperCase() + f.slice(1);
             el.dataset.field = f;
@@ -168,7 +160,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         levelPillsRow.innerHTML = '';
         ['basic','medium','hard'].forEach(function(l){
             const el = document.createElement('button');
-            el.className = 'level-pill ' + l + (selectedLevel === l ? ' active' : '');
+            el.className = 'pill' + (selectedLevel === l ? ' active' : '');
             el.type = 'button';
             el.textContent = l.charAt(0).toUpperCase() + l.slice(1);
             el.dataset.level = l;
@@ -343,73 +335,18 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         if (cont && section) {
             cont.innerHTML = '';
             if (filtered.length === 0) {
-                cont.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-illustration">🎯</div>
-                        <h3>No quizzes match. Try selecting different filters.</h3>
-                        <p>Or explore all visible quizzes.</p>
-                        <button class="btn-primary" id="empty-explore-btn">Explore All Quizzes</button>
-                    </div>
-                `;
+                cont.innerHTML = '<p>No matching quizzes found.</p>';
             } else {
                 filtered.forEach(function(q){ cont.innerHTML += createQuizCard(q); });
             }
             section.style.display = 'block';
+            try { section.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
         }
     }
 
     renderCategoryPills();
 
     fetchQuizzes();
-
-    // Profile dropdown interactions
-    const profileBtn = document.getElementById('profile-menu-btn');
-    const profileDropdown = document.getElementById('profile-dropdown');
-    const dropdownLogout = document.getElementById('dropdown-logout');
-    if (profileBtn && profileDropdown) {
-        profileBtn.addEventListener('click', function(e){
-            e.preventDefault();
-            profileDropdown.classList.toggle('open');
-        });
-        document.addEventListener('click', function(e){
-            if (!e.target.closest('.profile-menu')) {
-                profileDropdown.classList.remove('open');
-            }
-        });
-    }
-    if (dropdownLogout) {
-        dropdownLogout.addEventListener('click', function(e){
-            e.preventDefault();
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = 'index.html';
-        });
-    }
-
-    document.addEventListener('click', function(e){
-        const btn = e.target.closest('#empty-explore-btn');
-        if (btn) {
-            const cont = document.getElementById('filtered-quizzes-container');
-            if (cont) {
-                cont.innerHTML = '';
-                const visible = allQuizzesFlat.filter(function(q){ return String(q.visibility || 'public').toLowerCase() !== 'unlisted'; });
-                visible.forEach(function(q){ cont.innerHTML += createQuizCard(q); });
-            }
-        }
-    });
-
-    // Update profile completeness in hero/KPI
-    (async function(){
-        try{
-            const pct = await getProfileCompleteness();
-            const label = document.getElementById('profile-progress-label');
-            const fill = document.getElementById('profile-progress-fill');
-            const stat = document.getElementById('stat-profile');
-            if (label) label.textContent = `Profile ${pct}%`;
-            if (fill) fill.style.width = pct + '%';
-            if (stat) stat.textContent = pct + '%';
-        } catch(_){ }
-    })();
 
     // Note: The poller logic from the original file has been removed for clarity,
     // as it can cause performance issues and is better replaced by WebSockets.
