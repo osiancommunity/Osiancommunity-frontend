@@ -334,7 +334,7 @@ body {
 }
 
 .category-card:hover {
-    transform: translateY(-6px) scale(1.02);
+    transform: translateY(-5px);
     background: var(--primary-color);
     color: var(--white);
 }
@@ -373,8 +373,8 @@ body {
 }
 
 .dashboard-box:hover {
-    transform: translateY(-6px) scale(1.01);
-    box-shadow: 0 14px 28px rgba(74, 144, 226, 0.16);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(74, 144, 226, 0.1);
 }
 
 .dashboard-box h2 {
@@ -667,7 +667,7 @@ body {
 }
 
 .video-card:hover {
-    transform: translateY(-6px) scale(1.01);
+    transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -1332,14 +1332,13 @@ body {
 }
 
 .btn-primary {
-    background: var(--primary-gradient);
+    background: var(--primary-color);
     color: var(--white);
-    position: relative;
-    overflow: hidden;
 }
 
-.btn-primary:hover { animation: gradientShift 2s ease infinite; }
-.btn-primary::after { content: ''; position: absolute; left: -30%; top: 0; width: 30%; height: 100%; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.35), rgba(255,255,255,0)); transform: skewX(-20deg); animation: shine 2.2s linear infinite; }
+.btn-primary:hover {
+    background: #3a7bd5;
+}
 
 .btn-secondary {
     background: var(--secondary-color);
@@ -1620,7 +1619,6 @@ a, button {
 .dashboard-box { animation: fadeUp 0.4s ease both; }
 .video-card { animation: fadeUp 0.4s ease both; }
 .quiz-card { animation: fadeUp 0.4s ease both; }
-.quiz-card:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 14px 28px rgba(0,0,0,0.12); }
 
 .sidebar-menu a:hover { transform: translateX(3px); }
 .header-profile input:focus { box-shadow: 0 0 0 3px rgba(74,144,226,0.15); }
@@ -1629,13 +1627,3 @@ a, button {
 .btn-secondary:hover { transform: translateY(-2px); }
 .bottom-nav a:hover { color: var(--primary-color); transform: translateY(-1px); }
 .support-chat:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(74,144,226,0.18); }
-
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-@keyframes shine {
-    0% { left: -30%; }
-    100% { left: 130%; }
-}

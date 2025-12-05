@@ -54,15 +54,57 @@
                 </div>
             </header>
 
-            <!-- New Category-Based Sections -->
 
+            
+            <section class="content-card" id="quiz-filter-panel">
+                <h3>Select Category, Field, and Level</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="filter-category">Category</label>
+                        <select id="filter-category" required>
+                            <option value="" disabled selected>Select category</option>
+                            <option value="technical">Technical</option>
+                            <option value="law">Law</option>
+                            <option value="engineering">Engineering</option>
+                            <option value="gk">General Knowledge</option>
+                            <option value="sports">Sports</option>
+                            <option value="coding">Coding</option>
+                            <option value="studies">Social Studies</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-field">Field</label>
+                        <select id="filter-field" required>
+                            <option value="" disabled selected>Select field</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-level">Level</label>
+                        <select id="filter-level" required>
+                            <option value="basic">Basic</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top:10px;">
+                    <button class="btn-primary" id="apply-filter-btn">Find Quizzes</button>
+                </div>
+            </section>
+
+            <section class="quiz-list-section" id="filtered-section" style="display:none;">
+                <h2><i class='bx bx-filter-alt'></i> Matching Quizzes</h2>
+                <div class="quiz-list-grid" id="filtered-quizzes-container">
+                </div>
+            </section>
+
+            <!-- New Category-Based Sections -->
             <section class="quiz-list-section" id="technical-section">
                 <h2><i class='bx bx-code-alt'></i> Technical Quizzes</h2>
                 <div class="quiz-list-grid" id="technical-quizzes-container">
                     <p>Loading quizzes...</p>
                 </div>
             </section>
-
             <section class="quiz-list-section" id="gk-section">
                 <h2><i class='bx bx-brain'></i> General Knowledge Quizzes</h2>
                 <div class="quiz-list-grid" id="gk-quizzes-container">

@@ -144,15 +144,11 @@ body, html {
     font-weight: 600;
     cursor: pointer;
     transition: background 0.3s ease;
-    position: relative;
-    overflow: hidden;
 }
 
 .login-btn:hover {
     background: linear-gradient(135deg, #3e00b8, #7d26c9);
 }
-.login-btn::after { content: ''; position: absolute; left: -30%; top: 0; width: 30%; height: 100%; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.35), rgba(255,255,255,0)); transform: skewX(-20deg); animation: shine 2.2s linear infinite; }
-@keyframes shine { 0% { left: -30%; } 100% { left: 130%; } }
 
 .social-separator {
     margin: 30px 0;

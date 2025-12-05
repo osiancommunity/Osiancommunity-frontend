@@ -77,6 +77,38 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
 
     // --- Fetch and Display Quizzes ---
+    let allQuizzesFlat = [];
+    const filterCategory = document.getElementById('filter-category');
+    const filterField = document.getElementById('filter-field');
+    const filterLevel = document.getElementById('filter-level');
+    const applyFilterBtn = document.getElementById('apply-filter-btn');
+
+    const fieldOptionsByCategory = {
+        technical: ['python','java','c++','os','networks','web'],
+        law: ['constitutional','criminal','civil','corporate','tax'],
+        engineering: ['mechanical','electrical','civil','computer'],
+        gk: ['history','science','geography','current-affairs'],
+        sports: ['football','cricket','basketball','athletics'],
+        coding: ['javascript','python','java','c++','algorithms','data-structures'],
+        studies: ['sociology','economics','politics','history']
+    };
+
+    function populateFieldOptions(cat){
+        if (!filterField) return;
+        filterField.innerHTML = '<option value="" disabled selected>Select field</option>';
+        const opts = fieldOptionsByCategory[cat] || [];
+        opts.forEach(function(f){
+            const o = document.createElement('option');
+            o.value = f;
+            o.textContent = f.charAt(0).toUpperCase() + f.slice(1);
+            filterField.appendChild(o);
+        });
+    }
+
+    if (filterCategory) {
+        filterCategory.addEventListener('change', function(){ populateFieldOptions(this.value); });
+    }
+
     async function fetchQuizzes() {
         try {
             const response = await fetch(`${backendUrl}/quizzes`, {
@@ -111,6 +143,11 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             renderQuizzes(cat.coding, 'coding-quizzes-container', 'coding-section');
             renderQuizzes(cat.law, 'law-quizzes-container', 'law-section');
             renderQuizzes(cat.studies, 'studies-quizzes-container', 'studies-section');
+
+            allQuizzesFlat = [];
+            Object.keys(cat).forEach(function(k){
+                (cat[k]||[]).forEach(function(q){ allQuizzesFlat.push(q); });
+            });
 
         } catch (error) {
             console.error('Error fetching quizzes:', error);
@@ -164,6 +201,8 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 <div class="quiz-stats">
                     <span><i class='bx bx-user'></i> ${participantsCount} Participants</span>
                     <span><i class='bx bx-time'></i> ${quiz.duration || 30} Mins</span>
+                    ${quiz.field ? `<span><i class='bx bx-category'></i> ${quiz.field}</span>` : ''}
+                    ${quiz.difficulty ? `<span><i class='bx bx-signal-4'></i> ${quiz.difficulty}</span>` : ''}
                 </div>
                 <button class="quiz-btn ${isPaid ? 'paid' : 'live'}" data-quiz-id="${quiz._id}" onclick="window.location.href='${destinationUrl}'">${isPaid ? `Register (₹${priceStr})` : 'Join Now'}</button>
             </div>
@@ -227,7 +266,34 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         }
     });
 
-    // --- Initial Page Load ---
+    function applyFilter(){
+        const cat = filterCategory ? filterCategory.value : '';
+        const fld = filterField ? filterField.value : '';
+        const lvl = filterLevel ? filterLevel.value : '';
+        const filtered = allQuizzesFlat.filter(function(q){
+            return String(q.category||'') === cat && String(q.field||'') === fld && String(q.difficulty||'') === lvl && String(q.visibility || 'public').toLowerCase() !== 'unlisted';
+        });
+        const cont = document.getElementById('filtered-quizzes-container');
+        const section = document.getElementById('filtered-section');
+        if (cont && section) {
+            cont.innerHTML = '';
+            if (filtered.length === 0) {
+                cont.innerHTML = '<p>No matching quizzes found.</p>';
+            } else {
+                filtered.forEach(function(q){ cont.innerHTML += createQuizCard(q); });
+            }
+            section.style.display = 'block';
+            ['technical-section','gk-section','engineering-section','sports-section','coding-section','law-section','studies-section'].forEach(function(id){
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+        }
+    }
+
+    if (applyFilterBtn) {
+        applyFilterBtn.addEventListener('click', function(e){ e.preventDefault(); applyFilter(); });
+    }
+
     fetchQuizzes();
 
     // Note: The poller logic from the original file has been removed for clarity,

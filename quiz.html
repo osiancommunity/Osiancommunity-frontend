@@ -85,6 +85,17 @@
             <div class="written-answer-container" style="display: none;">
                 <textarea id="written-answer" placeholder="Write your answer here..." rows="6"></textarea>
             </div>
+            <div class="code-answer-container" style="display: none;">
+                <div class="form-group">
+                    <label id="code-language-label">Language: </label>
+                </div>
+                <textarea id="code-editor" placeholder="Write your code here..." rows="10" style="font-family: monospace;"></textarea>
+                <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+                    <button id="run-code-btn" class="btn-primary" type="button">Run Code</button>
+                    <span id="run-status" style="color: var(--text-light);"></span>
+                </div>
+                <div class="code-output" id="code-output" style="margin-top:10px; white-space: pre-wrap; background:#111; color:#0f0; padding:10px; border-radius:8px; display:none;"></div>
+            </div>
 
             <div class="quiz-navigation">
                 <button id="prev-btn" class="btn-secondary" style="display: none;">Previous</button>

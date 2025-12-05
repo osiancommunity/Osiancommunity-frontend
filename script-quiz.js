@@ -49,6 +49,12 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     const submitQuizBtn = document.getElementById('submit-btn');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
+    const codeContainer = document.querySelector('.code-answer-container');
+    const codeEditor = document.getElementById('code-editor');
+    const runCodeBtn = document.getElementById('run-code-btn');
+    const codeOutput = document.getElementById('code-output');
+    const codeLangLabel = document.getElementById('code-language-label');
+    const runStatus = document.getElementById('run-status');
 
     // Disable start button immediately to prevent premature clicks
     startQuizBtn.disabled = true;
@@ -230,6 +236,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         if (question.questionType === 'mcq') {
             optionsContainer.style.display = 'grid';
             writtenContainer.style.display = 'none';
+            if (codeContainer) codeContainer.style.display = 'none';
             optionsContainer.innerHTML = ''; // Clear old options
 
             question.options.forEach((option, i) => {
@@ -247,6 +254,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         } else if (question.questionType === 'written') {
             optionsContainer.style.display = 'none';
             writtenContainer.style.display = 'block';
+            if (codeContainer) codeContainer.style.display = 'none';
             // Load existing written answer if any
             const existingWritten = writtenAnswers.find(a => a.questionIndex === index);
             writtenTextarea.value = existingWritten ? existingWritten.answer : '';
@@ -267,6 +275,50 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             // Remove previous event listeners to avoid duplicates
             writtenTextarea.removeEventListener('input', handleWrittenInput);
             writtenTextarea.addEventListener('input', handleWrittenInput);
+        } else if (question.questionType === 'coding') {
+            optionsContainer.style.display = 'none';
+            writtenContainer.style.display = 'none';
+            if (codeContainer) codeContainer.style.display = 'block';
+            if (codeLangLabel) codeLangLabel.textContent = `Language: ${question.codeLanguage || 'javascript'}`;
+            if (codeEditor) {
+                const existingCode = codeAnswers.find(a => a.questionIndex === index);
+                codeEditor.value = existingCode ? existingCode.code : (question.codeStarter || '');
+            }
+            if (codeEditor) {
+                codeEditor.removeEventListener('input', handleCodeInput);
+                codeEditor.addEventListener('input', handleCodeInput);
+            }
+            if (runCodeBtn) {
+                runCodeBtn.onclick = async function(){
+                    if (runStatus) runStatus.textContent = 'Running...';
+                    if (codeOutput) { codeOutput.style.display = 'none'; codeOutput.textContent = ''; }
+                    const lang = (question.codeLanguage || 'javascript');
+                    const code = codeEditor ? codeEditor.value : '';
+                    let version = null;
+                    const runtimes = await fetchPistonRuntimes();
+                    if (Array.isArray(runtimes)) {
+                        const rt = runtimes.find(r => r.language.toLowerCase() === lang.toLowerCase());
+                        version = rt ? rt.version : null;
+                    }
+                    try {
+                        const res = await fetch('https://emkc.org/api/v2/piston/execute', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                language: lang,
+                                version: version || undefined,
+                                files: [{ name: 'main', content: code }]
+                            })
+                        });
+                        const data = await res.json();
+                        const out = (data && data.run && (data.run.output || data.run.stdout)) || JSON.stringify(data);
+                        if (codeOutput) { codeOutput.textContent = out; codeOutput.style.display = 'block'; }
+                        if (runStatus) runStatus.textContent = '';
+                    } catch(e) {
+                        if (runStatus) runStatus.textContent = 'Failed to run';
+                    }
+                };
+            }
         }
 
         updateNavigationButtons();
@@ -281,6 +333,15 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 questionIndex: currentQuestionIndex,
                 answer: this.value
             });
+        }
+    }
+
+    function handleCodeInput() {
+        const existing = codeAnswers.find(a => a.questionIndex === currentQuestionIndex);
+        if (existing) {
+            existing.code = this.value;
+        } else {
+            codeAnswers.push({ questionIndex: currentQuestionIndex, code: this.value });
         }
     }
 
@@ -400,10 +461,12 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     answers: currentQuizData.questions.map((question, index) => {
                         const mcqAnswer = userAnswers.find(a => a.questionIndex === index);
                         const writtenAnswer = writtenAnswers.find(w => w.questionIndex === index);
+                        const codeAnswer = codeAnswers.find(c => c.questionIndex === index);
                         return {
                             questionIndex: index,
                             selectedAnswer: mcqAnswer ? mcqAnswer.answerIndex : null,
                             writtenAnswer: writtenAnswer ? writtenAnswer.answer : '',
+                            codeAnswer: codeAnswer ? codeAnswer.code : '',
                             timeSpent: 0
                         };
                     }),
@@ -619,3 +682,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // --- Initial Load ---
     loadQuiz();
 });
+    let codeAnswers = [];
+    let pistonRuntimes = null;
+    async function fetchPistonRuntimes(){
+        if (pistonRuntimes) return pistonRuntimes;
+        try {
+            const res = await fetch('https://emkc.org/api/v2/piston/runtimes');
+            if (!res.ok) return null;
+            pistonRuntimes = await res.json();
+            return pistonRuntimes;
+        } catch(_) { return null; }
+    }

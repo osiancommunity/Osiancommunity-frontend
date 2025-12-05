@@ -64,6 +64,21 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="quiz-field">Field</label>
+                            <select id="quiz-field" title="Select a field/sub-category" required>
+                                <option value="" disabled selected>Select a field</option>
+                            </select>
+                            <small>Options update based on selected category</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="quiz-difficulty">Difficulty</label>
+                            <select id="quiz-difficulty" title="Select difficulty" required>
+                                <option value="basic">Basic</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="quiz-type">Quiz Type</label>
                             <select id="quiz-type" title="Select a quiz type" required>
                                 <option value="regular">Regular</option>
@@ -115,6 +130,7 @@
                                 <select class="question-type" required>
                                     <option value="mcq">Multiple Choice Question (MCQ)</option>
                                     <option value="written">Written Question</option>
+                                    <option value="coding">Coding Question</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -147,6 +163,23 @@
                                     <option value="2">Option 3</option>
                                     <option value="3">Option 4</option>
                                 </select>
+                            </div>
+                            <div class="form-group coding-only" style="display:none;">
+                                <label>Programming Language</label>
+                                <select class="code-language">
+                                    <option value="javascript">JavaScript</option>
+                                    <option value="python">Python</option>
+                                    <option value="java">Java</option>
+                                    <option value="cpp">C++</option>
+                                </select>
+                            </div>
+                            <div class="form-group coding-only" style="display:none;">
+                                <label>Starter Code (optional)</label>
+                                <textarea class="code-starter" placeholder="Provide starter template or function signature..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Marks</label>
+                                <input type="number" class="question-marks" placeholder="e.g., 5" min="1" required>
                             </div>
                         </div>
                         </div>

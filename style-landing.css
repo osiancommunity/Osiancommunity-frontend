@@ -40,16 +40,12 @@ ul {
 .btn-primary {
     background: linear-gradient(135deg, #4a00e0, #8e2de2);
     color: #fff;
-    position: relative;
-    overflow: hidden;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    animation: gradientShift 2s ease infinite;
 }
-.btn-primary::after { content: ''; position: absolute; left: -30%; top: 0; width: 30%; height: 100%; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.35), rgba(255,255,255,0)); transform: skewX(-20deg); animation: shine 2.2s linear infinite; }
 
 .btn-light {
     background: #f4f4f4;
@@ -266,7 +262,6 @@ ul {
 .category-card:hover {
     background: #4a00e0;
     color: #fff;
-    transform: translateY(-3px) scale(1.02);
 }
 
 /* ------------------------- */
@@ -275,10 +270,8 @@ ul {
 .cta {
     padding: 80px 20px;
     background: linear-gradient(135deg, #4a00e0, #8e2de2);
-    background-size: 200% 200%;
     color: #fff;
     text-align: center;
-    animation: gradientShift 6s ease infinite;
 }
 
 .cta h2 {
@@ -374,8 +367,6 @@ ul {
     0% { opacity: 0; transform: translateY(8px); }
     100% { opacity: 1; transform: translateY(0); }
 }
-@keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-@keyframes shine { 0% { left: -30%; } 100% { left: 130%; } }
 
 .hero { animation: fadeUp 0.4s ease both; }
 .feature-card { animation: fadeUp 0.4s ease both; }

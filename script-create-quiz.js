@@ -51,6 +51,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     const addQuestionBtn = document.getElementById('add-question-btn');
     const questionsContainer = document.getElementById('questions-container');
     const quizCoverInput = document.getElementById('quiz-cover');
+    const quizCategorySelect = document.getElementById('quiz-category');
+    const quizFieldSelect = document.getElementById('quiz-field');
+    const quizDifficultySelect = document.getElementById('quiz-difficulty');
     let questionCount = 1; // Initialize with 1 for the first question block
     let coverImageBase64 = null;
 
@@ -62,6 +65,35 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             priceGroup.style.display = 'none';
         }
     });
+
+    // --- Field options per Category ---
+    const fieldOptionsByCategory = {
+        technical: ['python','java','c++','os','networks','web'],
+        law: ['constitutional','criminal','civil','corporate','tax'],
+        engineering: ['mechanical','electrical','civil','computer'],
+        gk: ['history','science','geography','current-affairs'],
+        sports: ['football','cricket','basketball','athletics'],
+        coding: ['javascript','python','java','c++','algorithms','data-structures'],
+        studies: ['sociology','economics','politics','history']
+    };
+
+    function populateFieldOptions(category){
+        if (!quizFieldSelect) return;
+        quizFieldSelect.innerHTML = '<option value="" disabled selected>Select a field</option>';
+        const opts = fieldOptionsByCategory[category] || [];
+        opts.forEach(function(f){
+            const opt = document.createElement('option');
+            opt.value = f;
+            opt.textContent = f.charAt(0).toUpperCase() + f.slice(1);
+            quizFieldSelect.appendChild(opt);
+        });
+    }
+
+    if (quizCategorySelect) {
+        quizCategorySelect.addEventListener('change', function(){
+            populateFieldOptions(this.value);
+        });
+    }
 
     // --- Handle Quiz Cover Image Upload ---
     quizCoverInput.addEventListener('change', function(e) {
@@ -118,18 +150,27 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     // --- Handle Question Type Changes ---
     questionsContainer.addEventListener('change', function(e) {
-        if (e.target.classList.contains('question-type')) {
-            const questionBlock = e.target.closest('.question-block');
-            const mcqOnlyElements = questionBlock.querySelectorAll('.mcq-only');
-            if (e.target.value === 'mcq') {
-                mcqOnlyElements.forEach(el => el.style.display = 'block'); // Show MCQ fields
-                // Ensure required attributes are set for MCQ fields
-                questionBlock.querySelectorAll('.mcq-only input, .mcq-only select').forEach(input => input.setAttribute('required', 'true'));
-            } else {
-                mcqOnlyElements.forEach(el => el.style.display = 'none'); // Hide MCQ fields
-                // Remove required attributes for written fields
-                questionBlock.querySelectorAll('.mcq-only input, .mcq-only select').forEach(input => input.removeAttribute('required'));
-            }
+        if (!e.target.classList.contains('question-type')) return;
+        const questionBlock = e.target.closest('.question-block');
+        const mcqEls = questionBlock.querySelectorAll('.mcq-only');
+        const codingEls = questionBlock.querySelectorAll('.coding-only');
+        const type = e.target.value;
+        if (type === 'mcq') {
+            mcqEls.forEach(el => el.style.display = 'block');
+            codingEls.forEach(el => el.style.display = 'none');
+            questionBlock.querySelectorAll('.mcq-only input, .mcq-only select').forEach(input => input.setAttribute('required','true'));
+            questionBlock.querySelectorAll('.coding-only select, .coding-only textarea').forEach(input => input.removeAttribute('required'));
+        } else if (type === 'coding') {
+            mcqEls.forEach(el => el.style.display = 'none');
+            codingEls.forEach(el => el.style.display = 'block');
+            questionBlock.querySelectorAll('.mcq-only input, .mcq-only select').forEach(input => input.removeAttribute('required'));
+            questionBlock.querySelectorAll('.coding-only select').forEach(input => input.setAttribute('required','true'));
+            // starter code optional
+        } else {
+            mcqEls.forEach(el => el.style.display = 'none');
+            codingEls.forEach(el => el.style.display = 'none');
+            questionBlock.querySelectorAll('.mcq-only input, .mcq-only select').forEach(input => input.removeAttribute('required'));
+            questionBlock.querySelectorAll('.coding-only select, .coding-only textarea').forEach(input => input.removeAttribute('required'));
         }
     });
 
@@ -147,6 +188,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 <select class="question-type" required> 
                     <option value="mcq">Multiple Choice Question (MCQ)</option>
                     <option value="written">Written Question</option>
+                    <option value="coding">Coding Question</option>
                 </select>
             </div>
             <div class="form-group">
@@ -179,6 +221,23 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     <option value="2">Option 3</option>
                     <option value="3">Option 4</option>
                 </select>
+            </div>
+            <div class="form-group coding-only" style="display:none;">
+                <label>Programming Language</label>
+                <select class="code-language">
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                </select>
+            </div>
+            <div class="form-group coding-only" style="display:none;">
+                <label>Starter Code (optional)</label>
+                <textarea class="code-starter" placeholder="Provide starter template or function signature..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Marks</label>
+                <input type="number" class="question-marks" placeholder="e.g., 5" min="1" required>
             </div>
         `;
         questionsContainer.appendChild(newQuestionBlock);
@@ -213,10 +272,12 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             for (const block of questionBlocks) {
                 const questionText = block.querySelector('.question-text').value;
                 const questionType = block.querySelector('.question-type').value;
+                const marks = parseInt(block.querySelector('.question-marks').value) || 1;
                 
                 const questionData = {
                     questionText,
-                    questionType
+                    questionType,
+                    marks
                 };
 
                 if (questionType === 'mcq') {
@@ -231,6 +292,11 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     
                     questionData.options = options;
                     questionData.correctAnswer = parseInt(correctAnswer); // Convert "0", "1" to number
+                } else if (questionType === 'coding') {
+                    const langEl = block.querySelector('.code-language');
+                    const starterEl = block.querySelector('.code-starter');
+                    questionData.codeLanguage = langEl ? langEl.value : 'javascript';
+                    questionData.codeStarter = starterEl ? starterEl.value : '';
                 }
                 // For 'written' questions, no options or correct answer are needed.
                 // No specific validation for written question answers on creation, as they are free-form.
@@ -250,6 +316,8 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             const quizData = {
                 title: document.getElementById('quiz-title').value,
                 category: document.getElementById('quiz-category').value,
+                field: document.getElementById('quiz-field').value,
+                difficulty: document.getElementById('quiz-difficulty').value,
                 quizType: document.getElementById('quiz-type').value,
                 duration: parseInt(document.getElementById('quiz-duration').value),
                 registrationLimit: parseInt(document.getElementById('quiz-limit').value) || 0,
@@ -261,7 +329,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             };
 
             // Basic validation for required fields
-            if (!quizData.title || !quizData.category || !quizData.quizType || !quizData.duration || !quizData.coverImage) {
+            if (!quizData.title || !quizData.category || !quizData.field || !quizData.difficulty || !quizData.quizType || !quizData.duration || !quizData.coverImage) {
                 showToast('Please fill in all required quiz details and upload a cover image.', 'warning');
                 submitButton.disabled = false;
                 submitButton.textContent = "Create Quiz";
@@ -347,6 +415,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             // Populate form fields
             document.getElementById('quiz-title').value = quiz.title;
             document.getElementById('quiz-category').value = quiz.category;
+            try { populateFieldOptions(quiz.category); } catch(_){}
+            if (quiz.field && quizFieldSelect) { quizFieldSelect.value = quiz.field; }
+            if (quiz.difficulty && quizDifficultySelect) { quizDifficultySelect.value = quiz.difficulty; }
             document.getElementById('quiz-type').value = quiz.quizType;
             document.getElementById('quiz-duration').value = quiz.duration;
             document.getElementById('quiz-limit').value = quiz.registrationLimit || '';
@@ -391,6 +462,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                         <select class="question-type" required>
                             <option value="mcq" ${question.questionType === 'mcq' ? 'selected' : ''}>Multiple Choice Question (MCQ)</option>
                             <option value="written" ${question.questionType === 'written' ? 'selected' : ''}>Written Question</option>
+                            <option value="coding" ${question.questionType === 'coding' ? 'selected' : ''}>Coding Question</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -423,6 +495,23 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                             <option value="2" ${question.correctAnswer === 2 ? 'selected' : ''}>Option 3</option>
                             <option value="3" ${question.correctAnswer === 3 ? 'selected' : ''}>Option 4</option>
                         </select>
+                    </div>
+                    <div class="form-group coding-only" style="display: ${question.questionType === 'coding' ? 'block' : 'none'};">
+                        <label>Programming Language</label>
+                        <select class="code-language" ${question.questionType === 'coding' ? 'required' : ''}>
+                            <option value="javascript" ${question.codeLanguage === 'javascript' ? 'selected' : ''}>JavaScript</option>
+                            <option value="python" ${question.codeLanguage === 'python' ? 'selected' : ''}>Python</option>
+                            <option value="java" ${question.codeLanguage === 'java' ? 'selected' : ''}>Java</option>
+                            <option value="cpp" ${question.codeLanguage === 'cpp' ? 'selected' : ''}>C++</option>
+                        </select>
+                    </div>
+                    <div class="form-group coding-only" style="display: ${question.questionType === 'coding' ? 'block' : 'none'};">
+                        <label>Starter Code (optional)</label>
+                        <textarea class="code-starter" placeholder="Provide starter template or function signature...">${question.codeStarter || ''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Marks</label>
+                        <input type="number" class="question-marks" placeholder="e.g., 5" min="1" value="${Number.isFinite(question.marks) ? question.marks : 1}" required>
                     </div>
                 `;
                 questionsContainer.appendChild(questionBlock);
