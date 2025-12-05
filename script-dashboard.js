@@ -88,15 +88,18 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     function slideOpen(el){
         if (!el) return;
         el.classList.add('open');
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
         el.style.maxHeight = '0px';
-        requestAnimationFrame(function(){
-            el.style.maxHeight = el.scrollHeight + 'px';
-        });
+        void el.offsetHeight; // force reflow
+        el.style.maxHeight = el.scrollHeight + 'px';
     }
 
     function slideClose(el){
         if (!el) return;
         el.classList.remove('open');
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-4px)';
         el.style.maxHeight = '0px';
     }
 

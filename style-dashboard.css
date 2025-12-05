@@ -1036,6 +1036,7 @@ body {
     opacity: 0;
     transform: translateY(-4px);
     transition: max-height 0.3s ease, opacity 0.25s ease, transform 0.25s ease;
+    -webkit-transition: max-height 0.3s ease, opacity 0.25s ease, transform 0.25s ease;
     will-change: max-height, transform, opacity;
 }
 
