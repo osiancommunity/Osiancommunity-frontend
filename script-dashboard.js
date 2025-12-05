@@ -111,11 +111,11 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         categoryPillsRow.innerHTML = '';
         cats.forEach(function(cat){
             const el = document.createElement('button');
-            el.className = 'category-chip' + (selectedCategory === cat ? ' active' : '');
+            el.className = 'category-card' + (selectedCategory === cat ? ' active' : '');
             el.type = 'button';
             const label = (cat.charAt(0).toUpperCase() + cat.slice(1)).replace('Gk','General Knowledge');
             const icon = categoryIcons[cat] || 'bx bx-category';
-            el.innerHTML = `<i class='${icon}'></i><span>${label}</span>`;
+            el.innerHTML = `<i class='${icon}'></i><div class="category-info"><span class="category-name">${label}</span></div>`;
             el.dataset.cat = cat;
             el.onclick = function(){
                 selectedCategory = cat;
@@ -141,7 +141,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         });
         opts.forEach(function(f){
             const el = document.createElement('button');
-            el.className = 'pill' + (selectedField === f ? ' active' : '');
+            el.className = 'field-chip' + (selectedField === f ? ' active' : '');
             el.type = 'button';
             el.textContent = f.charAt(0).toUpperCase() + f.slice(1);
             el.dataset.field = f;
@@ -168,7 +168,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         levelPillsRow.innerHTML = '';
         ['basic','medium','hard'].forEach(function(l){
             const el = document.createElement('button');
-            el.className = 'pill' + (selectedLevel === l ? ' active' : '');
+            el.className = 'level-pill ' + l + (selectedLevel === l ? ' active' : '');
             el.type = 'button';
             el.textContent = l.charAt(0).toUpperCase() + l.slice(1);
             el.dataset.level = l;
@@ -346,8 +346,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 cont.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-illustration">🎯</div>
-                        <h3>No quizzes match yet</h3>
-                        <p>Try another category, field or level.</p>
+                        <h3>No quizzes match. Try selecting different filters.</h3>
+                        <p>Or explore all visible quizzes.</p>
+                        <button class="btn-primary" id="empty-explore-btn">Explore All Quizzes</button>
                     </div>
                 `;
             } else {
@@ -384,6 +385,18 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             window.location.href = 'index.html';
         });
     }
+
+    document.addEventListener('click', function(e){
+        const btn = e.target.closest('#empty-explore-btn');
+        if (btn) {
+            const cont = document.getElementById('filtered-quizzes-container');
+            if (cont) {
+                cont.innerHTML = '';
+                const visible = allQuizzesFlat.filter(function(q){ return String(q.visibility || 'public').toLowerCase() !== 'unlisted'; });
+                visible.forEach(function(q){ cont.innerHTML += createQuizCard(q); });
+            }
+        }
+    });
 
     // Update profile completeness in hero/KPI
     (async function(){
