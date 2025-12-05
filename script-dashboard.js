@@ -78,10 +78,12 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     // --- Fetch and Display Quizzes ---
     let allQuizzesFlat = [];
-    const filterCategory = document.getElementById('filter-category');
-    const filterField = document.getElementById('filter-field');
-    const filterLevel = document.getElementById('filter-level');
-    const applyFilterBtn = document.getElementById('apply-filter-btn');
+    const categoryPillsRow = document.getElementById('category-pills');
+    const fieldPillsRow = document.getElementById('field-pills');
+    const levelPillsRow = document.getElementById('level-pills');
+    let selectedCategory = '';
+    let selectedField = '';
+    let selectedLevel = '';
 
     const fieldOptionsByCategory = {
         technical: ['python','java','c++','os','networks','web'],
@@ -93,20 +95,70 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         studies: ['sociology','economics','politics','history']
     };
 
-    function populateFieldOptions(cat){
-        if (!filterField) return;
-        filterField.innerHTML = '<option value="" disabled selected>Select field</option>';
-        const opts = fieldOptionsByCategory[cat] || [];
-        opts.forEach(function(f){
-            const o = document.createElement('option');
-            o.value = f;
-            o.textContent = f.charAt(0).toUpperCase() + f.slice(1);
-            filterField.appendChild(o);
+    function renderCategoryPills(){
+        if (!categoryPillsRow) return;
+        const cats = ['technical','law','engineering','gk','sports','coding','studies'];
+        categoryPillsRow.innerHTML = '';
+        cats.forEach(function(cat){
+            const el = document.createElement('button');
+            el.className = 'pill' + (selectedCategory === cat ? ' active' : '');
+            el.type = 'button';
+            el.textContent = (cat.charAt(0).toUpperCase() + cat.slice(1)).replace('Gk','General Knowledge');
+            el.dataset.cat = cat;
+            el.onclick = function(){
+                selectedCategory = cat;
+                selectedField = '';
+                selectedLevel = '';
+                renderCategoryPills();
+                renderFieldPills();
+                levelPillsRow.innerHTML = '';
+                document.getElementById('filtered-section').style.display = 'none';
+                ['technical-section','gk-section','engineering-section','sports-section','coding-section','law-section','studies-section'].forEach(function(id){
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'block';
+                });
+            };
+            categoryPillsRow.appendChild(el);
         });
     }
 
-    if (filterCategory) {
-        filterCategory.addEventListener('change', function(){ populateFieldOptions(this.value); });
+    function renderFieldPills(){
+        if (!fieldPillsRow) return;
+        fieldPillsRow.innerHTML = '';
+        const opts = fieldOptionsByCategory[selectedCategory] || [];
+        opts.forEach(function(f){
+            const el = document.createElement('button');
+            el.className = 'pill' + (selectedField === f ? ' active' : '');
+            el.type = 'button';
+            el.textContent = f.charAt(0).toUpperCase() + f.slice(1);
+            el.dataset.field = f;
+            el.onclick = function(){
+                selectedField = f;
+                selectedLevel = '';
+                renderFieldPills();
+                renderLevelPills();
+                document.getElementById('filtered-section').style.display = 'none';
+            };
+            fieldPillsRow.appendChild(el);
+        });
+    }
+
+    function renderLevelPills(){
+        if (!levelPillsRow) return;
+        levelPillsRow.innerHTML = '';
+        ['basic','medium','hard'].forEach(function(l){
+            const el = document.createElement('button');
+            el.className = 'pill' + (selectedLevel === l ? ' active' : '');
+            el.type = 'button';
+            el.textContent = l.charAt(0).toUpperCase() + l.slice(1);
+            el.dataset.level = l;
+            el.onclick = function(){
+                selectedLevel = l;
+                renderLevelPills();
+                applyFilter();
+            };
+            levelPillsRow.appendChild(el);
+        });
     }
 
     async function fetchQuizzes() {
@@ -267,9 +319,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     });
 
     function applyFilter(){
-        const cat = filterCategory ? filterCategory.value : '';
-        const fld = filterField ? filterField.value : '';
-        const lvl = filterLevel ? filterLevel.value : '';
+        const cat = selectedCategory;
+        const fld = selectedField;
+        const lvl = selectedLevel;
         const filtered = allQuizzesFlat.filter(function(q){
             return String(q.category||'') === cat && String(q.field||'') === fld && String(q.difficulty||'') === lvl && String(q.visibility || 'public').toLowerCase() !== 'unlisted';
         });
@@ -290,9 +342,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         }
     }
 
-    if (applyFilterBtn) {
-        applyFilterBtn.addEventListener('click', function(e){ e.preventDefault(); applyFilter(); });
-    }
+    renderCategoryPills();
 
     fetchQuizzes();
 

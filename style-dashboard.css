@@ -998,6 +998,28 @@ body {
     gap: 25px;
 }
 
+/* Category/Field/Level Pills */
+.pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+.pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    background: transparent;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.pill:hover { transform: translateY(-2px); }
+.pill.active { background: var(--primary-color); color: var(--white); }
+
 .square-grid .quiz-card {
     aspect-ratio: 1 / 1; /* 1:1 ratio */
     display: flex;
