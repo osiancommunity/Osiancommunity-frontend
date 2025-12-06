@@ -110,7 +110,7 @@ ul {
     letter-spacing: 0.5px;
     color: #6C00FF;
 }
-.nav-logo-img { height: 32px; width: auto; display: block; }
+.nav-logo-img { height: 40px; width: auto; display: block; border-radius: 6px; }
 
 .nav-menu {
     display: flex;
