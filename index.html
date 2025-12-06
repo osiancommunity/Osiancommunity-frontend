@@ -13,7 +13,7 @@
 
     <header class="header">
         <nav class="navbar">
-            <a href="index.html" class="nav-logo">OSIAN</a>
+            <a href="index.html" class="nav-logo"><img src="assets/osian-logo.svg" alt="OSIAN" class="nav-logo-img"></a>
             <ul class="nav-menu">
                 <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
                 <li class="nav-item"><a href="#features" class="nav-link">Features</a></li>
@@ -37,13 +37,15 @@
     <main>
         <section class="hero" id="home">
             <div class="hero-content">
-                <h1>Welcome to OSIAN</h1>
-                <h2>The Ultimate Quiz Platform</h2>
-                <p>Challenge your knowledge, compete with peers, and explore quizzes across dozens of fields. Your journey to mastery starts here.</p>
-                <a href="register.html" class="btn btn-primary btn-lg">Get Started Now</a>
+                <h1><span class="highlight-yellow">Welcome to OSIAN —</span> <span class="highlight-black">India’s Ultimate Quiz Arena.</span></h1>
+                <p>Challenge your knowledge, compete with peers, and win exciting rewards through Free Challenges and curated quizzes.</p>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <a href="register.html" class="btn btn-primary btn-lg">Get Started Now</a>
+                    <a href="#features" class="btn btn-light btn-lg">Explore Features</a>
+                </div>
             </div>
             <div class="hero-image">
-                <img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Quiz Illustration">
+                <img src="https://images.unsplash.com/photo-1513258491355-0f9a0d0cb221?auto=format&fit=crop&w=1600&q=70" alt="Students studying together">
             </div>
         </section>
 
@@ -51,48 +53,47 @@
                 <h2>Why Choose OSIAN?</h2>
             <div class="features-grid">
                 <div class="feature-card">
-                    <i class='bx bx-broadcast'></i>
-                    <h3>Live Quizzes</h3>
-                    <p>Participate in real-time quiz events and compete on a live leaderboard.</p>
-                </div>
-                <div class="feature-card">
                     <i class='bx bx-trophy'></i>
                     <h3>Free Challenges</h3>
                     <p>Open, exciting quiz challenges that students can join without payment.</p>
                 </div>
                 <div class="feature-card">
-                    <i class='bx bx-video'></i>
-                    <h3>Expert Mentorship</h3>
-                    <p>Access exclusive video content and guidance from experts in various fields.</p>
+                    <i class='bx bx-category-alt'></i>
+                    <h3>Multi-Category Quizzes</h3>
+                    <p>Explore quizzes across diverse fields tailored for students nationwide.</p>
                 </div>
                 <div class="feature-card">
-                    <i class='bx bx-category-alt'></i>
-                    <h3>Diverse Categories</h3>
-                    <p>From technical and law to general knowledge, we have a quiz for everyone.</p>
+                    <i class='bx bx-bar-chart-alt-2'></i>
+                    <h3>Live Leaderboards</h3>
+                    <p>Track your performance in real time and climb the ranks with your peers.</p>
+                </div>
+                <div class="feature-card">
+                    <i class='bx bx-medal'></i>
+                    <h3>Rewards & Achievements</h3>
+                    <p>Earn badges, certificates, and recognition as you progress.</p>
                 </div>
             </div>
         </section>
 
         <section class="categories" id="categories">
             <h2>Explore Our Categories</h2>
+            <p style="margin-bottom:16px; color:#666;">Click any category to sign up first — then start competing.</p>
             <div class="category-grid">
-                <div class="category-card"><span>Technical</span></div>
-                <div class="category-card"><span>Law</span></div>
-                <div class="category-card"><span>Engineering</span></div>
-                <div class="category-card"><span>General Knowledge</span></div>
-                <div class="category-card"><span>Sports</span></div>
-                <div class="category-card"><span>Coding</span></div>
-                <div class="category-card"><span>Social Studies</span></div>
-                <div class="category-card"><span>And More...</span></div>
+                <div class="category-card"><i class='bx bx-lock-alt'></i><span>Technical</span></div>
+                <div class="category-card"><i class='bx bx-lock-alt'></i><span>Law</span></div>
+                <div class="category-card"><i class='bx bx-lock-alt'></i><span>Engineering</span></div>
+                <div class="category-card"><i class='bx bx-lock-alt'></i><span>General Knowledge</span></div>
+                <div class="category-card"><i class='bx bx-lock-alt'></i><span>Sports</span></div>
+                <div class="category-card"><i class='bx bx-lock-alt'></i><span>Coding</span></div>
+                <div class="category-card"><i class='bx bx-lock-alt'></i><span>Social Studies</span></div>
+                <div class="category-card"><i class='bx bx-lock-alt'></i><span>And More...</span></div>
             </div>
         </section>
 
         <section class="about" id="about">
             <div class="about-container">
                 <h2>About OSIAN</h2>
-                <p>OSIAN is a national-level youth quiz and talent platform empowering students through knowledge, skills, and competitive challenges. We design engaging, fair, and community-driven experiences that build confidence and showcase student talent across India.</p>
-                <p>Our mission is to make high-quality quiz experiences accessible to every student, with structured categories, clear levels, and transparent scoring. OSIAN promotes curiosity, discipline, and healthy competition, encouraging students to learn by doing.</p>
-                <p>From online challenges to campus events, OSIAN blends technology with education to deliver modern, reliable, and student-first experiences.</p>
+                <p>OSIAN makes competitive learning accessible and fun for students across India — with fair, transparent, and technology-driven quizzes and challenges.</p>
                 <div class="trust-grid">
                     <div class="trust-card">
                         <i class='bx bx-shield'></i>
@@ -133,10 +134,10 @@
                         <span>Leads the platform’s vision, quiz standards, and partnerships; ensures fairness, authenticity, and educational impact in every challenge.</span>
                     </div>
                     <div class="team-card">
-                        <div class="team-photo"><img src="https://i.ibb.co/xKXczpkh/Whats-App-Image-2025-12-06-at-14-55-11-537923f8.jpg" alt="Technical Lead & Events Manager Photo"></div>
+                        <div class="team-photo"><img src="https://i.ibb.co/KcggmW5y/Whats-App-Image-2025-12-06-at-15-33-07-1021c2b4.jpg" alt="Techinal leader"></div>
                         <h3>Diljot Tiwana</h3>
-                        <p>Technical Lead & Events Manager</p>
-                        <span>Manages the website and quiz system, coordinates events, and ensures smooth execution and student support across colleges.</span>
+                        <p>CEO and Technical Lead</p>
+                        <span>Manages website, quiz systems, and event coordination, ensuring smooth execution and student support across colleges. Oversees communication to keep all operations aligned and efficient.</span>
                     </div>
                 </div>
             </div>
@@ -153,28 +154,16 @@
         <div class="footer-container">
             <div class="footer-about">
                 <h3>OSIAN</h3>
-                <p>The ultimate platform to learn, compete, and grow through quizzes.</p>
+                <p>India’s premium student quiz platform — fair, transparent, and engaging.</p>
             </div>
             <div class="footer-links">
-                <h4>Quick Links</h4>
+                <h4>Links</h4>
                 <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="contact-us.html">Contact</a></li>
+                    <li><a href="terms-and-conditions.html">Terms</a></li>
                     <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                    <li><a href="terms-and-conditions.html">Terms & Conditions</a></li>
-                    <li><a href="refund-policy.html">Refund Policy</a></li>
-                    <li><a href="shipping-policy.html">Shipping Policy</a></li>
-                    <li><a href="contact-us.html">Contact Us</a></li>
                 </ul>
-            </div>
-            <div class="footer-contact">
-                <h4>Contact Us</h4>
-                <p id="form-status" style="margin-top: 10px;"></p>
-                <div class="social-media">
-                    <a href="https://www.instagram.com/osianoffical?igsh=MTA2MWFvZWI2NnNpdg%3D%3D&utm_source=qr" aria-label="Instagram"><i class='bx bxl-instagram'></i></a>
-                    <a href="https://www.linkedin.com/in/osian-group-94b1b3398/" aria-label="LinkedIn"><i class='bx bxl-linkedin'></i></a>
-                </div>
-                <p style="margin-top: 20px;">Email: osiancommunity01025@gmail.com</p>
-                <p>Phone: +91 76967-01967,+91 62003-98447</p>
-                <p>Address: [Office Address]</p>
             </div>
         </div>
         <div class="footer-bottom">
