@@ -22,12 +22,10 @@ document.addEventListener('DOMContentLoaded', function(){
 
   const iconMap = {
     'Technical': 'bx-chip',
-    'Coding': 'bx-code-alt',
     'Law': 'bx-gavel',
     'Engineering': 'bx-cog',
     'General Knowledge': 'bx-brain',
-    'Sports': 'bx-football',
-    'Studies': 'bx-book'
+    'Sports': 'bx-football'
   };
 
   function setCategoryHeader() {
@@ -37,13 +35,11 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   const topicMap = {
-    'Technical': ['Python','Java','C++','DBMS','Operating Systems','Computer Networks'],
-    'Coding': ['Python','Java','C++','Data Structures','Algorithms','Competitive Coding'],
+    'Technical': ['Python','Java','C++','DBMS','OS','Computer Networks'],
     'Law': ['Constitution','IPC','Evidence','Contract','Corporate Law','Torts'],
     'Engineering': ['Mechanics','Thermodynamics','Circuits','Signals','Design','Materials'],
     'General Knowledge': ['India','World','Science','History','Geography','Current Affairs'],
-    'Sports': ['Cricket','Football','Tennis','Olympics','Athletics','eSports'],
-    'Studies': ['Mathematics','Physics','Chemistry','Biology','Commerce','Arts']
+    'Sports': ['Cricket','Football','Tennis','Olympics','Athletics','eSports']
   };
 
   const levels = ['Basic','Medium','Hard'];
@@ -118,4 +114,3 @@ document.addEventListener('DOMContentLoaded', function(){
   renderLevels();
   loadRecommended();
 });
-

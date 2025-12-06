@@ -68,23 +68,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             const categories = data.categories || {};
             const all = [
                 ...(categories.technical || []),
-                ...(categories.coding || []),
                 ...(categories.law || []),
                 ...(categories.engineering || []),
                 ...(categories.gk || []),
-                ...(categories.sports || []),
-                ...(categories.studies || [])
+                ...(categories.sports || [])
             ];
 
             const recommended = pickTop(all, 6);
-            const popular = pickTop(all, 6);
             renderIntoGrid(recommended, 'recommended-quizzes-container');
-            renderIntoGrid(popular, 'popular-quizzes-container');
-
-            const continueData = getContinueLearning();
-            renderIntoScroll((continueData && continueData.length ? continueData : pickTop(all, 8)), 'continue-learning-list');
-
-            renderTopCategories(categories);
 
         } catch (error) {
             console.error('Error fetching quizzes:', error);
@@ -159,28 +150,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     // No filter or expand behavior on dashboard; categories route to dedicated pages.
 
-    function renderTopCategories(categories) {
-        const grid = document.getElementById('top-categories-grid');
-        if (!grid) return;
-        grid.innerHTML = '';
-        const entries = [
-            ['Technical','bx-chip'],
-            ['Coding','bx-code-alt'],
-            ['Law','bx-gavel'],
-            ['Engineering','bx-cog'],
-            ['General Knowledge','bx-brain'],
-            ['Sports','bx-football'],
-            ['Studies','bx-book']
-        ];
-        entries.forEach(([name, icon]) => {
-            const list = (categories[name.toLowerCase()] || categories[name] || []);
-            const count = Array.isArray(list) ? list.length : 0;
-            const el = document.createElement('div');
-            el.className = 'category-card';
-            el.innerHTML = `<i class='bx ${icon}'></i><span>${name} (${count})</span>`;
-            grid.appendChild(el);
-        });
-    }
+    // Removed Top Categories rendering to keep dashboard minimal per spec.
 
     // --- Handle Quiz Registration Buttons ---
     async function getProfileCompleteness() {
