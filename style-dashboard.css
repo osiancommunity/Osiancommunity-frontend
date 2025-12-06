@@ -299,6 +299,19 @@ body {
     cursor: pointer;
 }
 
+/* Mobile header refinements */
+@media (max-width: 768px) {
+    .main-header { flex-direction: column; align-items: center; gap: 12px; }
+    .header-title { text-align: center; }
+    .header-title h1 { font-size: 28px; }
+    .header-title p { font-size: 13px; }
+    .header-hero { padding: 16px; }
+    .header-profile { gap: 10px; }
+    .header-profile .profile-dropdown, .header-profile #header-logout { display: none; }
+    .sidebar-toggle i, .icon-btn i { font-size: 18px; }
+    .header-profile img, .profile-avatar-btn img { width: 32px; height: 32px; }
+}
+
 /* ------------------------- */
 /* Featured Quizzes Slider */
 /* ------------------------- */
