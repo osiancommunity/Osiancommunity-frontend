@@ -31,14 +31,17 @@
         </aside>
 
         <main class="main-content">
-            <header class="main-header">
+            <header class="main-header premium-header">
                 <div class="header-title">
-                    <h1>Welcome Back, to OSIAN!</h1>
+                    <h1>Welcome Back, Kudoz Kundan!</h1>
                     <p>Let's find a quiz for you.</p>
                 </div>
                 <div class="header-profile">
                     <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
-                    <button class="icon-btn" id="header-logout" title="Log Out"><i class='bx bx-log-out'></i></button>
+                    <div class="header-actions">
+                        <a href="profile.html" class="header-link"><i class='bx bxs-user'></i> My Profile</a>
+                        <a href="index.html" class="header-link logout-direct"><i class='bx bx-log-out'></i> Log Out</a>
+                    </div>
                     <div class="profile-menu">
                         <button id="profile-menu-btn" class="profile-avatar-btn">
                             <img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar">
@@ -51,27 +54,32 @@
                 </div>
             </header>
 
-            <section class="header-hero">
-                <div class="hero-illustration"><i class='bx bxs-graduation'></i></div>
-                <div class="hero-text">
+            <section class="header-hero premium-hero">
+                <div class="hero-content-left">
                     <h2>Keep learning, keep growing</h2>
                     <p>Pick a category to jump right in or continue your progress</p>
+                </div>
+                <div class="hero-illustration">
+                    <div class="hero-wave"></div>
+                    <i class='bx bxs-graduation'></i>
                 </div>
             </section>
 
 
             <section class="content-card minimal" id="category-select-panel">
                 <h2><i class='bx bx-category'></i> Categories</h2>
-                <div class="category-grid" id="category-pills"></div>
+                <div class="category-grid premium-categories" id="category-pills">
+                    <div class="category-card" data-category="Technical"><i class='bx bx-chip'></i><span>Technical</span></div>
+                    <div class="category-card" data-category="Coding"><i class='bx bx-code-alt'></i><span>Coding</span></div>
+                    <div class="category-card" data-category="Law"><i class='bx bx-gavel'></i><span>Law</span></div>
+                    <div class="category-card" data-category="Engineering"><i class='bx bx-cog'></i><span>Engineering</span></div>
+                    <div class="category-card" data-category="General Knowledge"><i class='bx bx-brain'></i><span>General Knowledge</span></div>
+                    <div class="category-card" data-category="Sports"><i class='bx bx-football'></i><span>Sports</span></div>
+                    <div class="category-card" data-category="Studies"><i class='bx bx-book'></i><span>Studies</span></div>
+                </div>
             </section>
-            <section class="content-card minimal" id="field-select-panel">
-                <h2><i class='bx bx-category'></i> Fields</h2>
-                <div class="category-grid" id="field-pills"></div>
-            </section>
-            <section class="content-card minimal" id="level-select-panel">
-                <h2><i class='bx bx-signal-4'></i> Levels</h2>
-                <div class="category-grid" id="level-pills"></div>
-            </section>
+            <section class="content-card minimal" id="field-select-panel" style="display:none"></section>
+            <section class="content-card minimal" id="level-select-panel" style="display:none"></section>
             <section class="quiz-list-section" id="filtered-section" style="display:none">
                 <h2><i class='bx bx-filter'></i> Matching Quizzes</h2>
                 <div class="quiz-list-grid" id="filtered-quizzes-container"></div>
@@ -79,6 +87,21 @@
             <section class="quiz-list-section" id="recommended-section">
                 <h2><i class='bx bx-star'></i> Recommended For You</h2>
                 <div class="quiz-list-grid" id="recommended-quizzes-container"></div>
+            </section>
+
+            <section class="content-card slider-section" id="continue-learning">
+                <h2><i class='bx bx-trending-up'></i> Continue Learning</h2>
+                <div class="horizontal-scroll" id="continue-learning-list"></div>
+            </section>
+
+            <section class="quiz-list-section" id="popular-section">
+                <h2><i class='bx bx-hot'></i> Popular Quizzes</h2>
+                <div class="quiz-list-grid" id="popular-quizzes-container"></div>
+            </section>
+
+            <section class="content-card minimal" id="top-categories">
+                <h2><i class='bx bx-pyramid'></i> Top Categories</h2>
+                <div class="category-grid" id="top-categories-grid"></div>
             </section>
 
             

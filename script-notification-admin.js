@@ -1,25 +1,12 @@
 document.addEventListener("DOMContentLoaded", function() {
-    function showToast(message, type){
-        let el = document.getElementById('osian-toast');
-        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
-        el.className = 'osian-toast ' + (type || '');
-        el.textContent = message;
-        el.classList.add('show');
-        clearTimeout(el._hideTimer);
-        el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
-    }
 
-    const backendUrl = (location.hostname.endsWith('vercel.app'))
-        ? 'https://osiancommunity-backend.vercel.app/api'
-        : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-            ? 'http://localhost:5000/api'
-            : 'https://osiancommunity-backend.vercel.app/api');
+    const backendUrl = 'http://localhost:5000/api';
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
 
     // Security Check
     if (!token || !user || user.role.toLowerCase() !== 'superadmin') {
-        showToast('Access Denied.', 'warning');
+        alert('Access Denied.');
         window.location.href = 'login.html';
         return;
     }
@@ -64,12 +51,12 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             const result = await response.json();
-            showToast('Notification sent successfully!', 'success');
+            alert('Notification sent successfully!');
             form.reset();
 
         } catch (error) {
             console.error('Error sending notification:', error);
-            showToast(`Error: ${error.message}`, 'error');
+            alert(`Error: ${error.message}`);
         } finally {
             submitButton.disabled = false;
             submitButton.innerHTML = `<i class='bx bx-send'></i> Send Notification Now`;

@@ -37,14 +37,14 @@
                     <p>Manage your account settings.</p>
                 </div>
                 <div class="header-profile">
-                    <img id="header-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='20' cy='20' r='20' fill='%23dddddd'/><circle cx='20' cy='16' r='8' fill='%23bbbbbb'/><rect x='8' y='24' width='24' height='12' rx='6' fill='%23bbbbbb'/></svg>" alt="Admin Avatar">
+                    <img id="header-avatar" src="https://via.placeholder.com/40" alt="Admin Avatar">
                     <span>Super Admin</span>
                 </div>
             </header>
             <section class="content-card full-page">
                 <div class="profile-card" style="display:flex;gap:16px;align-items:center;">
                     <div class="avatar" style="position:relative;width:96px;height:96px;border-radius:50%;overflow:hidden;">
-                        <img id="profile-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><circle cx='48' cy='48' r='48' fill='%23dddddd'/><circle cx='48' cy='38' r='18' fill='%23bbbbbb'/><rect x='20' y='58' width='56' height='24' rx='12' fill='%23bbbbbb'/></svg>" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">
+                        <img id="profile-avatar" src="https://via.placeholder.com/96" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">
                         <label for="avatar-upload" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);color:#fff;text-align:center;padding:6px;font-size:12px;cursor:pointer;">Change</label>
                         <input type="file" id="avatar-upload" accept="image/*" style="display:none;">
                     </div>
@@ -82,11 +82,7 @@
     </div>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-        const backendUrl = (location.hostname.endsWith('vercel.app'))
-          ? 'https://osiancommunity-backend.vercel.app/api'
-          : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-              ? 'http://localhost:5000/api'
-              : 'https://osiancommunity-backend.vercel.app/api');
+        const backendUrl = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:5000/api' : '/api';
         const token = localStorage.getItem('token');
         let user = null;
         try { user = JSON.parse(localStorage.getItem('user')); } catch(e) { user = null; }
