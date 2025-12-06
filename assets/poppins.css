@@ -10,24 +10,8 @@
 @font-face {
     font-family: 'Poppins';
     font-style: normal;
-    font-weight: 400;
-    src: url('poppins-400.woff2') format('woff2');
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
     font-weight: 500;
     src: url('poppins-500.woff2') format('woff2');
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 600;
-    src: url('poppins-600.woff2') format('woff2');
     font-display: swap;
 }
 

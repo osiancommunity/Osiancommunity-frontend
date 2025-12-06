@@ -131,21 +131,18 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             el.textContent = (cat.charAt(0).toUpperCase() + cat.slice(1)).replace('Gk','General Knowledge');
             el.dataset.cat = cat;
             el.onclick = function(){
-<<<<<<< HEAD
                 selectedCategory = cat;
                 selectedField = '';
                 selectedLevel = '';
                 renderCategoryPills();
                 renderFieldPills();
                 levelPillsRow.innerHTML = '';
-                document.getElementById('filtered-section').style.display = 'none';
+                const filtered = document.getElementById('filtered-section');
+                if (filtered) filtered.style.display = 'none';
                 ['technical-section','gk-section','engineering-section','sports-section','coding-section','law-section','studies-section'].forEach(function(id){
-                    const el = document.getElementById(id);
-                    if (el) el.style.display = 'block';
+                    const sec = document.getElementById(id);
+                    if (sec) sec.style.display = 'block';
                 });
-=======
-                window.location.href = 'category.html?cat=' + encodeURIComponent(cat);
->>>>>>> feature/dashboard-drilldown
             };
             categoryPillsRow.appendChild(el);
         });
