@@ -11,17 +11,19 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     const user = JSON.parse(localStorage.getItem('user'));
     const token = localStorage.getItem('token');
     
-    // Check if user is logged in
+    // Check if user is logged in; allow local preview without redirect
+    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
     if (!token || !user) {
-        // If no token, redirect to login page
-        window.location.href = 'login.html';
-        return; // Stop the script
+        if (!isLocal) {
+            window.location.href = 'login.html';
+            return;
+        }
     }
 
     // Display user's name in the header
     const welcomeHeader = document.querySelector('.header-title h1');
     if (welcomeHeader) {
-        welcomeHeader.textContent = `Welcome Back, ${user.name}!`;
+        welcomeHeader.textContent = `Welcome Back, ${user && user.name ? user.name : 'Kudoz Kundan'}!`;
     }
 
     // Load user avatar from profile data
@@ -49,7 +51,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         try {
             const response = await fetch(`${backendUrl}/quizzes`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
                 }
             });
             const data = await response.json();
@@ -61,8 +63,10 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     window.location.href = 'login.html';
                     return; // Silently redirect
                 }
-                showErrorMessage(`Error fetching quizzes: ${data.message}`);
-                return;
+                if (!isLocal) {
+                    showErrorMessage(`Error fetching quizzes: ${data.message}`);
+                    return;
+                }
             }
 
             const categories = data.categories || {};
@@ -75,7 +79,11 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             ];
 
             const recommended = pickTop(all, 6);
-            renderIntoGrid(recommended, 'recommended-quizzes-container');
+            if (recommended.length === 0 && isLocal) {
+                renderIntoGrid(sampleQuizzes('Recommended'), 'recommended-quizzes-container');
+            } else {
+                renderIntoGrid(recommended, 'recommended-quizzes-container');
+            }
 
         } catch (error) {
             console.error('Error fetching quizzes:', error);
@@ -119,6 +127,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         const arr = Array.isArray(list) ? [...list] : [];
         arr.sort((a,b) => (b.participants||0) - (a.participants||0));
         return arr.slice(0, count);
+    }
+
+    function sampleQuizzes(label) {
+        return [
+            { _id: 'demo1', quizType: 'free', title: `${label} Demo Quiz #1`, category: 'Technical', duration: 30, participants: 120, coverImage: '' },
+            { _id: 'demo2', quizType: 'paid', title: `${label} Demo Quiz #2`, category: 'Engineering', duration: 45, participants: 200, price: 99, coverImage: '' },
+            { _id: 'demo3', quizType: 'free', title: `${label} Demo Quiz #3`, category: 'General Knowledge', duration: 25, participants: 90, coverImage: '' }
+        ];
     }
 
     function renderIntoScroll(quizzes, containerId) {

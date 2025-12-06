@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user'));
-  if (!token || !user) { window.location.href = 'login.html'; return; }
+  const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+  if (!token || !user) { if (!isLocal) { window.location.href = 'login.html'; return; } }
 
   const params = new URLSearchParams(location.search);
   const categoryName = params.get('category') || 'Technical';
@@ -73,7 +74,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
   async function fetchAllQuizzes() {
     try {
-      const res = await fetch(`${backendUrl}/quizzes`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+      const res = await fetch(`${backendUrl}/quizzes`, { headers });
       const data = await res.json();
       return data.quizzes || [];
     } catch (_) { return []; }
@@ -105,8 +107,17 @@ document.addEventListener('DOMContentLoaded', function(){
     const filteredTopic = selectedTopic ? filteredCategory.filter(q => String(q.title||'').toLowerCase().includes(String(selectedTopic).toLowerCase())) : filteredCategory;
     const filteredLevel = selectedLevel ? filteredTopic.filter(q => String(q.level||'').toLowerCase() === String(selectedLevel).toLowerCase()) : filteredTopic;
     const top = [...filteredLevel].sort((a,b) => (b.participants||0) - (a.participants||0)).slice(0, 12);
-    if (top.length === 0) { recommendedGrid.innerHTML = '<p class="no-data">No quizzes found for the current selection.</p>'; return; }
+    if (top.length === 0) { recommendedGrid.innerHTML = sampleFallback(categoryName); return; }
     top.forEach(q => { recommendedGrid.innerHTML += createQuizCard(q); });
+  }
+
+  function sampleFallback(cat) {
+    const demos = [
+      { _id: 'c1', quizType: 'free', title: `${cat} Demo #1`, category: cat, duration: 25, participants: 80 },
+      { _id: 'c2', quizType: 'paid', title: `${cat} Demo #2`, category: cat, duration: 45, participants: 120, price: 99 },
+      { _id: 'c3', quizType: 'free', title: `${cat} Demo #3`, category: cat, duration: 30, participants: 60 }
+    ];
+    return demos.map(createQuizCard).join('');
   }
 
   setCategoryHeader();
