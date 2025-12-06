@@ -104,13 +104,9 @@ ul {
     align-items: center;
 }
 
-.nav-logo {
-    font-size: 34px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    color: #6C00FF;
-}
-.nav-logo-img { height: 40px; width: auto; display: block; border-radius: 6px; }
+.nav-logo { display: flex; align-items: center; gap: 10px; }
+.nav-logo-img { height: 56px; width: auto; display: block; border-radius: 6px; }
+.nav-logo-text { font-size: 22px; font-weight: 800; color: #6C00FF; letter-spacing: 0.5px; }
 
 .nav-menu {
     display: flex;
@@ -182,7 +178,7 @@ ul {
     color: #6C00FF;
     line-height: 1.2;
 }
-.highlight-yellow { color: #FFD60A; }
+.highlight-yellow { color: #ce952b; }
 .highlight-black { color: #111; }
 
 .hero-content h2 {
@@ -472,9 +468,9 @@ ul {
         left: 0;
     }
 
-    .nav-item {
-        padding: 15px 0;
-    }
+    .nav-item { padding: 15px 0; }
+    .nav-logo-img { height: 42px; }
+    .nav-logo-text { font-size: 18px; }
 
     .nav-buttons {
         display: none; /* Hide buttons in menu, or move them */
