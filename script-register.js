@@ -1,20 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-const backendUrl = (location.hostname.endsWith('vercel.app'))
-    ? 'https://osiancommunity-backend.vercel.app/api'
-    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-        ? 'http://localhost:5000/api'
-        : 'https://osiancommunity-backend.vercel.app/api');
-
-function showToast(message, type){
-    let el = document.getElementById('osian-toast');
-    if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
-    el.className = 'osian-toast ' + (type || '');
-    el.textContent = message;
-    el.classList.add('show');
-    clearTimeout(el._hideTimer);
-    el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
-}
+    // Define the location of your backend API
+const backendUrl = 'http://localhost:5000/api';
 
     const registerForm = document.getElementById("register-form");
     const registerBtn = document.getElementById("register-btn");
@@ -34,12 +21,12 @@ function showToast(message, type){
         const confirmPassword = document.getElementById("confirm-password").value;
 
         if (password !== confirmPassword) {
-            showToast("Passwords do not match!", 'warning');
+            alert("Passwords do not match!");
             return;
         }
 
         if (password.length < 6) {
-            showToast("Password must be at least 6 characters long!", 'warning');
+            alert("Password must be at least 6 characters long!");
             return;
         }
 
@@ -62,7 +49,7 @@ function showToast(message, type){
 
             if (!response.ok) {
                 // Handle backend errors (e.g., email already in use)
-                showToast(`Registration failed: ${data.message}`, 'error');
+                alert(`Registration failed: ${data.message}`);
             } else {
                 // --- SUCCESS: Show OTP Section ---
                 currentUserId = data.userId;
@@ -73,7 +60,7 @@ function showToast(message, type){
 
         } catch (error) {
             console.error('Registration Error:', error);
-            showToast('A network error occurred. Please ensure the backend server is running.', 'error');
+            alert('A network error occurred. Please ensure the backend server is running.');
         } finally {
             registerBtn.disabled = false;
             registerBtn.textContent = "Register";
@@ -85,7 +72,7 @@ function showToast(message, type){
         const otp = document.getElementById('otp-input').value;
 
         if (!otp || otp.length !== 6) {
-            showToast('Please enter a valid 6-digit OTP', 'warning');
+            alert('Please enter a valid 6-digit OTP');
             return;
         }
 
@@ -105,26 +92,19 @@ function showToast(message, type){
             const data = await response.json();
 
             if (!response.ok) {
-                showToast(`OTP verification failed: ${data.message}`, 'error');
+                alert(`OTP verification failed: ${data.message}`);
             } else {
-                // --- SUCCESS: Save token and redirect based on role ---
+                // --- SUCCESS: Save token and redirect ---
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
 
-                const role = String((data.user && data.user.role) || 'user').toLowerCase();
-                showToast('Registration and verification successful! Redirecting to Dashboard.', 'success');
-                if (role === 'superadmin') {
-                    window.location.href = 'dashboard-superadmin.html';
-                } else if (role === 'admin') {
-                    window.location.href = 'dashboard-admin.html';
-                } else {
-                    window.location.href = 'dashboard-user.html';
-                }
+                alert('Registration and verification successful! Redirecting to Dashboard.');
+                window.location.href = "dashboard-user.html";
             }
 
         } catch (error) {
             console.error('OTP Verification Error:', error);
-            showToast('A network error occurred during verification.', 'error');
+            alert('A network error occurred during verification.');
         } finally {
             this.disabled = false;
             this.textContent = 'Verify OTP';
@@ -134,7 +114,7 @@ function showToast(message, type){
     // --- Handle Resend OTP ---
     resendOtpBtn.addEventListener('click', async function() {
         if (!currentUserId) {
-            showToast('No user ID available. Please register again.', 'error');
+            alert('No user ID available. Please register again.');
             return;
         }
 
@@ -153,16 +133,16 @@ function showToast(message, type){
             const data = await response.json();
 
             if (!response.ok) {
-                showToast(`Failed to resend OTP: ${data.message}`, 'error');
+                alert(`Failed to resend OTP: ${data.message}`);
             } else {
-                showToast('OTP sent successfully! Check your email.', 'success');
+                alert('OTP sent successfully! Check your email.');
                 document.getElementById('otp-input').value = '';
                 document.getElementById('otp-input').focus();
             }
 
         } catch (error) {
             console.error('Resend OTP Error:', error);
-            showToast('A network error occurred while resending OTP.', 'error');
+            alert('A network error occurred while resending OTP.');
         } finally {
             this.disabled = false;
             this.textContent = 'Resend OTP';

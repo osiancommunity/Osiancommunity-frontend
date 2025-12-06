@@ -1,132 +1,127 @@
 document.addEventListener('DOMContentLoaded', function(){
-    function getParam(name){
-        var m = new URLSearchParams(location.search).get(name);
-        return m ? String(m).toLowerCase() : '';
-    }
 
-    const backendUrl = (location.hostname.endsWith('vercel.app'))
-      ? 'https://osiancommunity-backend.vercel.app/api'
-      : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-          ? 'http://localhost:5000/api'
-          : 'https://osiancommunity-backend.vercel.app/api');
+  const backendUrl = (location.hostname.endsWith('vercel.app'))
+    ? 'https://osiancommunity-backend.vercel.app/api'
+    : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        ? 'http://localhost:5000/api'
+        : 'https://osiancommunity-backend.vercel.app/api');
 
-    const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user')||'null');
-    if (!token || !user) { window.location.href = 'login.html'; return; }
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user'));
+  const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+  if (!token || !user) { if (!isLocal) { window.location.href = 'login.html'; return; } }
 
-    const catParam = getParam('cat') || 'technical';
-    const displayNameMap = {
-        technical: 'Technical', coding: 'Coding', law: 'Law', engineering: 'Engineering', sports: 'Sports', gk: 'General Knowledge', studies: 'Studies'
-    };
-    const iconMap = {
-        technical: 'bx-chip', coding: 'bx-code', law: 'bx-balance', engineering: 'bx-cog', sports: 'bx-football', gk: 'bx-brain', studies: 'bx-book'
-    };
+  const params = new URLSearchParams(location.search);
+  const categoryName = params.get('category') || 'Technical';
 
-    const fieldOptionsByCategory = {
-        technical: ['python','java','c++','os','networks','web'],
-        law: ['constitutional','criminal','civil','corporate','tax'],
-        engineering: ['mechanical','electrical','civil','computer'],
-        gk: ['history','science','geography','current-affairs'],
-        sports: ['football','cricket','basketball','athletics'],
-        coding: ['javascript','python','java','c++','algorithms','data-structures'],
-        studies: ['sociology','economics','politics','history']
-    };
+  const titleEl = document.getElementById('category-title');
+  const heroHeading = document.getElementById('hero-heading');
+  const iconEl = document.getElementById('category-icon');
+  const topicGrid = document.getElementById('topic-grid');
+  const levelGrid = document.getElementById('level-grid');
+  const recommendedGrid = document.getElementById('category-recommended');
 
-    const categoryTitle = document.getElementById('category-title');
-    const categoryIcon = document.getElementById('category-icon');
-    if (categoryTitle) categoryTitle.textContent = displayNameMap[catParam] || 'Category';
-    if (categoryIcon) categoryIcon.innerHTML = `<i class='bx ${iconMap[catParam]||'bx-category'}'></i>`;
+  const iconMap = {
+    'Technical': 'bx-chip',
+    'Law': 'bx-gavel',
+    'Engineering': 'bx-cog',
+    'General Knowledge': 'bx-brain',
+    'Sports': 'bx-football'
+  };
 
-    let allQuizzesFlat = [];
-    let selectedField = '';
-    let selectedLevel = '';
+  function setCategoryHeader() {
+    if (titleEl) titleEl.textContent = categoryName;
+    if (heroHeading) heroHeading.textContent = `Explore ${categoryName} quizzes`;
+    if (iconEl) { iconEl.className = `bx ${iconMap[categoryName] || 'bx-category'}`; }
+  }
 
-    function createQuizCard(quiz){
-        const isPaid = quiz.quizType === 'paid';
-        const destinationUrl = isPaid ? `payment.html?quizId=${quiz._id}` : `quiz.html?id=${quiz._id}`;
-        const participantsCount = (typeof quiz.registeredUsers === 'number')
-            ? quiz.registeredUsers
-            : (Array.isArray(quiz.participants) ? quiz.participants.length : 0);
-        const priceStr = isPaid ? ((quiz.price != null && !Number.isNaN(Number(quiz.price))) ? Number(quiz.price).toFixed(2) : '0.00') : null;
-        return `
-            <div class="quiz-card">
-                <img src="${quiz.coverImage || 'https://via.placeholder.com/320x200?text=No+Image'}" alt="${quiz.title}" class="quiz-card-img">
-                <div class="quiz-card-header">
-                    <span class="quiz-tag ${isPaid ? 'paid' : 'live'}">${isPaid ? 'Paid' : 'Free'}</span>
-                    <span class="quiz-category">${quiz.category}</span>
-                </div>
-                <h3>${quiz.title}</h3>
-                <p class="quiz-details">${quiz.description || 'No description available.'}</p>
-                <div class="quiz-stats">
-                    <span><i class='bx bx-user'></i> ${participantsCount} Participants</span>
-                    <span><i class='bx bx-time'></i> ${quiz.duration || 30} Mins</span>
-                    ${quiz.field ? `<span><i class='bx bx-category'></i> ${quiz.field}</span>` : ''}
-                    ${quiz.difficulty ? `<span><i class='bx bx-signal-4'></i> ${quiz.difficulty}</span>` : ''}
-                </div>
-                <button class="quiz-btn ${isPaid ? 'paid' : 'live'}" onclick="window.location.href='${destinationUrl}'">${isPaid ? `Register (₹${priceStr})` : 'Join Now'}</button>
-            </div>
-        `;
-    }
+  const topicMap = {
+    'Technical': ['Python','Java','C++','DBMS','OS','Computer Networks'],
+    'Law': ['Constitution','IPC','Evidence','Contract','Corporate Law','Torts'],
+    'Engineering': ['Mechanics','Thermodynamics','Circuits','Signals','Design','Materials'],
+    'General Knowledge': ['India','World','Science','History','Geography','Current Affairs'],
+    'Sports': ['Cricket','Football','Tennis','Olympics','Athletics','eSports']
+  };
 
-    async function fetchQuizzes(){
-        try {
-            const res = await fetch(`${backendUrl}/quizzes`, { headers: { 'Authorization': `Bearer ${token}` } });
-            const data = await res.json();
-            const cat = data.categories || {};
-            allQuizzesFlat = [];
-            Object.keys(cat).forEach(function(k){ (cat[k]||[]).forEach(function(q){ allQuizzesFlat.push(q); }); });
-            renderTopics();
-            renderLevels();
-            renderRecommendations();
-        } catch (_) {}
-    }
+  const levels = ['Basic','Medium','Hard'];
+  let selectedTopic = null;
+  let selectedLevel = null;
 
-    function renderTopics(){
-        const grid = document.getElementById('topic-grid');
-        if (!grid) return;
-        const topics = fieldOptionsByCategory[catParam] || [];
-        grid.innerHTML = '';
-        topics.forEach(function(t){
-            const btn = document.createElement('button');
-            btn.className = 'topic-card' + (selectedField === t ? ' active' : '');
-            btn.textContent = t.charAt(0).toUpperCase() + t.slice(1);
-            btn.onclick = function(){ selectedField = t; renderTopics(); renderLevels(); renderRecommendations(); };
-            grid.appendChild(btn);
-        });
-    }
+  function renderTopics() {
+    if (!topicGrid) return;
+    topicGrid.innerHTML = '';
+    const topics = topicMap[categoryName] || [];
+    topics.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'category-card';
+      el.innerHTML = `<i class='bx bx-folder'></i><span>${t}</span>`;
+      el.addEventListener('click', function(){ selectedTopic = t; loadRecommended(); });
+      topicGrid.appendChild(el);
+    });
+  }
 
-    function renderLevels(){
-        const grid = document.getElementById('level-grid');
-        if (!grid) return;
-        const lvls = ['basic','medium','hard'];
-        grid.innerHTML = '';
-        lvls.forEach(function(l){
-            const btn = document.createElement('button');
-            btn.className = 'level-card' + (selectedLevel === l ? ' active' : '');
-            btn.textContent = l.charAt(0).toUpperCase() + l.slice(1);
-            btn.onclick = function(){ selectedLevel = l; renderLevels(); renderRecommendations(); };
-            grid.appendChild(btn);
-        });
-    }
+  function renderLevels() {
+    if (!levelGrid) return;
+    levelGrid.innerHTML = '';
+    levels.forEach(l => {
+      const el = document.createElement('div');
+      el.className = 'category-card';
+      el.innerHTML = `<i class='bx bx-signal-4'></i><span>${l}</span>`;
+      el.addEventListener('click', function(){ selectedLevel = l; loadRecommended(); });
+      levelGrid.appendChild(el);
+    });
+  }
 
-    function renderRecommendations(){
-        const grid = document.getElementById('reco-grid');
-        const section = document.getElementById('reco-section');
-        if (!grid || !section) return;
-        grid.innerHTML = '';
-        const filtered = allQuizzesFlat.filter(function(q){
-            const matchCat = String(q.category||'') === catParam;
-            const matchField = selectedField ? String(q.field||'') === selectedField : true;
-            const matchLvl = selectedLevel ? String(q.difficulty||'') === selectedLevel : true;
-            const visible = String(q.visibility || 'public').toLowerCase() !== 'unlisted';
-            return matchCat && matchField && matchLvl && visible;
-        });
-        if (filtered.length === 0) {
-            grid.innerHTML = '<p>No quizzes found for this selection.</p>';
-        } else {
-            filtered.forEach(function(q){ grid.innerHTML += createQuizCard(q); });
-        }
-    }
+  async function fetchAllQuizzes() {
+    try {
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+      const res = await fetch(`${backendUrl}/quizzes`, { headers });
+      const data = await res.json();
+      return data.quizzes || [];
+    } catch (_) { return []; }
+  }
 
-    fetchQuizzes();
+  function createQuizCard(quiz) {
+    const isPaid = quiz.quizType === 'paid';
+    const destinationUrl = isPaid ? `payment.html?quizId=${quiz._id}` : `quiz.html?id=${quiz._id}`;
+    return `
+      <div class="quiz-card">
+        <img src="${quiz.coverImage || 'https://via.placeholder.com/320x200?text=No+Image'}" alt="${quiz.title}" class="quiz-card-img">
+        <div class="quiz-card-header">
+          <span class="quiz-tag ${isPaid ? 'paid' : 'live'}">${isPaid ? 'Paid' : 'Free'}</span>
+          <span class="quiz-category">${quiz.category}</span>
+        </div>
+        <h3>${quiz.title}</h3>
+        <p class="quiz-details">${quiz.description || 'No description available.'}</p>
+        <div class="quiz-stats"><span><i class='bx bx-user'></i> ${quiz.participants || 0} Participants</span><span><i class='bx bx-time'></i> ${quiz.duration || 30} Mins</span></div>
+        <button class="quiz-btn ${isPaid ? 'paid' : 'live'}" data-quiz-id="${quiz._id}" onclick="window.location.href='${destinationUrl}'">${isPaid ? `Register (₹${quiz.price ? quiz.price.toFixed(2) : 0})` : 'Join Now'}</button>
+      </div>
+    `;
+  }
+
+  async function loadRecommended() {
+    if (!recommendedGrid) return;
+    recommendedGrid.innerHTML = '';
+    const all = await fetchAllQuizzes();
+    const filteredCategory = all.filter(q => String(q.category||'').toLowerCase() === String(categoryName).toLowerCase());
+    const filteredTopic = selectedTopic ? filteredCategory.filter(q => String(q.title||'').toLowerCase().includes(String(selectedTopic).toLowerCase())) : filteredCategory;
+    const filteredLevel = selectedLevel ? filteredTopic.filter(q => String(q.level||'').toLowerCase() === String(selectedLevel).toLowerCase()) : filteredTopic;
+    const top = [...filteredLevel].sort((a,b) => (b.participants||0) - (a.participants||0)).slice(0, 12);
+    if (top.length === 0) { recommendedGrid.innerHTML = sampleFallback(categoryName); return; }
+    top.forEach(q => { recommendedGrid.innerHTML += createQuizCard(q); });
+  }
+
+  function sampleFallback(cat) {
+    const demos = [
+      { _id: 'c1', quizType: 'free', title: `${cat} Demo #1`, category: cat, duration: 25, participants: 80 },
+      { _id: 'c2', quizType: 'paid', title: `${cat} Demo #2`, category: cat, duration: 45, participants: 120, price: 99 },
+      { _id: 'c3', quizType: 'free', title: `${cat} Demo #3`, category: cat, duration: 30, participants: 60 }
+    ];
+    return demos.map(createQuizCard).join('');
+  }
+
+  setCategoryHeader();
+  renderTopics();
+  renderLevels();
+  loadRecommended();
 });
