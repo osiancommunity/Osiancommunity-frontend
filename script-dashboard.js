@@ -11,11 +11,12 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     const user = JSON.parse(localStorage.getItem('user'));
     const token = localStorage.getItem('token');
     
-    // Check if user is logged in
+    const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
     if (!token || !user) {
-        // If no token, redirect to login page
-        window.location.href = 'login.html';
-        return; // Stop the script
+        if (!isLocal) {
+            window.location.href = 'login.html';
+            return;
+        }
     }
 
     // Display user's name in the header
@@ -33,7 +34,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     
     // Handle Logout
     // Find all logout buttons (in sidebar and sidebar-footer)
-    const logoutButtons = document.querySelectorAll('.logout-btn');
+    const logoutButtons = document.querySelectorAll('.logout-btn, .logout-direct');
     logoutButtons.forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
@@ -56,27 +57,25 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    alert('Your session has expired or is invalid. Please login again.');
-                    return;
+                    if (!isLocal) { alert('Your session has expired or is invalid. Please login again.'); return; }
                 }
-                showErrorMessage(`Error fetching quizzes: ${data.message}`);
-                return;
+                if (!isLocal) { showErrorMessage(`Error fetching quizzes: ${data.message}`); return; }
             }
 
-            // Featured Paid
-            if (data.featured && Array.isArray(data.featured.paid)) {
-                renderQuizzes(data.featured.paid, 'paid-quizzes-container', 'paid-section');
-            }
-
-            // Populate category-based sections (include all known categories)
             const cat = data.categories || {};
-            renderQuizzes(cat.technical, 'technical-quizzes-container', 'technical-section');
-            renderQuizzes(cat.gk, 'gk-quizzes-container', 'gk-section');
-            renderQuizzes(cat.engineering, 'engineering-quizzes-container', 'engineering-section');
-            renderQuizzes(cat.sports, 'sports-quizzes-container', 'sports-section');
-            renderQuizzes(cat.coding, 'coding-quizzes-container', 'coding-section');
-            renderQuizzes(cat.law, 'law-quizzes-container', 'law-section');
-            renderQuizzes(cat.studies, 'studies-quizzes-container', 'studies-section');
+            const all = [
+                ...(cat.technical || []),
+                ...(cat.law || []),
+                ...(cat.engineering || []),
+                ...(cat.gk || []),
+                ...(cat.sports || [])
+            ];
+            const recommended = pickTop(all, 6);
+            if (recommended.length === 0 && isLocal) {
+                renderIntoGrid(sampleQuizzes('Recommended'), 'recommended-quizzes-container');
+            } else {
+                renderIntoGrid(recommended, 'recommended-quizzes-container');
+            }
 
         } catch (error) {
             console.error('Error fetching quizzes:', error);
@@ -85,24 +84,12 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     }
     
     // --- NEW: Function to render quizzes into a container ---
-    function renderQuizzes(quizzes, containerId, sectionId) {
+    function renderIntoGrid(quizzes, containerId) {
         const container = document.getElementById(containerId);
-        const section = document.getElementById(sectionId);
-        if (!container || !section) return;
-
-        container.innerHTML = ''; // Clear loading message
-
-        if (!quizzes || quizzes.length === 0) {
-            // Hide the entire section if there are no quizzes for that category
-            section.style.display = 'none';
-            return;
-        }
-
-        // No duplication needed for square grid
-
-        quizzes.forEach(quiz => {
-            container.innerHTML += createQuizCard(quiz);
-        });
+        if (!container) return;
+        container.innerHTML = '';
+        if (!quizzes || quizzes.length === 0) return;
+        quizzes.forEach(quiz => { container.innerHTML += createQuizCard(quiz); });
     }
 
     // --- NEW: Helper function to create a single quiz card with an image ---
@@ -124,7 +111,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     <span><i class='bx bx-user'></i> ${quiz.participants || 0} Participants</span>
                     <span><i class='bx bx-time'></i> ${quiz.duration || 30} Mins</span>
                 </div>
-                <button class="quiz-btn ${isPaid ? 'paid' : 'live'}" data-quiz-id="${quiz._id}" onclick="window.location.href='${destinationUrl}'">${isPaid ? `Register (₹${quiz.price.toFixed(2)})` : 'Join Now'}</button>
+                <button class="quiz-btn ${isPaid ? 'paid' : 'live'}" data-quiz-id="${quiz._id}" onclick="window.location.href='${destinationUrl}'">${isPaid ? `Register (₹${quiz.price ? quiz.price.toFixed(2) : 0})` : 'Join Now'}</button>
             </div>
         `;
     }
@@ -163,6 +150,18 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             }
         }
     });
+
+    // Route categories on dashboard
+    const categoryGrid = document.getElementById('category-pills');
+    if (categoryGrid) {
+        categoryGrid.addEventListener('click', function(e){
+            const card = e.target.closest('.category-card');
+            if (!card) return;
+            const cat = card.getAttribute('data-category');
+            if (!cat) return;
+            window.location.href = `category.html?category=${encodeURIComponent(cat)}`;
+        });
+    }
 
     // --- Initial Page Load ---
     fetchQuizzes();
@@ -241,3 +240,16 @@ function showErrorMessage(message) {
         errorDiv.remove();
     });
 }
+    function pickTop(list, count) {
+        const arr = Array.isArray(list) ? [...list] : [];
+        arr.sort((a,b) => (b.participants||0) - (a.participants||0));
+        return arr.slice(0, count);
+    }
+
+    function sampleQuizzes(label) {
+        return [
+            { _id: 'demo1', quizType: 'free', title: `${label} Demo Quiz #1`, category: 'Technical', duration: 30, participants: 120, coverImage: '' },
+            { _id: 'demo2', quizType: 'paid', title: `${label} Demo Quiz #2`, category: 'Engineering', duration: 45, participants: 200, price: 99, coverImage: '' },
+            { _id: 'demo3', quizType: 'free', title: `${label} Demo Quiz #3`, category: 'General Knowledge', duration: 25, participants: 90, coverImage: '' }
+        ];
+    }

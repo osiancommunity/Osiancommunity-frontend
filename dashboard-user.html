@@ -38,71 +38,50 @@
         </aside>
 
         <main class="main-content">
-            <header class="main-header">
+            <header class="main-header premium-header">
                 <div class="header-title">
-                    <h1>Welcome Back, User!</h1>
-                    <p>Let's find a quiz for you</p>
+                    <h1>Welcome Back, Kudoz Kundan!</h1>
+                    <p>Let's find a quiz for you.</p>
                 </div>
                 <div class="header-profile">
                     <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
-                    <a href="profile.html"><img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar"></a>
+                    <div class="header-actions">
+                        <a href="profile.html" class="header-link"><i class='bx bxs-user'></i> My Profile</a>
+                        <a href="index.html" class="header-link logout-direct"><i class='bx bx-log-out'></i> Log Out</a>
+                    </div>
+                    <div class="profile-menu">
+                        <button id="profile-menu-btn" class="profile-avatar-btn">
+                            <img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar">
+                        </button>
+                    </div>
                 </div>
             </header>
 
-            <!-- New Category-Based Sections -->
-            <section class="quiz-list-section" id="paid-section">
-                <h2><i class='bx bx-rupee'></i> Paid Quizzes</h2>
-                <div class="quiz-list-grid" id="paid-quizzes-container">
-                    <p>Loading quizzes...</p>
+            <section class="header-hero premium-hero">
+                <div class="hero-content-left">
+                    <h2>Keep learning, keep growing</h2>
+                    <p>Pick a category to jump right in</p>
                 </div>
-            </section>
-            <section class="quiz-list-section" id="technical-section">
-                <h2><i class='bx bx-code-alt'></i> Technical Quizzes</h2>
-                <div class="quiz-list-grid" id="technical-quizzes-container">
-                    <p>Loading quizzes...</p>
+                <div class="hero-illustration">
+                    <div class="hero-wave"></div>
+                    <i class='bx bxs-graduation'></i>
                 </div>
             </section>
 
-            <section class="quiz-list-section" id="gk-section">
-                <h2><i class='bx bx-brain'></i> General Knowledge Quizzes</h2>
-                <div class="quiz-list-grid" id="gk-quizzes-container">
-                    <p>Loading quizzes...</p>
+            <section class="content-card minimal" id="category-select-panel">
+                <h2><i class='bx bx-category'></i> Categories</h2>
+                <div class="category-grid premium-categories" id="category-pills">
+                    <div class="category-card" data-category="Technical"><i class='bx bx-chip'></i><span>Technical</span></div>
+                    <div class="category-card" data-category="Law"><i class='bx bx-gavel'></i><span>Law</span></div>
+                    <div class="category-card" data-category="Engineering"><i class='bx bx-cog'></i><span>Engineering</span></div>
+                    <div class="category-card" data-category="General Knowledge"><i class='bx bx-brain'></i><span>General Knowledge</span></div>
+                    <div class="category-card" data-category="Sports"><i class='bx bx-football'></i><span>Sports</span></div>
                 </div>
             </section>
 
-            <section class="quiz-list-section" id="engineering-section">
-                <h2><i class='bx bx-building-house'></i> Engineering Quizzes</h2>
-                <div class="quiz-list-grid" id="engineering-quizzes-container">
-                    <p>Loading quizzes...</p>
-                </div>
-            </section>
-
-            <section class="quiz-list-section" id="sports-section">
-                <h2><i class='bx bx-football'></i> Sports Quizzes</h2>
-                <div class="quiz-list-grid" id="sports-quizzes-container">
-                    <p>Loading quizzes...</p>
-                </div>
-            </section>
-
-            <section class="quiz-list-section" id="coding-section">
-                <h2><i class='bx bx-code'></i> Coding Quizzes</h2>
-                <div class="quiz-list-grid" id="coding-quizzes-container">
-                    <p>Loading quizzes...</p>
-                </div>
-            </section>
-
-            <section class="quiz-list-section" id="law-section">
-                <h2><i class='bx bx-book-alt'></i> Law Quizzes</h2>
-                <div class="quiz-list-grid" id="law-quizzes-container">
-                    <p>Loading quizzes...</p>
-                </div>
-            </section>
-
-            <section class="quiz-list-section" id="studies-section">
-                <h2><i class='bx bx-library'></i> Social Studies Quizzes</h2>
-                <div class="quiz-list-grid" id="studies-quizzes-container">
-                    <p>Loading quizzes...</p>
-                </div>
+            <section class="quiz-list-section" id="recommended-section">
+                <h2><i class='bx bx-star'></i> Recommended For You</h2>
+                <div class="quiz-list-grid" id="recommended-quizzes-container"></div>
             </section>
 
         </main>
