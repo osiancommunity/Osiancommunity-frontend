@@ -309,11 +309,11 @@ ul {
 .about-container { max-width: 1100px; margin: 0 auto; }
 .about h2 { font-size: 36px; font-weight: 600; margin-bottom: 12px; }
 .about p { font-size: 16px; color: #555; margin-bottom: 24px; }
-.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
-.team-card { background: #f9f9f9; border: 1px solid #eee; border-radius: 14px; padding: 26px; box-shadow: 0 8px 18px rgba(0,0,0,0.07); text-align: center; }
-.team-photo { width: 140px; height: 140px; margin: 0 auto 14px; border-radius: 50%; background: #fff; border: 3px dashed #bfa7ff; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 0 4px rgba(74,0,224,0.12), 0 0 22px rgba(142,45,226,0.40); animation: glowPulse 3s ease-in-out infinite; }
-.team-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; }
-.team-card h3 { font-size: 22px; font-weight: 700; color: #4a00e0; }
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 26px; }
+.team-card { background: #f9f9f9; border: 1px solid #eee; border-radius: 16px; padding: 30px; box-shadow: 0 10px 22px rgba(0,0,0,0.08); text-align: center; }
+.team-photo { width: 180px; height: 180px; margin: 0 auto 16px; border-radius: 50%; background: #fff; border: 3px dashed #bfa7ff; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 0 5px rgba(74,0,224,0.14), 0 0 26px rgba(142,45,226,0.45); animation: glowPulse 3s ease-in-out infinite; }
+.team-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; }
+.team-card h3 { font-size: 24px; font-weight: 700; color: #4a00e0; }
 .team-card p { font-weight: 500; margin: 6px 0 8px 0; }
 .team-card span { font-size: 14px; color: #666; }
 
@@ -688,4 +688,5 @@ ul {
     }
 }
 .about .team-card:hover .team-photo { box-shadow: 0 0 0 4px rgba(74,0,224,0.18), 0 0 22px rgba(142,45,226,0.45); }
+@media (max-width: 560px) { .team-photo { width: 130px; height: 130px; } .team-card { padding: 22px; } }
 @keyframes glowPulse { 0% { box-shadow: 0 0 0 2px rgba(74,0,224,0.10), 0 0 12px rgba(142,45,226,0.28);} 100% { box-shadow: 0 0 0 4px rgba(74,0,224,0.18), 0 0 22px rgba(142,45,226,0.45);} }
