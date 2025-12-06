@@ -59,8 +59,6 @@
                                 <option value="engineering">Engineering</option>
                                 <option value="gk">General Knowledge</option>
                                 <option value="sports">Sports</option>
-                                <option value="coding">Coding</option>
-                                <option value="studies">Social Studies</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -117,6 +115,11 @@
                             <input type="file" id="quiz-cover" accept="image/*" required>
                             <small>Image will be automatically converted to 16:9 aspect ratio</small>
                         </div>
+                        <div class="form-group">
+                            <label for="num-questions">Number of questions to show</label>
+                            <input type="number" id="num-questions" placeholder="e.g., 10">
+                            <small>Leave blank to show all uploaded questions</small>
+                        </div>
                     </div>
                 </div>
 
@@ -137,32 +140,20 @@
                                 <label>Question Text</label>
                                 <textarea class="question-text" placeholder="Enter the question here..." required></textarea>
                             </div>
-                            <div class="options-grid mcq-only">
-                                <div class="form-group">
-                                    <label>Option 1</label>
-                                    <input type="text" class="option-text" placeholder="Option 1" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Option 2</label>
-                                    <input type="text" class="option-text" placeholder="Option 2" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Option 3</label>
-                                    <input type="text" class="option-text" placeholder="Option 3" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Option 4</label>
-                                    <input type="text" class="option-text" placeholder="Option 4" required>
-                                </div>
+                            <div class="form-group">
+                                <label>Question Image (optional)</label>
+                                <input type="file" class="question-image" accept="image/*">
                             </div>
-                            <div class="form-group mcq-only">
-                                <label>Correct Answer</label>
-                                <select class="correct-answer" required>
-                                    <option value="0">Option 1</option>
-                                    <option value="1">Option 2</option>
-                                    <option value="2">Option 3</option>
-                                    <option value="3">Option 4</option>
-                                </select>
+                            <div class="form-group">
+                                <label>Explanation (optional)</label>
+                                <textarea class="question-explanation" placeholder="Add explanation or solution..."></textarea>
+                            </div>
+                            <div class="mcq-only">
+                                <div class="form-group" style="margin-bottom:10px;">
+                                    <label><input type="checkbox" class="is-multiple"> Allow multiple correct answers</label>
+                                </div>
+                                <div class="options-container"></div>
+                                <button type="button" class="btn-action add-option-btn"><i class='bx bx-plus'></i> Add Option</button>
                             </div>
                             <div class="form-group coding-only" style="display:none;">
                                 <label>Programming Language</label>

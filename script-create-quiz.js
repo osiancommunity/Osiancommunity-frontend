@@ -54,8 +54,67 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     const quizCategorySelect = document.getElementById('quiz-category');
     const quizFieldSelect = document.getElementById('quiz-field');
     const quizDifficultySelect = document.getElementById('quiz-difficulty');
-    let questionCount = 1; // Initialize with 1 for the first question block
+    let questionCount = 1;
     let coverImageBase64 = null;
+
+    function createOptionRow(text, imageBase64, isCorrect){
+        const row = document.createElement('div');
+        row.className = 'option-row';
+        row.innerHTML = `
+            <div class="form-group" style="display:flex; gap:10px; align-items:center;">
+                <input type="checkbox" class="option-correct" ${isCorrect ? 'checked' : ''} title="Mark as correct">
+                <input type="text" class="option-text" placeholder="Option text" value="${text || ''}" required style="flex:1;">
+                <input type="file" class="option-image" accept="image/*">
+                <button type="button" class="btn-remove-option">Remove</button>
+            </div>`;
+        if (imageBase64) row.dataset.imageBase64 = imageBase64;
+        return row;
+    }
+
+    function attachQuestionEnhancements(block){
+        const optsContainer = block.querySelector('.options-container');
+        const addOptBtn = block.querySelector('.add-option-btn');
+        const isMultipleEl = block.querySelector('.is-multiple');
+        const qImageInput = block.querySelector('.question-image');
+        if (optsContainer && addOptBtn){
+            if (optsContainer.children.length === 0){
+                optsContainer.appendChild(createOptionRow('', null, false));
+                optsContainer.appendChild(createOptionRow('', null, false));
+            }
+            addOptBtn.onclick = function(){ optsContainer.appendChild(createOptionRow('', null, false)); };
+            optsContainer.addEventListener('click', function(e){
+                if (e.target && e.target.classList.contains('btn-remove-option')) {
+                    const row = e.target.closest('.option-row');
+                    row && row.remove();
+                }
+            });
+            optsContainer.addEventListener('change', function(e){
+                if (e.target && e.target.classList.contains('option-image')){
+                    const file = e.target.files && e.target.files[0];
+                    const row = e.target.closest('.option-row');
+                    if (file && row){
+                        const reader = new FileReader();
+                        reader.onload = function(){ row.dataset.imageBase64 = reader.result; };
+                        reader.readAsDataURL(file);
+                    }
+                }
+                if (e.target && e.target.classList.contains('option-correct')){
+                    if (!isMultipleEl || !isMultipleEl.checked){
+                        optsContainer.querySelectorAll('.option-correct').forEach(cb => { if (cb !== e.target) cb.checked = false; });
+                    }
+                }
+            });
+        }
+        if (qImageInput){
+            qImageInput.addEventListener('change', function(e){
+                const file = e.target.files && e.target.files[0];
+                if (!file) { block.dataset.questionImage = ''; return; }
+                const reader = new FileReader();
+                reader.onload = function(){ block.dataset.questionImage = reader.result; };
+                reader.readAsDataURL(file);
+            });
+        }
+    }
 
     // --- Show/Hide Price Field ---
     quizTypeSelect.addEventListener('change', function() {
@@ -68,13 +127,11 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     // --- Field options per Category ---
     const fieldOptionsByCategory = {
-        technical: ['python','java','c++','os','networks','web'],
+        technical: ['python','java','c++','os','computer networks','dbms'],
         law: ['constitutional','criminal','civil','corporate','tax'],
         engineering: ['mechanical','electrical','civil','computer'],
         gk: ['history','science','geography','current-affairs'],
-        sports: ['football','cricket','basketball','athletics'],
-        coding: ['javascript','python','java','c++','algorithms','data-structures'],
-        studies: ['sociology','economics','politics','history']
+        sports: ['football','cricket','basketball','athletics']
     };
 
     function populateFieldOptions(category){
@@ -195,32 +252,20 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 <label>Question Text</label>
                 <textarea class="question-text" placeholder="Enter the question here..." required></textarea>
             </div>
-            <div class="options-grid mcq-only">
-                <div class="form-group">
-                    <label>Option 1</label>
-                    <input type="text" class="option-text" placeholder="Option 1" required>
-                </div>
-                <div class="form-group">
-                    <label>Option 2</label>
-                    <input type="text" class="option-text" placeholder="Option 2" required>
-                </div>
-                <div class="form-group">
-                    <label>Option 3</label>
-                    <input type="text" class="option-text" placeholder="Option 3" required>
-                </div>
-                <div class="form-group">
-                    <label>Option 4</label>
-                    <input type="text" class="option-text" placeholder="Option 4" required>
-                </div>
+            <div class="form-group">
+                <label>Question Image (optional)</label>
+                <input type="file" class="question-image" accept="image/*">
             </div>
-            <div class="form-group mcq-only">
-                <label>Correct Answer</label>
-                <select class="correct-answer" required>
-                    <option value="0">Option 1</option>
-                    <option value="1">Option 2</option>
-                    <option value="2">Option 3</option>
-                    <option value="3">Option 4</option>
-                </select>
+            <div class="form-group">
+                <label>Explanation (optional)</label>
+                <textarea class="question-explanation" placeholder="Add explanation or solution..."></textarea>
+            </div>
+            <div class="mcq-only">
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label><input type="checkbox" class="is-multiple"> Allow multiple correct answers</label>
+                </div>
+                <div class="options-container"></div>
+                <button type="button" class="btn-action add-option-btn"><i class='bx bx-plus'></i> Add Option</button>
             </div>
             <div class="form-group coding-only" style="display:none;">
                 <label>Programming Language</label>
@@ -241,6 +286,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             </div>
         `;
         questionsContainer.appendChild(newQuestionBlock);
+        attachQuestionEnhancements(newQuestionBlock);
     });
 
     // --- Remove Question ---
@@ -274,24 +320,20 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 const questionType = block.querySelector('.question-type').value;
                 const marks = parseInt(block.querySelector('.question-marks').value) || 1;
                 
-                const questionData = {
-                    questionText,
-                    questionType,
-                    marks
-                };
+                const explanation = block.querySelector('.question-explanation')?.value || '';
+                const questionImage = block.dataset.questionImage || '';
+                const questionData = { questionText, questionType, marks, explanation, questionImage };
 
                 if (questionType === 'mcq') {
-                    const optionElements = block.querySelectorAll('.option-text'); // Get all option input fields
-                    const correctAnswer = block.querySelector('.correct-answer').value; // Get the selected correct answer index
-                    
-                    // Format options as [{text: "Option A"}, {text: "Option B"}, ...]
-                    const options = Array.from(optionElements).map(opt => ({ text: opt.value.trim() }));
-                    if (options.some(opt => opt.text === '')) {
-                        throw new Error('All MCQ options must be filled.');
-                    }
-                    
+                    const optsContainer = block.querySelector('.options-container');
+                    const isMultiple = !!block.querySelector('.is-multiple')?.checked;
+                    const optRows = optsContainer ? Array.from(optsContainer.querySelectorAll('.option-row')) : [];
+                    const options = optRows.map((row) => ({ text: row.querySelector('.option-text').value.trim(), image: row.dataset.imageBase64 || '' }));
+                    if (options.length === 0 || options.some(o => o.text === '')) throw new Error('Please add and fill all MCQ options.');
+                    const correctIndices = optRows.map((row, idx) => ({ idx, ok: !!row.querySelector('.option-correct')?.checked })).filter(x => x.ok).map(x => x.idx);
+                    questionData.isMultiple = isMultiple;
                     questionData.options = options;
-                    questionData.correctAnswer = parseInt(correctAnswer); // Convert "0", "1" to number
+                    if (isMultiple) { questionData.correctAnswers = correctIndices; } else { questionData.correctAnswer = correctIndices[0] ?? 0; }
                 } else if (questionType === 'coding') {
                     const langEl = block.querySelector('.code-language');
                     const starterEl = block.querySelector('.code-starter');
@@ -325,7 +367,8 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 price: parseFloat(document.getElementById('quiz-price').value) || 0,
                 visibility: document.getElementById('quiz-visibility').value,
                 coverImage: coverImageBase64, // Add the Base64 image string
-                questions: questions
+                questions: questions,
+                numQuestionsToShow: parseInt(document.getElementById('num-questions')?.value) || undefined
             };
 
             // Basic validation for required fields
@@ -469,32 +512,20 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                         <label>Question Text</label>
                         <textarea class="question-text" placeholder="Enter the question here..." required>${question.questionText}</textarea>
                     </div>
-                    <div class="options-grid mcq-only" style="display: ${question.questionType === 'mcq' ? 'grid' : 'none'};">
-                        <div class="form-group">
-                            <label>Option 1</label>
-                            <input type="text" class="option-text" placeholder="Option 1" value="${question.options ? question.options[0]?.text || '' : ''}" ${question.questionType === 'mcq' ? 'required' : ''}>
-                        </div>
-                        <div class="form-group">
-                            <label>Option 2</label>
-                            <input type="text" class="option-text" placeholder="Option 2" value="${question.options ? question.options[1]?.text || '' : ''}" ${question.questionType === 'mcq' ? 'required' : ''}>
-                        </div>
-                        <div class="form-group">
-                            <label>Option 3</label>
-                            <input type="text" class="option-text" placeholder="Option 3" value="${question.options ? question.options[2]?.text || '' : ''}" ${question.questionType === 'mcq' ? 'required' : ''}>
-                        </div>
-                        <div class="form-group">
-                            <label>Option 4</label>
-                            <input type="text" class="option-text" placeholder="Option 4" value="${question.options ? question.options[3]?.text || '' : ''}" ${question.questionType === 'mcq' ? 'required' : ''}>
-                        </div>
+                    <div class="form-group">
+                        <label>Question Image (optional)</label>
+                        <input type="file" class="question-image" accept="image/*">
                     </div>
-                    <div class="form-group mcq-only" style="display: ${question.questionType === 'mcq' ? 'block' : 'none'};">
-                        <label>Correct Answer</label>
-                        <select class="correct-answer" ${question.questionType === 'mcq' ? 'required' : ''}>
-                            <option value="0" ${question.correctAnswer === 0 ? 'selected' : ''}>Option 1</option>
-                            <option value="1" ${question.correctAnswer === 1 ? 'selected' : ''}>Option 2</option>
-                            <option value="2" ${question.correctAnswer === 2 ? 'selected' : ''}>Option 3</option>
-                            <option value="3" ${question.correctAnswer === 3 ? 'selected' : ''}>Option 4</option>
-                        </select>
+                    <div class="form-group">
+                        <label>Explanation (optional)</label>
+                        <textarea class="question-explanation" placeholder="Add explanation or solution...">${question.explanation || ''}</textarea>
+                    </div>
+                    <div class="mcq-only" style="display: ${question.questionType === 'mcq' ? 'block' : 'none'};">
+                        <div class="form-group" style="margin-bottom:10px;">
+                            <label><input type="checkbox" class="is-multiple" ${question.isMultiple ? 'checked' : ''}> Allow multiple correct answers</label>
+                        </div>
+                        <div class="options-container"></div>
+                        <button type="button" class="btn-action add-option-btn"><i class='bx bx-plus'></i> Add Option</button>
                     </div>
                     <div class="form-group coding-only" style="display: ${question.questionType === 'coding' ? 'block' : 'none'};">
                         <label>Programming Language</label>
@@ -515,6 +546,16 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     </div>
                 `;
                 questionsContainer.appendChild(questionBlock);
+                if (question.questionImage) { questionBlock.dataset.questionImage = question.questionImage; }
+                if (question.questionType === 'mcq') {
+                    const cont = questionBlock.querySelector('.options-container');
+                    const correctSet = question.isMultiple ? (Array.isArray(question.correctAnswers) ? question.correctAnswers : []) : [question.correctAnswer];
+                    (question.options || []).forEach((opt, i) => {
+                        const row = createOptionRow(opt.text || '', opt.image || '', Array.isArray(correctSet) ? correctSet.includes(i) : false);
+                        cont.appendChild(row);
+                    });
+                }
+                attachQuestionEnhancements(questionBlock);
             });
 
             questionCount = quiz.questions.length;
@@ -541,4 +582,5 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     } else {
         priceGroup.style.display = 'none';
     }
+    document.querySelectorAll('.question-block').forEach(attachQuestionEnhancements);
 });

@@ -234,23 +234,58 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         const writtenTextarea = document.getElementById('written-answer');
 
         if (question.questionType === 'mcq') {
-            optionsContainer.style.display = 'grid';
+            optionsContainer.style.display = 'block';
             writtenContainer.style.display = 'none';
             if (codeContainer) codeContainer.style.display = 'none';
             optionsContainer.innerHTML = ''; // Clear old options
 
+            const existing = userAnswers.find(a => a.questionIndex === index);
+            const selectedForMulti = existing && Array.isArray(existing.selectedAnswers) ? existing.selectedAnswers : [];
+            const selectedSingle = existing && typeof existing.answerIndex === 'number' ? existing.answerIndex : null;
+
             question.options.forEach((option, i) => {
-                optionsContainer.innerHTML += `
-                    <div class="option" data-option-index="${i}">
-                        <span>${String.fromCharCode(65 + i)}</span> <p>${option.text}</p>
-                    </div>
-                `;
+                const label = String.fromCharCode(65 + i);
+                const imgHtml = option.image ? `<img src="${option.image}" alt="Option image" style="max-width:220px; display:block; margin-top:8px; border-radius:6px;">` : '';
+                if (question.isMultiple) {
+                    const checked = selectedForMulti.includes(i) ? 'checked' : '';
+                    optionsContainer.innerHTML += `
+                        <label class="option option-multiple" data-option-index="${i}" style="display:block; cursor:pointer; padding:12px; border:1px solid var(--border-color); border-radius:8px; margin-bottom:10px;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <input type="checkbox" class="option-checkbox" ${checked} />
+                                <span>${label}</span>
+                                <p style="margin:0;">${option.text}</p>
+                            </div>
+                            ${imgHtml}
+                        </label>
+                    `;
+                } else {
+                    const selClass = selectedSingle === i ? 'selected' : '';
+                    optionsContainer.innerHTML += `
+                        <div class="option ${selClass}" data-option-index="${i}" style="padding:12px; border:1px solid var(--border-color); border-radius:8px; margin-bottom:10px;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span>${label}</span>
+                                <p style="margin:0;">${option.text}</p>
+                            </div>
+                            ${imgHtml}
+                        </div>
+                    `;
+                }
             });
 
-            // Add click listeners to new options
-            document.querySelectorAll('.option').forEach(opt => {
-                opt.addEventListener('click', selectAnswer);
-            });
+            if (question.isMultiple) {
+                document.querySelectorAll('.option-checkbox').forEach(cb => {
+                    cb.addEventListener('change', toggleMultiSelection);
+                });
+                // Apply selected class to checked ones
+                document.querySelectorAll('.option.option-multiple').forEach(opt => {
+                    const i = parseInt(opt.getAttribute('data-option-index'));
+                    if (selectedForMulti.includes(i)) opt.classList.add('selected');
+                });
+            } else {
+                document.querySelectorAll('.option').forEach(opt => {
+                    opt.addEventListener('click', selectAnswer);
+                });
+            }
         } else if (question.questionType === 'written') {
             optionsContainer.style.display = 'none';
             writtenContainer.style.display = 'block';
@@ -378,12 +413,34 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         const existingAnswer = userAnswers.find(a => a.questionIndex === currentQuestionIndex);
         if (existingAnswer) {
             existingAnswer.answerIndex = selectedAnswerIndex;
+            if (Array.isArray(existingAnswer.selectedAnswers)) delete existingAnswer.selectedAnswers;
         } else {
             userAnswers.push({
                 questionIndex: currentQuestionIndex,
                 answerIndex: selectedAnswerIndex
             });
         }
+    }
+
+    function toggleMultiSelection(e) {
+        const cb = e.currentTarget;
+        const optEl = cb.closest('.option');
+        const idx = optEl ? parseInt(optEl.getAttribute('data-option-index')) : NaN;
+        if (optEl) {
+            if (cb.checked) optEl.classList.add('selected'); else optEl.classList.remove('selected');
+        }
+        if (Number.isNaN(idx)) return;
+        let existing = userAnswers.find(a => a.questionIndex === currentQuestionIndex);
+        if (!existing) {
+            existing = { questionIndex: currentQuestionIndex, selectedAnswers: [] };
+            userAnswers.push(existing);
+        }
+        if (!Array.isArray(existing.selectedAnswers)) existing.selectedAnswers = [];
+        const pos = existing.selectedAnswers.indexOf(idx);
+        if (cb.checked && pos === -1) existing.selectedAnswers.push(idx);
+        if (!cb.checked && pos !== -1) existing.selectedAnswers.splice(pos, 1);
+        // ensure single-answer field does not interfere
+        if (typeof existing.answerIndex === 'number') delete existing.answerIndex;
     }
 
     // Navigation button event listeners
@@ -464,7 +521,8 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                         const codeAnswer = codeAnswers.find(c => c.questionIndex === index);
                         return {
                             questionIndex: index,
-                            selectedAnswer: mcqAnswer ? mcqAnswer.answerIndex : null,
+                            selectedAnswer: (!question.isMultiple && mcqAnswer && typeof mcqAnswer.answerIndex === 'number') ? mcqAnswer.answerIndex : null,
+                            selectedAnswers: (question.isMultiple && mcqAnswer && Array.isArray(mcqAnswer.selectedAnswers)) ? mcqAnswer.selectedAnswers : undefined,
                             writtenAnswer: writtenAnswer ? writtenAnswer.answer : '',
                             codeAnswer: codeAnswer ? codeAnswer.code : '',
                             timeSpent: 0
