@@ -22,16 +22,12 @@ document.addEventListener('DOMContentLoaded', function(){
         const loginBtn = document.getElementById('nav-login');
         const signupBtn = document.getElementById('nav-signup');
         const logoutBtn = document.getElementById('nav-logout');
-        const loginMobile = document.getElementById('nav-login-mobile');
-        const signupMobile = document.getElementById('nav-signup-mobile');
-        const logoutMobile = document.getElementById('nav-logout-mobile');
 
         const show = (el) => { if (el) el.style.display = ''; };
         const hide = (el) => { if (el) el.style.display = 'none'; };
 
         if (token && user) {
             hide(loginBtn); hide(signupBtn); show(logoutBtn);
-            hide(loginMobile); hide(signupMobile); show(logoutMobile);
             const role = String((user && user.role) || '').toLowerCase();
             if (role === 'superadmin') {
                 window.location.replace('dashboard-superadmin.html');
@@ -45,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function(){
             }
         } else {
             show(loginBtn); show(signupBtn); hide(logoutBtn);
-            show(loginMobile); show(signupMobile); hide(logoutMobile);
         }
 
         const doLogout = function(e){
@@ -60,4 +55,19 @@ document.addEventListener('DOMContentLoaded', function(){
             if (a) a.addEventListener('click', doLogout);
         }
     } catch (_) {}
+
+    // Active underline for navbar links by hash
+    const setActive = () => {
+        const hash = location.hash || '#home';
+        document.querySelectorAll('.nav-link').forEach(a => {
+            if (a.getAttribute('href') === hash) a.classList.add('active'); else a.classList.remove('active');
+        });
+    };
+    setActive();
+    window.addEventListener('hashchange', setActive);
+
+    // Redirect category clicks to Sign Up
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.addEventListener('click', function(){ window.location.href = 'register.html'; });
+    });
 });
