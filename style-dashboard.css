@@ -26,7 +26,9 @@
 }
 
 body {
-    background-color: var(--secondary-color);
+    background: radial-gradient(1200px 800px at 80% 20%, rgba(80,227,194,0.08), transparent 50%),
+                radial-gradient(1000px 700px at 10% 90%, rgba(74,144,226,0.08), transparent 60%),
+                linear-gradient(180deg, #f7fafc, #ffffff 50%);
 }
 
 .osian-toast {
@@ -188,15 +190,68 @@ body {
     cursor: pointer;
 }
 
-.header-title h1 {
-    font-size: 28px;
-    font-weight: 600;
-    color: var(--text-color);
+.header-title h1 { font-size: 40px; font-weight: 700; color: var(--text-color); }
+.header-title p {
+    font-size: 16px; color: var(--text-light);
 }
 
-.header-title p {
-    font-size: 16px;
-    color: var(--text-light);
+.header-hero {
+    background: linear-gradient(135deg, rgba(74,144,226,0.1), rgba(80,227,194,0.08));
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-shadow: var(--shadow);
+}
+.header-hero .hero-illustration { width: 80px; height: 80px; border-radius: 14px; background: #eaf3ff; display:flex; align-items:center; justify-content:center; color: var(--primary-color); box-shadow: var(--shadow); }
+.header-hero .hero-text h2 { font-size: 24px; font-weight: 600; }
+.header-hero .hero-text p { font-size: 14px; color: var(--text-light); }
+
+/* Polished Sidebar */
+.sidebar { backdrop-filter: saturate(120%) blur(0px); }
+.sidebar .logo { letter-spacing: 0.5px; }
+.sidebar-menu a { border: 1px solid transparent; }
+.sidebar-menu a.active { background: var(--primary-color); color: var(--white); box-shadow: 0 6px 20px rgba(74,144,226,0.25); }
+
+/* Category Icon Cards */
+.category-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; }
+.category-card { background:#fff; border: 1px solid var(--border-color); border-radius: 18px; padding: 18px; display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer; box-shadow: var(--shadow); transition: transform 0.2s ease, box-shadow 0.3s ease; text-decoration:none; color:inherit; }
+.category-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+.category-card .card-icon { width: 56px; height: 56px; border-radius: 14px; background:#eaf3ff; display:flex; align-items:center; justify-content:center; color: var(--primary-color); font-size: 28px; }
+.category-card .card-label { font-weight:600; }
+
+/* Popular Quizzes Horizontal */
+.popular-strip { display:flex; gap:16px; overflow-x:auto; padding-bottom:8px; }
+.popular-strip::-webkit-scrollbar { height: 8px; }
+.popular-strip::-webkit-scrollbar-thumb { background: #dbe6f5; border-radius: 8px; }
+.popular-card { min-width: 420px; background:#fff; border: 1px solid var(--border-color); border-radius: 16px; display:flex; gap:14px; padding:14px; box-shadow: var(--shadow); }
+.popular-card img { width: 160px; height: 100px; object-fit: cover; border-radius: 12px; }
+.popular-card .meta h3 { font-size: 18px; font-weight:600; }
+.popular-card .meta p { font-size: 13px; color: var(--text-light); }
+.popular-card .actions { margin-top: auto; }
+.popular-card .actions .quiz-btn { padding:8px 12px; font-size: 13px; }
+
+/* Continue Learning Strip */
+.continue-strip { display:flex; gap:14px; overflow-x:auto; padding-bottom:8px; }
+.continue-item { min-width: 260px; background:#fff; border:1px solid var(--border-color); border-radius:14px; padding:12px; box-shadow: var(--shadow); }
+.continue-item h4 { font-size:16px; font-weight:600; }
+.continue-item p { font-size:12px; color: var(--text-light); }
+
+/* Explore Topics Grid */
+.explore-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+.explore-card { background:#fff; border:1px solid var(--border-color); border-radius:16px; padding:16px; text-align:center; font-weight:500; box-shadow: var(--shadow); cursor:pointer; }
+.explore-card:hover { background:#f8fbff; }
+
+@media (max-width: 1400px) {
+    .category-grid { grid-template-columns: repeat(3, 1fr); }
+    .explore-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+    .category-grid { grid-template-columns: repeat(2, 1fr); }
+    .explore-grid { grid-template-columns: repeat(2, 1fr); }
+    .popular-card { min-width: 320px; }
 }
 
 .header-profile {

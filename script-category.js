@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if (!token || !user) { window.location.href = 'login.html'; return; }
 
     const catParam = getParam('cat') || 'technical';
+    const fieldParam = new URLSearchParams(location.search).get('field');
     const displayNameMap = {
         technical: 'Technical', coding: 'Coding', law: 'Law', engineering: 'Engineering', sports: 'Sports', gk: 'General Knowledge', studies: 'Studies'
     };
@@ -38,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if (categoryIcon) categoryIcon.innerHTML = `<i class='bx ${iconMap[catParam]||'bx-category'}'></i>`;
 
     let allQuizzesFlat = [];
-    let selectedField = '';
+    let selectedField = fieldParam ? String(fieldParam).toLowerCase() : '';
     let selectedLevel = '';
 
     function createQuizCard(quiz){

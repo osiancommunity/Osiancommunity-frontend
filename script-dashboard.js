@@ -125,11 +125,13 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         const cats = ['technical','law','engineering','gk','sports','coding','studies'];
         categoryPillsRow.innerHTML = '';
         cats.forEach(function(cat){
-            const el = document.createElement('button');
-            el.className = 'pill' + (selectedCategory === cat ? ' active' : '');
-            el.type = 'button';
-            el.textContent = (cat.charAt(0).toUpperCase() + cat.slice(1)).replace('Gk','General Knowledge');
+            const el = document.createElement('a');
+            el.href = 'category.html?cat=' + encodeURIComponent(cat);
+            el.className = 'category-card';
             el.dataset.cat = cat;
+            const label = (cat.charAt(0).toUpperCase() + cat.slice(1)).replace('Gk','General Knowledge');
+            const iconMap = { technical: 'bx-chip', coding: 'bx-code', law: 'bx-balance', engineering: 'bx-cog', gk: 'bx-brain', sports: 'bx-football', studies: 'bx-book' };
+            el.innerHTML = `<div class="card-icon"><i class='bx ${iconMap[cat]||'bx-category'}'></i></div><div class="card-label">${label}</div>`;
             el.onclick = function(){
                 window.location.href = 'category.html?cat=' + encodeURIComponent(cat);
             };
@@ -240,10 +242,72 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 (cat[k]||[]).forEach(function(q){ allQuizzesFlat.push(q); });
             });
 
+            renderPopular();
+            renderContinueLearning();
+            renderExploreTopics();
+
         } catch (error) {
             console.error('Error fetching quizzes:', error);
             showToast('Could not load quizzes. Server may be down.', 'error');
         }
+    }
+
+    function renderPopular(){
+        const strip = document.getElementById('popular-strip');
+        const section = document.getElementById('popular-section');
+        if (!strip || !section) return;
+        strip.innerHTML = '';
+        const ranked = allQuizzesFlat.map(function(q){
+            const participantsCount = (typeof q.registeredUsers === 'number') ? q.registeredUsers : (Array.isArray(q.participants) ? q.participants.length : 0);
+            return { q, participantsCount };
+        }).sort(function(a,b){ return b.participantsCount - a.participantsCount; }).slice(0,8);
+        ranked.forEach(function(r){
+            const q = r.q; const isPaid = q.quizType === 'paid';
+            const destinationUrl = isPaid ? `payment.html?quizId=${q._id}` : `quiz.html?id=${q._id}`;
+            const card = document.createElement('div');
+            card.className = 'popular-card';
+            card.innerHTML = `
+                <img src="${q.coverImage || 'https://via.placeholder.com/320x200?text=No+Image'}" alt="${q.title}">
+                <div class="meta">
+                    <h3>${q.title}</h3>
+                    <p>${q.description || ''}</p>
+                    <div class="actions"><button class="quiz-btn ${isPaid ? 'paid':'live'}" onclick="window.location.href='${destinationUrl}'">${isPaid ? 'Register' : 'Join Now'}</button></div>
+                </div>`;
+            strip.appendChild(card);
+        });
+    }
+
+    function renderContinueLearning(){
+        const strip = document.getElementById('continue-strip');
+        const section = document.getElementById('continue-section');
+        if (!strip || !section) return;
+        strip.innerHTML = '';
+        let recent = [];
+        try { recent = JSON.parse(localStorage.getItem('osianRecentQuizzes')) || []; } catch (_) { recent = []; }
+        if (!Array.isArray(recent) || recent.length === 0) {
+            recent = allQuizzesFlat.filter(function(q){ return q.quizType !== 'paid'; }).slice(0,6);
+        }
+        recent.slice(0,8).forEach(function(q){
+            const item = document.createElement('div');
+            item.className = 'continue-item';
+            item.innerHTML = `<h4>${q.title}</h4><p>${(q.category||'').toUpperCase()} • ${q.field||''} • ${q.difficulty||''}</p>`;
+            item.onclick = function(){ window.location.href = `quiz.html?id=${q._id}`; };
+            strip.appendChild(item);
+        });
+    }
+
+    function renderExploreTopics(){
+        const grid = document.getElementById('explore-grid');
+        if (!grid) return;
+        const topics = ['python','java','c++','os','networks','web'];
+        grid.innerHTML = '';
+        topics.forEach(function(t){
+            const el = document.createElement('a');
+            el.className = 'explore-card';
+            el.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+            el.href = `category.html?cat=technical&field=${encodeURIComponent(t)}`;
+            grid.appendChild(el);
+        });
     }
     
     // --- NEW: Function to render quizzes into a container ---

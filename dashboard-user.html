@@ -34,7 +34,7 @@
             <header class="main-header">
                 <div class="header-title">
                     <h1>Welcome Back, User!</h1>
-                    <p>Let's find a quiz for you</p>
+                    <p>Explore premium learning quizzes tailored for you</p>
                 </div>
                 <div class="header-profile">
                     <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
@@ -51,17 +51,38 @@
                 </div>
             </header>
 
+            <section class="header-hero">
+                <div class="hero-illustration"><i class='bx bxs-graduation'></i></div>
+                <div class="hero-text">
+                    <h2>Keep learning, keep growing</h2>
+                    <p>Pick a category to jump right in or continue your progress</p>
+                </div>
+            </section>
 
-            <section class="content-card" id="category-select-panel">
+
+            <section class="content-card minimal" id="category-select-panel">
+                <h2><i class='bx bx-category'></i> Categories</h2>
                 <div class="category-grid" id="category-pills"></div>
-                <div class="pill-row" id="field-pills" style="margin-top:16px;"></div>
-                <div class="pill-row" id="level-pills" style="margin-top:16px;"></div>
+            </section>
+
+            <section class="quiz-list-section" id="popular-section">
+                <h2><i class='bx bx-trending-up'></i> Popular Quizzes</h2>
+                <div class="popular-strip" id="popular-strip"></div>
+            </section>
+
+            <section class="quiz-list-section" id="continue-section">
+                <h2><i class='bx bx-time-five'></i> Continue Learning</h2>
+                <div class="continue-strip" id="continue-strip"></div>
+            </section>
+
+            <section class="quiz-list-section" id="explore-section">
+                <h2><i class='bx bx-compass'></i> Explore Topics</h2>
+                <div class="explore-grid" id="explore-grid"></div>
             </section>
 
             <section class="quiz-list-section" id="filtered-section" style="display:none;">
                 <h2><i class='bx bx-filter-alt'></i> Matching Quizzes</h2>
-                <div class="quiz-list-grid" id="filtered-quizzes-container">
-                </div>
+                <div class="quiz-list-grid" id="filtered-quizzes-container"></div>
             </section>
 
             <section class="quiz-list-section" id="paid-section">
