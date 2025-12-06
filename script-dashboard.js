@@ -131,18 +131,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             el.textContent = (cat.charAt(0).toUpperCase() + cat.slice(1)).replace('Gk','General Knowledge');
             el.dataset.cat = cat;
             el.onclick = function(){
-                selectedCategory = cat;
-                selectedField = '';
-                selectedLevel = '';
-                renderCategoryPills();
-                renderFieldPills();
-                if (levelPillsRow) { levelPillsRow.innerHTML = ''; slideClose(levelPillsRow); }
-                document.getElementById('filtered-section').style.display = 'none';
-                ['technical-section','gk-section','engineering-section','sports-section','coding-section','law-section','studies-section'].forEach(function(id){
-                    const el = document.getElementById(id);
-                    if (el) el.style.display = 'block';
-                });
-                if (fieldPillsRow) { slideOpen(fieldPillsRow); }
+                window.location.href = 'category.html?cat=' + encodeURIComponent(cat);
             };
             categoryPillsRow.appendChild(el);
         });
