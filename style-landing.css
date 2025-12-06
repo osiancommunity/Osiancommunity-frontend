@@ -106,7 +106,7 @@ ul {
 
 .nav-logo { display: flex; align-items: center; gap: 10px; }
 .nav-logo-img { height: 56px; width: auto; display: block; border-radius: 6px; }
-.nav-logo-text { font-size: 22px; font-weight: 800; color: #6C00FF; letter-spacing: 0.5px; }
+.nav-logo-text { font-size: 26px; font-weight: 800; color: #B8860B; letter-spacing: 0.5px; }
 
 .nav-menu {
     display: flex;
@@ -470,7 +470,7 @@ ul {
 
     .nav-item { padding: 15px 0; }
     .nav-logo-img { height: 42px; }
-    .nav-logo-text { font-size: 18px; }
+    .nav-logo-text { font-size: 20px; }
 
     .nav-buttons {
         display: none; /* Hide buttons in menu, or move them */
