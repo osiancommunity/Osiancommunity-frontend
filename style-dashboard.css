@@ -318,6 +318,40 @@ body {
     gap: 20px;
 }
 
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: #f7f8fb;
+    color: var(--text-color);
+    font-weight: 500;
+    cursor: pointer;
+}
+.pill.active {
+    background: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+}
+.pill-badge {
+    display: inline-block;
+    min-width: 20px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: var(--secondary-color);
+    color: var(--text-color);
+    font-size: 12px;
+}
+.slide-collapsible {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: max-height 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+
 .category-card {
     background: var(--white);
     padding: 20px;
