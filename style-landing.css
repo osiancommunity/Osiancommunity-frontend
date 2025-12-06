@@ -310,7 +310,9 @@ ul {
 .about h2 { font-size: 36px; font-weight: 600; margin-bottom: 12px; }
 .about p { font-size: 16px; color: #555; margin-bottom: 24px; }
 .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-.team-card { background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; padding: 20px; box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
+.team-card { background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; padding: 20px; box-shadow: 0 6px 16px rgba(0,0,0,0.06); text-align: center; }
+.team-photo { width: 96px; height: 96px; margin: 0 auto 12px; border-radius: 50%; background: #fff; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.team-photo img { width: 100%; height: 100%; object-fit: cover; }
 .team-card h3 { font-size: 20px; font-weight: 600; color: #4a00e0; }
 .team-card p { font-weight: 500; margin: 6px 0 8px 0; }
 .team-card span { font-size: 14px; color: #666; }
