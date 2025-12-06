@@ -245,11 +245,39 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             renderPopular();
             renderContinueLearning();
             renderExploreTopics();
+            renderRecommended();
 
         } catch (error) {
             console.error('Error fetching quizzes:', error);
             showToast('Could not load quizzes. Server may be down.', 'error');
         }
+    }
+
+    function renderRecommended(){
+        const cont = document.getElementById('recommended-quizzes-container');
+        const section = document.getElementById('recommended-section');
+        if (!cont || !section) return;
+        cont.innerHTML = '';
+        const picks = allQuizzesFlat.filter(function(q){
+            return String(q.visibility || 'public').toLowerCase() !== 'unlisted';
+        }).slice(0,6);
+        if (picks.length === 0) { section.style.display = 'none'; return; }
+        picks.forEach(function(q){ cont.innerHTML += createQuizCard(q); });
+    }
+
+    function renderTopCategories(){
+        const grid = document.getElementById('topcats-grid');
+        if (!grid) return;
+        const cats = ['technical','coding','law','engineering','gk','sports','studies'];
+        const iconMap = { technical: 'bx-chip', coding: 'bx-code', law: 'bx-balance', engineering: 'bx-cog', gk: 'bx-brain', sports: 'bx-football', studies: 'bx-book' };
+        grid.innerHTML = '';
+        cats.slice(0,6).forEach(function(cat){
+            const el = document.createElement('a');
+            el.className = 'topcat-card';
+            el.href = 'category.html?cat=' + encodeURIComponent(cat);
+            el.innerHTML = `<div class="tc-icon"><i class='bx ${iconMap[cat]}'></i></div><div class="tc-text">${(cat.charAt(0).toUpperCase()+cat.slice(1)).replace('Gk','General Knowledge')}</div>`;
+            grid.appendChild(el);
+        });
     }
 
     function renderPopular(){
@@ -443,6 +471,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     }
 
     renderCategoryPills();
+    renderTopCategories();
 
     fetchQuizzes();
 
