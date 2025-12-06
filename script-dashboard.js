@@ -85,6 +85,31 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     let selectedField = '';
     let selectedLevel = '';
 
+    function slideOpen(el){
+        if (!el) return;
+        el.classList.add('open');
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+        el.style.maxHeight = '0px';
+        void el.offsetHeight; // force reflow
+        el.style.maxHeight = el.scrollHeight + 'px';
+    }
+
+    function slideClose(el){
+        if (!el) return;
+        el.classList.remove('open');
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-4px)';
+        el.style.maxHeight = '0px';
+    }
+
+    function slideRefresh(el){
+        if (!el) return;
+        if (el.classList.contains('open')) {
+            el.style.maxHeight = el.scrollHeight + 'px';
+        }
+    }
+
     const fieldOptionsByCategory = {
         technical: ['python','java','c++','os','networks','web'],
         law: ['constitutional','criminal','civil','corporate','tax'],
@@ -106,17 +131,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             el.textContent = (cat.charAt(0).toUpperCase() + cat.slice(1)).replace('Gk','General Knowledge');
             el.dataset.cat = cat;
             el.onclick = function(){
-                selectedCategory = cat;
-                selectedField = '';
-                selectedLevel = '';
-                renderCategoryPills();
-                renderFieldPills();
-                levelPillsRow.innerHTML = '';
-                document.getElementById('filtered-section').style.display = 'none';
-                ['technical-section','gk-section','engineering-section','sports-section','coding-section','law-section','studies-section'].forEach(function(id){
-                    const el = document.getElementById(id);
-                    if (el) el.style.display = 'block';
-                });
+                window.location.href = 'category.html?cat=' + encodeURIComponent(cat);
             };
             categoryPillsRow.appendChild(el);
         });
@@ -150,9 +165,11 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 renderFieldPills();
                 renderLevelPills();
                 document.getElementById('filtered-section').style.display = 'none';
+                if (levelPillsRow) { slideOpen(levelPillsRow); }
             };
             fieldPillsRow.appendChild(el);
         });
+        slideRefresh(fieldPillsRow);
     }
 
     function renderLevelPills(){
@@ -168,10 +185,27 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 selectedLevel = l;
                 renderLevelPills();
                 applyFilter();
+                try { document.getElementById('filtered-section').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
             };
             levelPillsRow.appendChild(el);
         });
+        slideRefresh(levelPillsRow);
     }
+
+    // Initialize collapsibles once
+    if (fieldPillsRow) {
+        fieldPillsRow.classList.add('slide-collapsible');
+        slideClose(fieldPillsRow);
+    }
+    if (levelPillsRow) {
+        levelPillsRow.classList.add('slide-collapsible');
+        slideClose(levelPillsRow);
+    }
+
+    window.addEventListener('resize', function(){
+        slideRefresh(fieldPillsRow);
+        slideRefresh(levelPillsRow);
+    });
 
     async function fetchQuizzes() {
         try {

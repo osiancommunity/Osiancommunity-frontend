@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIAN - Category</title>
+    <link rel="stylesheet" href="style-dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body class="category-page">
+    <div class="category-container">
+        <header class="category-header">
+            <div class="header-icon" id="category-icon"><i class='bx bx-category'></i></div>
+            <div class="header-text">
+                <h1 id="category-title">Category</h1>
+                <p id="category-sub">Choose a topic and level</p>
+            </div>
+        </header>
+
+        <section class="category-hero"></section>
+
+        <main class="category-content">
+            <section class="content-card minimal" id="topics-section">
+                <h2><i class='bx bx-grid'></i> Topics</h2>
+                <div class="topic-grid" id="topic-grid"></div>
+            </section>
+
+            <section class="content-card minimal" id="levels-section">
+                <h2><i class='bx bx-signal-4'></i> Levels</h2>
+                <div class="level-grid" id="level-grid"></div>
+            </section>
+
+            <section class="content-card minimal" id="reco-section">
+                <h2><i class='bx bx-star'></i> Recommended Quizzes</h2>
+                <div class="reco-grid" id="reco-grid"></div>
+            </section>
+        </main>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="dashboard-user.html" id="nav-dashboard"><i class='bx bxs-dashboard'></i><span>Home</span></a>
+        <a href="quiz-progress.html" id="nav-quizzes"><i class='bx bx-file-blank'></i><span>Quizzes</span></a>
+        <a href="mentorship-user.html" id="nav-mentorship"><i class='bx bx-video'></i><span>Mentor</span></a>
+        <a href="notifications.html" id="nav-notifs"><i class='bx bx-bell'></i><span>Alerts</span></a>
+        <a href="profile.html" id="nav-profile"><i class='bx bxs-user'></i><span>Profile</span></a>
+    </div>
+
+    <script src="script-toast-helper.js"></script>
+    <script src="script-category.js"></script>
+</body>
+</html>
