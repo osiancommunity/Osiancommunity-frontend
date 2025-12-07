@@ -367,8 +367,86 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         window.location.href = `quiz-results.html?quizId=${quizId}`;
     };
 
+    // Leaderboard & Badges
+    let lbSocket;
+    async function fetchLeaderboardREST(scope, period) {
+        try {
+            const query = new URLSearchParams({ scope, period }).toString();
+            const res = await fetch(`${backendUrl}/leaderboard?${query}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) {
+                // Fallback message
+                const tbody = document.querySelector('#leaderboard-table tbody');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="4">Leaderboard not available</td></tr>';
+                return;
+            }
+            const data = await res.json();
+            renderLeaderboard(data.leaderboard || []);
+        } catch (_) {}
+    }
+    function renderLeaderboard(list) {
+        const tbody = document.querySelector('#leaderboard-table tbody');
+        if (!tbody) return;
+        const rows = list.map(x => `<tr><td>${x.rank}</td><td><img src="${x.user?.avatar || 'https://via.placeholder.com/24'}" class="lb-avatar"> ${x.user?.name || 'User'}</td><td>${Math.round(x.compositeScore)}</td><td>${x.attempts}</td></tr>`).join('');
+        tbody.innerHTML = rows || '<tr><td colspan="4">No data</td></tr>';
+    }
+    function connectLeaderboardWS(scope, period) {
+        try {
+            const url = new URL(window.location.href);
+            const wsProto = url.protocol === 'https:' ? 'wss' : 'ws';
+            const base = backendUrl.replace(/^http(s)?:\/\//,'');
+            const host = base.split('/')[0];
+            const ws = new WebSocket(`${wsProto}://${host}/ws/leaderboard?scope=${encodeURIComponent(scope)}&period=${encodeURIComponent(period)}`);
+            lbSocket = ws;
+            ws.onmessage = (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+                    if (msg.type === 'leaderboard') renderLeaderboard(msg.leaderboard || []);
+                } catch (_) {}
+            };
+            ws.onopen = () => {};
+            ws.onerror = () => { try { ws.close(); } catch(_){}; /* fallback to polling */ startLbPolling(scope, period); };
+            ws.onclose = () => { lbSocket = null; };
+        } catch (_) { startLbPolling(scope, period); }
+    }
+    let lbPollTimer;
+    function startLbPolling(scope, period) {
+        if (lbPollTimer) clearInterval(lbPollTimer);
+        fetchLeaderboardREST(scope, period);
+        lbPollTimer = setInterval(() => fetchLeaderboardREST(scope, period), 15000);
+    }
+
+    async function fetchBadges() {
+        try {
+            const res = await fetch(`${backendUrl}/badges/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) {
+                const row = document.getElementById('badges-row');
+                if (row) row.innerHTML = '<div class="badge"><span class="badge-icon">ℹ️</span><span class="badge-name">No badges yet</span></div>';
+                return;
+            }
+            const data = await res.json();
+            const row = document.getElementById('badges-row');
+            if (!row) return;
+            row.innerHTML = (data.badges || []).map(b => `<div class="badge" title="${b.description}"><span class="badge-icon">${b.icon || '🏅'}</span><span class="badge-name">${b.name}</span></div>`).join('');
+        } catch (_) {}
+    }
+
     // --- Initial Page Load ---
     fetchMyResults();
     fetchMyRegisteredQuizzes();
+    const lbScope = document.getElementById('lb-scope');
+    const lbPeriod = document.getElementById('lb-period');
+    if (lbScope && lbPeriod) {
+        const applyLb = () => {
+            const scope = lbScope.value;
+            const period = lbPeriod.value;
+            fetchLeaderboardREST(scope, period);
+            if (lbSocket) try { lbSocket.close(); } catch(_){}
+            connectLeaderboardWS(scope, period);
+        };
+        lbScope.addEventListener('change', applyLb);
+        lbPeriod.addEventListener('change', applyLb);
+        applyLb();
+    }
+    fetchBadges();
 
 });
