@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSIAN – Student Performance</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style-dashboard.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header"><h2>OSIAN</h2></div>
+      <ul class="sidebar-menu">
+        <li><a href="dashboard-user.html">Dashboard</a></li>
+        <li><a href="my-quizzes.html">My Quizzes</a></li>
+        <li><a href="mentorship-user.html">Mentorship</a></li>
+        <li><a href="notifications.html">Notifications</a></li>
+        <li><a href="profile.html">My Profile</a></li>
+        <li><a href="leaderboard.html">Leaderboard</a></li>
+      </ul>
+    </aside>
+    <main class="main-content">
+      <section class="premium-header">
+        <div class="header-title">
+          <h1>Student Performance</h1>
+          <p>Detailed analytics of your progress and results.</p>
+        </div>
+      </section>
+      <section class="content-card large">
+        <div class="grid two-cols" style="gap:20px;">
+          <div>
+            <h3>Overview</h3>
+            <div id="overview" class="grid two-cols" style="gap:12px;"></div>
+          </div>
+          <div>
+            <h3>Recent Attempts</h3>
+            <div id="attempts"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script-toast-helper.js"></script>
+  <script src="script-student-performance.js"></script>
+</body>
+</html>

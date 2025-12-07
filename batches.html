@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSIAN – Batches</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style-dashboard.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>OSIAN</h2>
+      </div>
+      <ul class="sidebar-menu">
+        <li><a href="dashboard-user.html">Dashboard</a></li>
+        <li><a href="my-quizzes.html">My Quizzes</a></li>
+        <li><a href="mentorship-user.html">Mentorship</a></li>
+        <li><a href="notifications.html">Notifications</a></li>
+        <li><a href="profile.html">My Profile</a></li>
+        <li><a href="batches.html" class="active">Batches</a></li>
+        <li><a href="leaderboard.html">Leaderboard</a></li>
+      </ul>
+    </aside>
+    <main class="main-content">
+      <section class="premium-header">
+        <div class="header-title">
+          <h1>Batches</h1>
+          <p>Create and manage cohorts. Enroll students and track progress.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" id="btn-create-batch">Create Batch</button>
+        </div>
+      </section>
+
+      <section class="content-card large">
+        <div class="grid two-cols" style="gap: 24px;">
+          <div>
+            <h3>All Batches</h3>
+            <div class="toolbar" style="display:flex; gap:12px; margin:12px 0;">
+              <input type="text" id="batch-search" placeholder="Search batches" style="flex:1;">
+              <select id="batch-sort">
+                <option value="recent">Recent</option>
+                <option value="name">Name</option>
+                <option value="size">Size</option>
+              </select>
+            </div>
+            <div id="batch-list" class="cards-grid"></div>
+          </div>
+          <div>
+            <h3>Batch Details</h3>
+            <div id="batch-details" class="content-card medium"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-card large">
+        <h3>Enroll Students</h3>
+        <div class="grid two-cols" style="gap: 16px;">
+          <div>
+            <input type="email" id="enroll-email" placeholder="Student email">
+          </div>
+          <div>
+            <button class="btn btn-secondary" id="btn-enroll">Enroll</button>
+          </div>
+        </div>
+        <div id="enroll-status" style="margin-top:10px; font-size:14px;"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal-create-batch" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+      <h2>Create Batch</h2>
+      <div class="grid two-cols" style="gap:12px;">
+        <input id="batch-name" placeholder="Batch name">
+        <input id="batch-start" type="date" placeholder="Start date">
+      </div>
+      <textarea id="batch-desc" placeholder="Description" style="margin-top:12px;"></textarea>
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button class="btn btn-primary" id="btn-save-batch">Save</button>
+        <button class="btn" id="btn-close-modal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script-toast-helper.js"></script>
+  <script src="script-batches.js"></script>
+</body>
+</html>
