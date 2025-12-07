@@ -12,7 +12,31 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f0f2f5;
+    background: 
+      radial-gradient(80px 80px at 10% 20%, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.00) 60%),
+      radial-gradient(120px 120px at 85% 10%, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.00) 60%),
+      radial-gradient(160px 160px at 15% 85%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.00) 60%),
+      linear-gradient(135deg, #6C00FF 0%, #3b82f6 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+body::before, body::after {
+    content: "";
+    position: absolute;
+    filter: blur(40px);
+    opacity: 0.35;
+    z-index: 0;
+}
+body::before {
+    width: 340px; height: 340px; border-radius: 50%;
+    left: -80px; top: -80px;
+    background: radial-gradient(circle, rgba(255,255,255,0.55), rgba(255,255,255,0));
+}
+body::after {
+    width: 420px; height: 420px; border-radius: 50%;
+    right: -100px; bottom: -120px;
+    background: radial-gradient(circle, rgba(255,255,255,0.40), rgba(255,255,255,0));
 }
 
 .osian-toast {
@@ -36,12 +60,12 @@ body, html {
 
 .login-container {
     display: flex;
-    width: 1000px;
-    height: 650px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 1060px;
+    height: 700px;
+    border-radius: 20px;
     overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
 }
 
 /* ------------------------- */
@@ -49,20 +73,28 @@ body, html {
 /* ------------------------- */
 .info-section {
     width: 50%;
-    background: linear-gradient(135deg, #4a00e0, #8e2de2);
+    background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
     color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px;
+    padding: 48px;
     text-align: center;
+    position: relative;
+}
+.info-section::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(120px 120px at 20% 30%, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.00) 60%),
+      radial-gradient(180px 180px at 80% 70%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.00) 60%);
+    pointer-events: none;
 }
 
-.info-content .logo-name {
-    font-size: 48px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
+.info-content .shield-logo { height: 72px; width: auto; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+.info-content .logo-name { font-size: 52px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+.info-content .slogan { font-size: 18px; font-weight: 600; opacity: 0.95; }
 
 .info-content p {
     font-size: 24px;
@@ -78,19 +110,26 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #fff;
+    background: transparent;
 }
 
 .form-wrapper {
     width: 100%;
-    max-width: 380px;
+    max-width: 420px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.35);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius: 18px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    padding: 32px 28px;
 }
 
 .form-wrapper h2 {
     font-size: 32px;
-    font-weight: 600;
-    margin-bottom: 30px;
-    color: #333;
+    font-weight: 800;
+    margin-bottom: 24px;
+    color: #0f172a;
 }
 
 .input-group {
@@ -99,23 +138,32 @@ body, html {
 
 .input-group label {
     display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: #555;
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(15,23,42,0.8);
     margin-bottom: 8px;
 }
 
+.input-group .input-wrap { position: relative; }
+.input-group .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #7c7f85; }
 .input-group input {
     width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 12px 15px 12px 44px;
+    border: 1px solid rgba(15,23,42,0.12);
+    border-radius: 12px;
     font-size: 16px;
+    background: rgba(255,255,255,0.65);
 }
 
 .input-group input:focus {
     outline: none;
-    border-color: #6a00e0;
+    border-color: rgba(108,0,255,0.6);
+    box-shadow: 0 0 0 3px rgba(108,0,255,0.15);
+    background: rgba(255,255,255,0.90);
+}
+
+.input-group input:hover {
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
 }
 
 .form-options {
@@ -135,20 +183,23 @@ body, html {
 
 .login-btn {
     width: 100%;
-    padding: 15px;
+    padding: 14px 16px;
     border: none;
-    border-radius: 5px;
-    background: linear-gradient(135deg, #4a00e0, #8e2de2);
+    border-radius: 14px;
+    background: linear-gradient(135deg, #6C00FF, #3b82f6);
     color: #fff;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+    box-shadow: 0 10px 24px rgba(60, 64, 67, 0.20);
 }
 
 .login-btn:hover {
-    background: linear-gradient(135deg, #3e00b8, #7d26c9);
+    background: linear-gradient(135deg, #7b1cff, #4aa0ff);
+    box-shadow: 0 16px 36px rgba(108,0,255,0.35), 0 10px 24px rgba(59,130,246,0.25);
 }
+.login-btn:active { transform: translateY(1px); }
 
 .social-separator {
     margin: 30px 0;
@@ -207,10 +258,7 @@ body, html {
 /* Responsive Design */
 /* ------------------------- */
 @media (max-width: 1024px) {
-    .login-container {
-        width: 90%;
-        max-width: 900px;
-    }
+    .login-container { width: 92%; max-width: 980px; height: auto; }
     .form-section {
         padding: 40px;
     }
@@ -221,20 +269,23 @@ body, html {
         flex-direction: column;
         height: auto;
         width: 95%;
-        max-width: 450px;
+        max-width: 520px;
     }
 
     .info-section {
         width: 100%;
-        height: 200px;
-        padding: 20px;
+        height: auto;
+        padding: 28px;
     }
 
     .form-section {
         width: 100%;
-        padding: 40px 30px;
+        padding: 24px;
     }
 }
+
+.form-illustration { margin-top: 18px; display: flex; justify-content: center; }
+.form-illustration img { width: 160px; height: auto; filter: drop-shadow(0 12px 28px rgba(0,0,0,0.25)); border-radius: 12px; }
 /* Add this to the bottom of style.css */
 .otp-message {
     font-size: 15px;
