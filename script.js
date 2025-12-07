@@ -6,7 +6,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const passwordInput = document.getElementById('password');
     const errorMessage = document.getElementById('error-message');
     
-const backendUrl = 'http://localhost:5000/api';
+const backendUrl = (location.hostname.endsWith('vercel.app'))
+  ? 'https://osiancommunity-backend.vercel.app/api'
+  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:5000/api'
+      : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- 1. Check if already logged in ---
     // If a user visits login.html but is already logged in, send them to their dashboard.
@@ -94,7 +98,10 @@ const backendUrl = 'http://localhost:5000/api';
             } catch (error) {
                 // Show error message to the user
                 if (errorMessage) {
-                    errorMessage.textContent = error.message;
+                    const msg = (error && error.message && !String(error.message).includes('Failed to fetch'))
+                      ? error.message
+                      : 'Unable to connect to the server. Please try again later.';
+                    errorMessage.textContent = msg;
                     errorMessage.style.display = 'block';
                 }
                 console.error('Login error:', error);

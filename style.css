@@ -12,11 +12,6 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: 
-      radial-gradient(80px 80px at 10% 20%, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.00) 60%),
-      radial-gradient(120px 120px at 85% 10%, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.00) 60%),
-      radial-gradient(160px 160px at 15% 85%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.00) 60%),
-      linear-gradient(135deg, #6C00FF 0%, #3b82f6 100%);
     position: relative;
     overflow: hidden;
 }
@@ -31,12 +26,12 @@ body::before, body::after {
 body::before {
     width: 340px; height: 340px; border-radius: 50%;
     left: -80px; top: -80px;
-    background: radial-gradient(circle, rgba(255,255,255,0.55), rgba(255,255,255,0));
+    background: none;
 }
 body::after {
     width: 420px; height: 420px; border-radius: 50%;
     right: -100px; bottom: -120px;
-    background: radial-gradient(circle, rgba(255,255,255,0.40), rgba(255,255,255,0));
+    background: none;
 }
 
 .osian-toast {
@@ -322,3 +317,23 @@ a, button {
 
 .social-icon:hover { transform: translateY(-2px) scale(1.02); }
 .forgot-password:hover { color: #3e00b8; }
+
+.login-page { background: #f8fafc; }
+.login-page::before, .login-page::after { content: none; }
+.login-page * { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif; }
+.login-page .login-container { width: 960px; max-width: 96%; height: auto; box-shadow: 0 12px 30px rgba(15,23,42,0.06); border-radius: 16px; }
+.login-page .info-section { background: #ffffff; color: #0f172a; }
+.login-page .info-section::after { content: none; }
+.login-page .info-content .logo-name { font-weight: 700; color: #0f172a; }
+.login-page .info-content .slogan { font-weight: 500; color: #334155; }
+.login-page .form-section { background: #f8fafc; }
+.login-page .form-wrapper { background: #ffffff; border: 1px solid #e5e7eb; backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: 0 8px 24px rgba(15,23,42,0.06); border-radius: 16px; }
+.login-page .input-group input { background: #ffffff; border: 1px solid #e5e7eb; }
+.login-page .input-group input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+.login-page .input-group .input-icon { color: #64748b; }
+.login-page .forgot-password { color: #2563eb; }
+.login-page .register-link a { color: #2563eb; }
+.login-page .login-btn { background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 8px 18px rgba(37,99,235,0.25); }
+.login-page .login-btn:hover { background: linear-gradient(135deg, #1d4ed8, #2563eb); }
+.login-page .form-hint { font-size: 12px; color: #64748b; margin-top: 8px; }
+.error-text { font-size: 12px; color: #ef4444; margin-top: 8px; }
