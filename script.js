@@ -6,7 +6,20 @@ document.addEventListener("DOMContentLoaded", function() {
     const passwordInput = document.getElementById('password');
     const errorMessage = document.getElementById('error-message');
     
-const backendUrl = 'http://localhost:5000/api';
+let backendCandidates = [];
+const backendOverride = localStorage.getItem('backendOverride');
+if (backendOverride) backendCandidates.push(backendOverride);
+backendCandidates.push('https://osiancommunity-backend.vercel.app/api');
+backendCandidates.push('http://localhost:5000/api');
+let backendUrl = backendCandidates[0];
+async function apiFetch(path, options){
+    let lastErr = null;
+    for (const base of backendCandidates){
+        try { const res = await fetch(`${base}${path}`, options); if (res && res.ok !== undefined) { backendUrl = base; return res; } }
+        catch(e){ lastErr = e; }
+    }
+    if (lastErr) throw lastErr; throw new Error('Backend unreachable');
+}
 
     // --- 1. Check if already logged in ---
     // If a user visits login.html but is already logged in, send them to their dashboard.
@@ -43,7 +56,7 @@ const backendUrl = 'http://localhost:5000/api';
             submitButton.textContent = 'Logging in...';
 
             try {
-                const response = await fetch(`${backendUrl}/auth/login`, {
+                const response = await apiFetch(`/auth/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -94,7 +107,8 @@ const backendUrl = 'http://localhost:5000/api';
             } catch (error) {
                 // Show error message to the user
                 if (errorMessage) {
-                    errorMessage.textContent = error.message;
+                    const msg = (error && error.message) ? error.message : 'Login failed';
+                    errorMessage.textContent = (/Failed to fetch|NetworkError|unreachable/i.test(msg)) ? 'Cannot reach backend. Try again or set Backend URL.' : msg;
                     errorMessage.style.display = 'block';
                 }
                 console.error('Login error:', error);
