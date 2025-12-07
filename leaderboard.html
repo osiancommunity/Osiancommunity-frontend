@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard • OSIAN</title>
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="style-dashboard.css?v=20251207">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">OSIAN</div>
+      <nav class="menu">
+        <a href="dashboard-user.html" class="menu-item"><i class='bx bx-home'></i> Dashboard</a>
+        <a href="quiz-progress.html" class="menu-item"><i class='bx bx-file'></i> My Quizzes</a>
+        <a href="leaderboard.html" class="menu-item active"><i class='bx bx-trophy'></i> Leaderboard</a>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <section class="content-card minimal">
+        <h2><i class='bx bx-trophy'></i> Top Users</h2>
+        <div class="leaderboard-controls" style="margin-top:10px">
+          <input type="text" id="lb-search" placeholder="Search users" aria-label="Search users">
+          <select id="lb-scope" aria-label="Leaderboard scope">
+            <option value="global">Global</option>
+            <option value="batch">Batch</option>
+          </select>
+          <select id="lb-period" aria-label="Leaderboard period">
+            <option value="all">All-time</option>
+            <option value="30d">30d</option>
+            <option value="7d">Weekly</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="content-card full-width-table">
+        <table class="leaderboard-table" id="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>User</th>
+              <th>Total Likes</th>
+              <th>Total Saved</th>
+              <th>Total Share</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+  <script src="script-toast-helper.js?v=20251207"></script>
+  <script src="script-leaderboard.js?v=20251207"></script>
+</body>
+</html>

@@ -330,8 +330,28 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         }
     });
 
+    // Tailored recommendations by field
+    async function fetchRecommendedByField() {
+        try {
+            const res = await fetch(`${backendUrl}/quizzes`, { headers: { ...(token ? { 'Authorization': `Bearer ${token}` } : {}) } });
+            const data = await res.json();
+            const prefLocal = localStorage.getItem('fieldPreference');
+            const pref = (user && user.profile && user.profile.fieldPreference) || prefLocal || 'General Knowledge';
+            const map = {
+                'Technical': data.categories?.technical || [],
+                'Law': data.categories?.law || [],
+                'Medical': data.categories?.medical || [],
+                'General Knowledge': data.categories?.gk || [],
+                'Social Studies': data.categories?.social || []
+            };
+            const base = map[pref] || [];
+            const rec = pickTop(base.length > 0 ? base : ([...(data.categories?.technical||[]),...(data.categories?.gk||[])]), 12);
+            renderIntoGrid(rec, 'recommended-quizzes-container');
+        } catch (e) { fetchQuizzes(); }
+    }
+
     // --- Initial Page Load ---
-    fetchQuizzes();
+    fetchRecommendedByField();
     // Removed KPIs/Registered/History/Leaderboard/Badges from dashboard per spec
 
     // Note: The poller logic from the original file has been removed for clarity,

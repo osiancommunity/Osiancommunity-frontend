@@ -1,7 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
 
     // Define the location of your backend API
-const backendUrl = 'http://localhost:5000/api';
+const backendUrl = (location.hostname.endsWith('vercel.app'))
+  ? 'https://osiancommunity-backend.vercel.app/api'
+  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:5000/api'
+      : 'https://osiancommunity-backend.vercel.app/api');
 
     const registerForm = document.getElementById("register-form");
     const registerBtn = document.getElementById("register-btn");
@@ -19,6 +23,7 @@ const backendUrl = 'http://localhost:5000/api';
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
         const confirmPassword = document.getElementById("confirm-password").value;
+        const fieldPreference = document.getElementById("field-preference").value;
 
         if (password !== confirmPassword) {
             alert("Passwords do not match!");
@@ -41,7 +46,8 @@ const backendUrl = 'http://localhost:5000/api';
                 body: JSON.stringify({
                     name: fullName,
                     email: email,
-                    password: password
+                    password: password,
+                    profile: { fieldPreference }
                 })
             });
 
@@ -56,6 +62,7 @@ const backendUrl = 'http://localhost:5000/api';
                 registerForm.style.display = 'none';
                 otpSection.style.display = 'block';
                 document.getElementById('otp-input').focus();
+                try { localStorage.setItem('fieldPreference', fieldPreference); } catch(_){}
             }
 
         } catch (error) {
@@ -97,6 +104,7 @@ const backendUrl = 'http://localhost:5000/api';
                 // --- SUCCESS: Save token and redirect ---
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
+                try { if (data.user && data.user.profile && data.user.profile.fieldPreference) { localStorage.setItem('fieldPreference', data.user.profile.fieldPreference); } } catch(_){}
 
                 alert('Registration and verification successful! Redirecting to Dashboard.');
                 window.location.href = "dashboard-user.html";

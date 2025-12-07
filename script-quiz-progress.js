@@ -496,20 +496,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // --- Initial Page Load ---
     fetchMyResults();
     fetchMyRegisteredQuizzes();
-    const lbScope = document.getElementById('lb-scope');
-    const lbPeriod = document.getElementById('lb-period');
-    if (lbScope && lbPeriod) {
-        const applyLb = () => {
-            const scope = lbScope.value;
-            const period = lbPeriod.value;
-            fetchLeaderboardREST(scope, period);
-            if (lbSocket) try { lbSocket.close(); } catch(_){}
-            connectLeaderboardWS(scope, period);
-        };
-        lbScope.addEventListener('change', applyLb);
-        lbPeriod.addEventListener('change', applyLb);
-        applyLb();
-    }
+    // Leaderboard removed from this page; keep badges
     fetchBadges();
 
 });

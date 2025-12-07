@@ -18,6 +18,7 @@
             <ul class="sidebar-menu">
                 <li><a href="dashboard-user.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
                 <li class="active"><a href="quiz-progress.html"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
+                <li><a href="leaderboard.html"><i class='bx bx-trophy'></i><span>Leaderboard</span></a></li>
               <li><a href="mentorship-user.html"><i class='bx bx-video'></i><span>Mentorship</span></a></li>
                  <li><a href="notifications.html"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
                 <li><a href="profile.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
@@ -106,39 +107,9 @@
                 </div>
             </section>
 
-            <!-- Leaderboard Section -->
-            <section class="content-card" id="leaderboard-card" aria-label="Leaderboard">
-                <div class="leaderboard-header">
-                    <h2><i class='bx bx-trophy'></i> Leaderboard</h2>
-                    <div class="leaderboard-controls">
-                        <input type="text" id="lb-search" placeholder="Search users" aria-label="Search users">
-                        <select id="lb-scope" aria-label="Leaderboard scope">
-                            <option value="global">Global</option>
-                            <option value="batch">Batch</option>
-                        </select>
-                        <select id="lb-period" aria-label="Leaderboard period">
-                            <option value="all">All-time</option>
-                            <option value="30d">30d</option>
-                            <option value="7d">Weekly</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="lb-user-mini" class="lb-user-mini" role="button" tabindex="0" aria-label="Current user card"></div>
-                <div id="lb-hero" class="lb-hero" aria-live="polite"></div>
-                <div id="lb-list" class="lb-list"></div>
-                <div class="lb-pagination">
-                    <button id="lb-prev" class="btn-edit" aria-label="Previous">Prev</button>
-                    <span id="lb-page-info">Page 1</span>
-                    <button id="lb-next" class="btn-edit" aria-label="Next">Next</button>
-                </div>
-            </section>
+            <!-- Leaderboard removed as requested; separate page will be created -->
 
-            <div id="profile-modal" class="modal" aria-hidden="true" aria-label="Profile modal">
-              <div class="modal-content">
-                <span class="close-modal" id="profile-close">×</span>
-                <div id="profile-content"></div>
-              </div>
-            </div>
+            
 
             <!-- Badges Section -->
             <section class="content-card" id="badges-section">
@@ -153,6 +124,7 @@
         <a href="dashboard-user.html" id="nav-dashboard"><i class='bx bxs-dashboard'></i><span>Home</span></a>
         <a href="quiz-progress.html" id="nav-quizzes"><i class='bx bx-file-blank'></i><span>Quizzes</span></a>
         <a href="mentorship-user.html" id="nav-mentorship"><i class='bx bx-video'></i><span>Mentor</span></a>
+        <a href="leaderboard.html" id="nav-leaderboard"><i class='bx bx-trophy'></i><span>Top</span></a>
         <a href="notifications.html" id="nav-notifs"><i class='bx bx-bell'></i><span>Alerts</span></a>
         <a href="profile.html" id="nav-profile"><i class='bx bxs-user'></i><span>Profile</span></a>
     </div>
