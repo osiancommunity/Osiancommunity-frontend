@@ -54,22 +54,23 @@ body::before, body::after { content: none; }
 /* ------------------------- */
 .info-section {
     width: 50%;
-    background: url('https://images.unsplash.com/photo-1513258498670-6ff090d96358?fm=jpg&q=60&w=1200') center/cover no-repeat;
+    background: #ffffff;
     color: #0f172a;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 48px;
-    text-align: center;
+    text-align: left;
     position: relative;
 }
-.info-section::after { content: ""; position: absolute; inset: 0; background: rgba(255,255,255,0.65); }
+.info-section::after { content: none; }
 
 .info-content .shield-logo { height: 72px; width: auto; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-.info-content .hero-image { width: 280px; max-width: 90%; height: auto; border-radius: 14px; box-shadow: 0 14px 32px rgba(0,0,0,0.18); margin-bottom: 16px; }
-.info-content .logo-name { font-size: 52px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; color: #6a00e0; }
-.info-content .slogan { font-size: 18px; font-weight: 600; opacity: 0.95; color: #334155; }
-.quiz-lines { margin-top: 8px; color: #475569; font-size: 15px; line-height: 1.6; }
+.info-content { max-width: 520px; }
+.info-content .hero-image { width: 220px; max-width: 90%; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-bottom: 12px; }
+.info-content .logo-name { display: none; }
+.info-content .slogan { font-size: 15px; font-weight: 600; opacity: 0.95; color: #334155; margin-bottom: 6px; }
+.quiz-lines { margin-top: 6px; color: #475569; font-size: 14px; line-height: 1.6; }
 
 .info-content p {
     font-size: 24px;
