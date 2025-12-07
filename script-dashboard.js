@@ -110,10 +110,44 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         } catch (_) {}
     }
     function renderLeaderboard(list) {
-        const tbody = document.querySelector('#leaderboard-table tbody');
-        if (!tbody) return;
-        const rows = list.map(x => `<tr><td>${x.rank}</td><td><img src="${x.user.avatar || 'https://via.placeholder.com/24'}" class="lb-avatar"> ${x.user.name}</td><td>${Math.round(x.compositeScore)}</td><td>${x.attempts}</td></tr>`).join('');
-        tbody.innerHTML = rows || '<tr><td colspan="4">No data</td></tr>';
+        const hero = document.getElementById('lb-hero');
+        const listEl = document.getElementById('lb-list');
+        const mini = document.getElementById('lb-user-mini');
+        if (!hero || !listEl) return;
+        const top3 = list.slice(0,3);
+        const rest = list.slice(3);
+        hero.innerHTML = top3.map((x, i) => {
+            const cls = i===0 ? 'lb-hero-card gold' : i===1 ? 'lb-hero-card silver' : 'lb-hero-card bronze';
+            const img = x.avatar_url || (x.user && x.user.avatar);
+            const name = x.display_name || (x.user && x.user.name) || 'User';
+            const initials = name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+            const avatarEl = img ? `<img src="${img}" loading="lazy" alt="${name}" class="avatar">` : `<div class="initials avatar">${initials}</div>`;
+            const score = Math.round(x.composite_score || x.compositeScore || 0);
+            return `<div class="${cls}" role="button" tabindex="0"><div class="medal">${x.rank}</div>${avatarEl}<div class="name">${name}</div><div class="meta">${x.college || ''}</div><div class="score">${score}</div></div>`;
+        }).join('');
+        listEl.innerHTML = rest.map((x) => {
+            const img = x.avatar_url || (x.user && x.user.avatar);
+            const name = x.display_name || (x.user && x.user.name) || 'User';
+            const initials = name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+            const avatarEl = img ? `<img src="${img}" loading="lazy" alt="${name}" class="avatar">` : `<div class="initials">${initials}</div>`;
+            const spark = (x.sparkline || []).slice(0,20);
+            const path = spark.map((v, idx) => `${idx===0?'M':'L'} ${idx*6} ${24 - Math.min(24, Math.max(0, v/5))}`).join(' ');
+            const score = Math.round(x.avg_score || x.avgScore || 0);
+            const attempts = x.attempts || 0;
+            const badges = (x.badges || []).map(b => `<div class="badge" title="${b.name}"><span class="badge-icon">🏅</span><span>${b.name}</span></div>`).join('');
+            return `<div class="lb-row">${avatarEl}<div class="content"><div class="title">${x.rank}. ${name}</div><div class="meta">Avg ${score} • Attempts ${attempts}</div><svg class="spark" viewBox="0 0 120 24"><path d="${path}" stroke="#4C8DFF" fill="none" stroke-width="2"/></svg><div class="badges">${badges}</div></div></div>`;
+        }).join('');
+        const user = JSON.parse(localStorage.getItem('user')) || {};
+        const me = list.find(x => String((x.user_id||x.user?.id)) === String(user._id));
+        if (me && me.rank > 3) {
+            mini.classList.add('active');
+            const score = Math.round(me.composite_score || me.compositeScore || 0);
+            const img = me.avatar_url || (me.user && me.user.avatar);
+            const name = me.display_name || (me.user && me.user.name) || 'User';
+            const initials = name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+            const avatarEl = img ? `<img src="${img}" loading="lazy" alt="${name}" class="avatar" style="width:var(--avatar-sm);height:var(--avatar-sm);">` : `<div class="initials" style="width:var(--avatar-sm);height:var(--avatar-sm);">${initials}</div>`;
+            mini.innerHTML = `${avatarEl}<div class="content"><div class="title">You • Rank ${me.rank}</div><div class="meta">${score}</div></div><a class="btn-edit" href="profile.html">View profile</a>`;
+        } else { mini.classList.remove('active'); mini.innerHTML = ''; }
     }
     function connectLeaderboardWS(scope, period) {
         try {

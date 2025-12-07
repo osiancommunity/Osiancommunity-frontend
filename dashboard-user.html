@@ -119,32 +119,30 @@
                 </table>
             </section>
 
-            <section class="content-card" id="leaderboard-card">
+            <section class="content-card" id="leaderboard-card" aria-label="Leaderboard">
                 <div class="leaderboard-header">
                     <h2><i class='bx bx-trophy'></i> Leaderboard</h2>
-                    <div class="leaderboard-filters">
-                        <select id="lb-scope">
+                    <div class="leaderboard-controls">
+                        <input type="text" id="lb-search" placeholder="Search users" aria-label="Search users">
+                        <select id="lb-scope" aria-label="Leaderboard scope">
                             <option value="global">Global</option>
                             <option value="batch">Batch</option>
                         </select>
-                        <select id="lb-period">
+                        <select id="lb-period" aria-label="Leaderboard period">
                             <option value="all">All-time</option>
                             <option value="30d">30d</option>
                             <option value="7d">Weekly</option>
                         </select>
                     </div>
                 </div>
-                <table class="quiz-history-table" id="leaderboard-table">
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>User</th>
-                            <th>Score</th>
-                            <th>Attempts</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+                <div id="lb-user-mini" class="lb-user-mini" role="button" tabindex="0" aria-label="Current user card"></div>
+                <div id="lb-hero" class="lb-hero" aria-live="polite"></div>
+                <div id="lb-list" class="lb-list"></div>
+                <div class="lb-pagination">
+                    <button id="lb-prev" class="btn-edit" aria-label="Previous">Prev</button>
+                    <span id="lb-page-info">Page 1</span>
+                    <button id="lb-next" class="btn-edit" aria-label="Next">Next</button>
+                </div>
             </section>
 
             <section class="content-card" id="badges-section">
