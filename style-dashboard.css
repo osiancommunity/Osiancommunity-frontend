@@ -494,10 +494,10 @@ body {
         margin-left: 0;
         align-items: flex-start;
         gap: 15px;
-    .main-header {
-        flex-direction: column;
-        width: 100%;
-    }
+    .main-header { flex-direction: column; width: 100%; }
+    .header-profile { width: 100%; justify-content: flex-end; }
+    .header-actions { margin-left: auto; }
+}
     .header-profile input {
         flex-grow: 1;
         gap: 15px;

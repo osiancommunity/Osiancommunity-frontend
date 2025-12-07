@@ -1,11 +1,12 @@
 document.addEventListener("DOMContentLoaded", function() {
     
     // Define the location of your backend
-const backendUrl = (location.hostname.endsWith('vercel.app'))
+const backendPrimary = (location.hostname.endsWith('vercel.app'))
   ? 'https://osiancommunity-backend.vercel.app/api'
   : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
       ? 'http://localhost:5000/api'
       : 'https://osiancommunity-backend.vercel.app/api');
+const backendFallback = 'https://osiancommunity-backend.vercel.app/api';
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -49,27 +50,36 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // --- Fetch and Display Quizzes ---
     async function fetchQuizzes() {
         try {
-            const response = await fetch(`${backendUrl}/quizzes`, {
-                headers: {
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                }
-            });
-            const data = await response.json();
-
-            if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                    return; // Silently redirect
-                }
-                if (!isLocal) {
-                    showErrorMessage(`Error fetching quizzes: ${data.message}`);
-                    return;
+            const endpoints = backendPrimary === backendFallback ? [backendPrimary] : [backendPrimary, backendFallback];
+            let data = null;
+            for (let i = 0; i < endpoints.length; i++) {
+                const base = endpoints[i];
+                try {
+                    const response = await fetch(`${base}/quizzes`, {
+                        headers: {
+                            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                        }
+                    });
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 403) {
+                            localStorage.removeItem('user');
+                            localStorage.removeItem('token');
+                            window.location.href = 'login.html';
+                            return;
+                        }
+                        if (response.status === 404 && i < endpoints.length - 1) continue;
+                        const errData = await response.json().catch(() => ({}));
+                        throw new Error(errData.message || 'Failed to load quizzes');
+                    }
+                    data = await response.json();
+                    break;
+                } catch (e) {
+                    if (i === endpoints.length - 1) throw e;
+                    continue;
                 }
             }
 
-            const categories = data.categories || {};
+            const categories = (data && data.categories) || {};
             const all = [
                 ...(categories.technical || []),
                 ...(categories.law || []),
@@ -87,7 +97,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         } catch (error) {
             console.error('Error fetching quizzes:', error);
-            alert('Could not load quizzes. Server may be down.');
+            showErrorMessage(error && error.message ? error.message : 'Could not load quizzes. Server may be down.');
         }
     }
     
@@ -96,7 +106,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         if (!container) return;
         container.innerHTML = '';
         if (!quizzes || quizzes.length === 0) return;
-        quizzes.forEach(quiz => { container.innerHTML += createQuizCard(quiz); });
+        let html = '';
+        quizzes.forEach(quiz => { html += createQuizCard(quiz); });
+        container.innerHTML = html;
     }
 
     // --- NEW: Helper function to create a single quiz card with an image ---
@@ -142,7 +154,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         if (!container) return;
         container.innerHTML = '';
         if (!quizzes || quizzes.length === 0) return;
-        quizzes.forEach(q => { container.innerHTML += createQuizCard(q); });
+        let html = '';
+        quizzes.forEach(q => { html += createQuizCard(q); });
+        container.innerHTML = html;
     }
 
     function getContinueLearning() {
