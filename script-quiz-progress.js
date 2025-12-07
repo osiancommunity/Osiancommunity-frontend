@@ -384,10 +384,46 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         } catch (_) {}
     }
     function renderLeaderboard(list) {
-        const tbody = document.querySelector('#leaderboard-table tbody');
-        if (!tbody) return;
-        const rows = list.map(x => `<tr><td>${x.rank}</td><td><img src="${x.user?.avatar || 'https://via.placeholder.com/24'}" class="lb-avatar"> ${x.user?.name || 'User'}</td><td>${Math.round(x.compositeScore)}</td><td>${x.attempts}</td></tr>`).join('');
-        tbody.innerHTML = rows || '<tr><td colspan="4">No data</td></tr>';
+        const hero = document.getElementById('lb-hero');
+        const listEl = document.getElementById('lb-list');
+        const mini = document.getElementById('lb-user-mini');
+        if (!hero || !listEl) return;
+        const top3 = list.slice(0,3);
+        const rest = list.slice(3);
+        hero.innerHTML = top3.map((x, i) => {
+            const cls = i===0 ? 'lb-hero-card gold' : i===1 ? 'lb-hero-card silver' : 'lb-hero-card bronze';
+            const img = x.avatar_url;
+            const initials = (x.display_name || 'U').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+            const avatarEl = img ? `<img src="${img}" loading="lazy" alt="${x.display_name}" class="avatar">` : `<div class="initials avatar">${initials}</div>`;
+            return `<div class="${cls}" role="button" tabindex="0" data-user="${x.user_id}"><div class="medal">${x.rank}</div>${avatarEl}<div class="name">${x.display_name || 'User'}</div><div class="meta">${x.college || ''}</div><div class="score">${Math.round(x.composite_score)}</div></div>`;
+        }).join('');
+        listEl.innerHTML = rest.map((x) => {
+            const img = x.avatar_url;
+            const initials = (x.display_name || 'U').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+            const avatarEl = img ? `<img src="${img}" loading="lazy" alt="${x.display_name}" class="avatar">` : `<div class="initials">${initials}</div>`;
+            const spark = (x.sparkline || []).slice(0,20);
+            const path = spark.map((v, idx) => `${idx===0?'M':'L'} ${idx*6} ${24 - Math.min(24, Math.max(0, v/5))}`).join(' ');
+            const badges = (x.badges || []).map(b => `<div class="badge" title="${b.name}"><span class="badge-icon">🏅</span><span>${b.name}</span></div>`).join('');
+            return `<div class="lb-row" data-user="${x.user_id}">${avatarEl}<div class="content"><div class="title">${x.rank}. ${x.display_name || 'User'}</div><div class="meta">Avg ${Math.round(x.avg_score)} • Attempts ${x.attempts}</div><svg class="spark" viewBox="0 0 120 24"><path d="${path}" stroke="#4C8DFF" fill="none" stroke-width="2"/></svg><div class="badges">${badges}</div></div></div>`;
+        }).join('');
+        const user = JSON.parse(localStorage.getItem('user')) || {};
+        const me = list.find(x => String(x.user_id) === String(user._id));
+        if (me && me.rank > 3) {
+            mini.classList.add('active');
+            const delta = 0;
+            const arrow = delta > 0 ? '▲' : delta < 0 ? '▼' : '–';
+            const img = me.avatar_url;
+            const initials = (me.display_name || 'U').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+            const avatarEl = img ? `<img src="${img}" loading="lazy" alt="${me.display_name}" class="avatar" style="width:var(--avatar-sm);height:var(--avatar-sm);">` : `<div class="initials" style="width:var(--avatar-sm);height:var(--avatar-sm);">${initials}</div>`;
+            mini.innerHTML = `${avatarEl}<div class="content"><div class="title">You • Rank ${me.rank}</div><div class="meta">${arrow} ${Math.round(me.composite_score)}</div></div><button class="btn-edit" id="mini-view">View profile</button>`;
+            const btn = document.getElementById('mini-view');
+            if (btn) btn.onclick = () => openProfileModal(me);
+        } else {
+            mini.classList.remove('active');
+            mini.innerHTML = '';
+        }
+        hero.querySelectorAll('.lb-hero-card').forEach(el => { el.onclick = () => openProfileModal(top3.find(z => String(z.user_id)===String(el.dataset.user))); });
+        listEl.querySelectorAll('.lb-row').forEach(el => { el.onclick = () => openProfileModal(rest.find(z => String(z.user_id)===String(el.dataset.user))); });
     }
     function connectLeaderboardWS(scope, period) {
         try {
@@ -400,7 +436,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             ws.onmessage = (event) => {
                 try {
                     const msg = JSON.parse(event.data);
-                    if (msg.type === 'leaderboard') renderLeaderboard(msg.leaderboard || []);
+                    if (msg.type === 'leaderboard') animateLeaderboardUpdate(msg.leaderboard || []);
                 } catch (_) {}
             };
             ws.onopen = () => {};
@@ -413,6 +449,33 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         if (lbPollTimer) clearInterval(lbPollTimer);
         fetchLeaderboardREST(scope, period);
         lbPollTimer = setInterval(() => fetchLeaderboardREST(scope, period), 15000);
+    }
+
+    function animateLeaderboardUpdate(list){
+        const prev = window._lbLast || [];
+        window._lbLast = list;
+        renderLeaderboard(list);
+    }
+
+    function openProfileModal(item){
+        const modal = document.getElementById('profile-modal');
+        const close = document.getElementById('profile-close');
+        const content = document.getElementById('profile-content');
+        if (!modal || !content) return;
+        content.innerHTML = `<div style="display:flex;gap:12px;align-items:center;"><img src="${item.avatar_url || ''}" onerror="this.style.display='none'" alt="${item.display_name}" style="width:${'var(--avatar-md)'};height:${'var(--avatar-md)'};border-radius:50%"><div><div style="font-weight:600">${item.display_name}</div><div style="color:#6b7380">${item.college || ''}</div></div></div><div style="margin-top:12px">Composite ${Math.round(item.composite_score)} • Avg ${Math.round(item.avg_score)} • Attempts ${item.attempts}</div><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">${(item.badges||[]).map(b=>`<div class='badge'><span class='badge-icon'>🏅</span><span>${b.name}</span></div>`).join('')}</div>`;
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden','false');
+        close.onclick = () => { modal.style.display='none'; modal.setAttribute('aria-hidden','true'); };
+        modal.onclick = (e)=>{ if(e.target===modal){ close.click(); } };
+    }
+
+    const searchEl = document.getElementById('lb-search');
+    if (searchEl) {
+        searchEl.addEventListener('input', () => {
+            const q = searchEl.value.toLowerCase();
+            const list = (window._lbLast || []).filter(x => String(x.display_name||'').toLowerCase().includes(q));
+            renderLeaderboard(list);
+        });
     }
 
     async function fetchBadges() {
