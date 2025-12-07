@@ -332,37 +332,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     // --- Initial Page Load ---
     fetchQuizzes();
-    fetchKpis();
-    fetchRegisteredQuizzes();
-    fetchHistory();
-
-    const lbScope = document.getElementById('lb-scope');
-    const lbPeriod = document.getElementById('lb-period');
-    if (lbScope && lbPeriod) {
-        const applyLb = () => {
-            const scope = lbScope.value;
-            const period = lbPeriod.value;
-            fetchLeaderboardREST(scope, period);
-            if (lbSocket) try { lbSocket.close(); } catch(_){}
-            connectLeaderboardWS(scope, period);
-        };
-        lbScope.addEventListener('change', applyLb);
-        lbPeriod.addEventListener('change', applyLb);
-        applyLb();
-    }
-
-    // Badges
-    async function fetchBadges() {
-        try {
-            const res = await fetch(`${backendUrl}/badges/me`, { headers: { 'Authorization': `Bearer ${token}` } });
-            if (!res.ok) return;
-            const data = await res.json();
-            const row = document.getElementById('badges-row');
-            if (!row) return;
-            row.innerHTML = (data.badges || []).map(b => `<div class="badge" title="${b.description}"><span class="badge-icon">${b.icon || '🏅'}</span><span class="badge-name">${b.name}</span></div>`).join('');
-        } catch (_) {}
-    }
-    fetchBadges();
+    // Removed KPIs/Registered/History/Leaderboard/Badges from dashboard per spec
 
     // Note: The poller logic from the original file has been removed for clarity,
     // as it can cause performance issues and is better replaced by WebSockets.

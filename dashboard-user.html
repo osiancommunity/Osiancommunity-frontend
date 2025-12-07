@@ -66,89 +66,12 @@
             </section>
             <section class="content-card minimal" id="field-select-panel" style="display:none"></section>
             <section class="content-card minimal" id="level-select-panel" style="display:none"></section>
-            <section class="dashboard-grid" id="kpi-grid">
-                <div class="dashboard-box kpi-card-user" id="kpi-attempted">
-                    <div class="card-info"><h2>0</h2><p>Quizzes Attempted</p></div>
-                    <i class='bx bx-list-check'></i>
-                </div>
-                <div class="dashboard-box kpi-card-user" id="kpi-passed">
-                    <div class="card-info"><h2>0</h2><p>Quizzes Passed</p></div>
-                    <i class='bx bx-badge-check'></i>
-                </div>
-                <div class="dashboard-box kpi-card-user" id="kpi-avg-score">
-                    <div class="card-info"><h2>0%</h2><p>Average Score</p></div>
-                    <i class='bx bx-line-chart'></i>
-                </div>
-                <div class="dashboard-box kpi-card-user" id="kpi-accuracy">
-                    <div class="card-info"><h2>0%</h2><p>Accuracy</p></div>
-                    <i class='bx bx-target-lock'></i>
-                </div>
-            </section>
             <section class="quiz-list-section" id="recommended-section">
                 <h2><i class='bx bx-star'></i> Recommended For You</h2>
                 <div class="quiz-list-grid" id="recommended-quizzes-container"></div>
             </section>
 
-            <section class="content-card full-width-table" id="registered-quizzes-section">
-                <h2><i class='bx bx-user-plus'></i> Registered Quizzes</h2>
-                <table class="quiz-history-table" id="registered-quizzes-table">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Type</th>
-                            <th>Status</th>
-                            <th>Schedule</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </section>
-
-            <section class="content-card full-width-table" id="history-section">
-                <h2><i class='bx bx-history'></i> Quiz History</h2>
-                <table class="quiz-history-table" id="quiz-history-table">
-                    <thead>
-                        <tr>
-                            <th>Quiz</th>
-                            <th>Score</th>
-                            <th>Percentage</th>
-                            <th>Completed At</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </section>
-
-            <section class="content-card" id="leaderboard-card" aria-label="Leaderboard">
-                <div class="leaderboard-header">
-                    <h2><i class='bx bx-trophy'></i> Leaderboard</h2>
-                    <div class="leaderboard-controls">
-                        <input type="text" id="lb-search" placeholder="Search users" aria-label="Search users">
-                        <select id="lb-scope" aria-label="Leaderboard scope">
-                            <option value="global">Global</option>
-                            <option value="batch">Batch</option>
-                        </select>
-                        <select id="lb-period" aria-label="Leaderboard period">
-                            <option value="all">All-time</option>
-                            <option value="30d">30d</option>
-                            <option value="7d">Weekly</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="lb-user-mini" class="lb-user-mini" role="button" tabindex="0" aria-label="Current user card"></div>
-                <div id="lb-hero" class="lb-hero" aria-live="polite"></div>
-                <div id="lb-list" class="lb-list"></div>
-                <div class="lb-pagination">
-                    <button id="lb-prev" class="btn-edit" aria-label="Previous">Prev</button>
-                    <span id="lb-page-info">Page 1</span>
-                    <button id="lb-next" class="btn-edit" aria-label="Next">Next</button>
-                </div>
-            </section>
-
-            <section class="content-card" id="badges-section">
-                <h2><i class='bx bx-award'></i> Badges</h2>
-                <div class="badges-row" id="badges-row"></div>
-            </section>
+            <!-- Removed KPIs, Registered, History, Leaderboard, Badges from Dashboard -->
             
             
 
