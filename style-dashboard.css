@@ -424,6 +424,10 @@ body {
     box-shadow: var(--shadow);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+.kpi-card-user { display:flex; align-items:center; justify-content:space-between; }
+.kpi-card-user i { font-size:42px; color: var(--primary-color); }
+.kpi-card-user .card-info h2 { font-size:28px; }
+.kpi-card-user .card-info p { color: var(--text-light); }
 
 .dashboard-box:hover {
     transform: translateY(-5px);
@@ -440,16 +444,22 @@ body {
     grid-column: span 2; /* Make this box span both columns */
 }
 
-.leaderboard-item { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border:1px solid var(--border-color); border-radius:10px; background:#fff; box-shadow: var(--shadow); margin-bottom:10px; }
-.leaderboard-item .rank { font-weight:700; color: var(--accent-color); }
-.leaderboard-item .name { font-weight:600; color: var(--text-color); }
-.leaderboard-item .score { color: var(--text-light); }
-.badge-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; }
-.badge-card { display:flex; flex-direction:column; align-items:center; gap:8px; padding:16px; border:1px solid var(--border-color); border-radius:12px; background:#fff; box-shadow: var(--shadow); }
-.badge-card.locked { opacity:0.6; }
-.badge-card i { font-size:28px; color: var(--accent-color); }
-.badge-card .title { font-weight:600; }
-.badge-card .desc { font-size:12px; color: var(--text-light); text-align:center; }
+/* Tables */
+.content-card.full-width-table { background:#fff; border-radius:18px; padding:24px; box-shadow: var(--shadow); }
+.quiz-history-table { width:100%; border-collapse: collapse; }
+.quiz-history-table th, .quiz-history-table td { padding:14px 16px; border-bottom:1px solid var(--border-color); text-align:left; }
+.quiz-history-table th { font-weight:600; color: var(--text-color); }
+
+/* Leaderboard */
+#leaderboard-card .leaderboard-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+#leaderboard-card .leaderboard-filters select { margin-left:8px; padding:6px 10px; border:1px solid var(--border-color); border-radius:8px; }
+.lb-avatar { width:24px; height:24px; border-radius:50%; vertical-align:middle; margin-right:8px; }
+
+/* Badges */
+.badges-row { display:flex; gap:12px; flex-wrap:wrap; }
+.badge { display:flex; align-items:center; gap:8px; background:#F7FAFF; border:1px solid var(--border-color); border-radius:12px; padding:8px 12px; }
+.badge-icon { font-size:20px; }
+.badge-name { font-size:14px; }
 
 /* ------------------------- */
 /* Responsive */

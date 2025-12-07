@@ -1,20 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-// Backend override + fallback
-let backendCandidates = [];
-const backendOverride = localStorage.getItem('backendOverride');
-if (backendOverride) backendCandidates.push(backendOverride);
-backendCandidates.push('https://osiancommunity-backend.vercel.app/api');
-backendCandidates.push('http://localhost:5000/api');
-let backendUrl = backendCandidates[0];
-async function apiFetch(path, options){
-    let lastErr = null;
-    for (const base of backendCandidates){
-        try { const res = await fetch(`${base}${path}`, options); if (res && res.ok !== undefined) { backendUrl = base; return res; } }
-        catch(e){ lastErr = e; }
-    }
-    if (lastErr) throw lastErr; throw new Error('Backend unreachable');
-}
+    // Define the location of your backend API
+const backendUrl = 'http://localhost:5000/api';
 
     const registerForm = document.getElementById("register-form");
     const registerBtn = document.getElementById("register-btn");
@@ -48,7 +35,7 @@ async function apiFetch(path, options){
 
         try {
             // --- BACKEND CALL: /auth/register ---
-            const response = await apiFetch(`/auth/register`, {
+            const response = await fetch(`${backendUrl}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -73,7 +60,7 @@ async function apiFetch(path, options){
 
         } catch (error) {
             console.error('Registration Error:', error);
-            alert('Cannot reach backend. Set Backend URL or try again later.');
+            alert('A network error occurred. Please ensure the backend server is running.');
         } finally {
             registerBtn.disabled = false;
             registerBtn.textContent = "Register";
@@ -93,7 +80,7 @@ async function apiFetch(path, options){
         this.textContent = 'Verifying...';
 
         try {
-            const response = await apiFetch(`/auth/verify-otp`, {
+            const response = await fetch(`${backendUrl}/auth/verify-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -135,7 +122,7 @@ async function apiFetch(path, options){
         this.textContent = 'Sending...';
 
         try {
-            const response = await apiFetch(`/auth/resend-otp`, {
+            const response = await fetch(`${backendUrl}/auth/resend-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

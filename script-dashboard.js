@@ -1,20 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
     
-    // Backend selection with override and fallback
-let backendCandidates = [];
-const backendOverride = localStorage.getItem('backendOverride');
-if (backendOverride) backendCandidates.push(backendOverride);
-backendCandidates.push('https://osiancommunity-backend.vercel.app/api');
-backendCandidates.push('http://localhost:5000/api');
-let backendUrl = backendCandidates[0];
-async function apiFetch(path, options){
-    let lastErr = null;
-    for (const base of backendCandidates){
-        try { const res = await fetch(`${base}${path}`, options); if (res && res.ok !== undefined) { backendUrl = base; return res; } }
-        catch(e){ lastErr = e; }
-    }
-    if (lastErr) throw lastErr; throw new Error('Backend unreachable');
-}
+    // Define the location of your backend
+const backendUrl = (location.hostname.endsWith('vercel.app'))
+  ? 'https://osiancommunity-backend.vercel.app/api'
+  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:5000/api'
+      : 'https://osiancommunity-backend.vercel.app/api');
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -55,10 +46,97 @@ async function apiFetch(path, options){
     });
 
 
-    // --- Fetch and Display Quizzes ---
+    // KPIs
+    async function fetchKpis() {
+        try {
+            const res = await fetch(`${backendUrl}/results/user`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) return;
+            const data = await res.json();
+            const results = data.results || [];
+            const attempted = results.length;
+            const passed = results.filter(r => r.passed).length;
+            const avgPct = attempted > 0 ? Math.round(results.reduce((a,r)=>a + (r.totalQuestions>0 ? (r.score / r.totalQuestions) * 100 : 0), 0) / attempted) : 0;
+            const accPct = avgPct; // accuracy equals percentage in current model
+            const setCard = (id, value, label) => {
+                const el = document.getElementById(id);
+                if (el) { const h = el.querySelector('.card-info h2'); const p = el.querySelector('.card-info p'); if (h) h.textContent = value; if (p && label) p.textContent = label; }
+            };
+            setCard('kpi-attempted', attempted);
+            setCard('kpi-passed', passed);
+            setCard('kpi-avg-score', `${avgPct}%`);
+            setCard('kpi-accuracy', `${accPct}%`);
+        } catch (_) {}
+    }
+
+    // Registered Quizzes
+    async function fetchRegisteredQuizzes() {
+        try {
+            const res = await fetch(`${backendUrl}/quizzes/user/registered`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) return;
+            const data = await res.json();
+            const rows = (data.quizzes || []).map(q => {
+                const typeText = q.quizType === 'paid' ? 'Paid' : (q.quizType === 'live' ? 'Live' : (q.quizType === 'upcoming' ? 'Upcoming' : 'Regular'));
+                return `<tr><td>${q.title}</td><td>${typeText}</td><td>${q.status}</td><td>${q.scheduleTime ? new Date(q.scheduleTime).toLocaleString() : '--'}</td></tr>`;
+            }).join('');
+            const tbody = document.querySelector('#registered-quizzes-table tbody');
+            if (tbody) tbody.innerHTML = rows || '<tr><td colspan="4">No registrations yet.</td></tr>';
+        } catch (_) {}
+    }
+
+    // History
+    async function fetchHistory() {
+        try {
+            const res = await fetch(`${backendUrl}/results/user`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) return;
+            const data = await res.json();
+            const rows = (data.results || []).map(r => {
+                const pct = r.totalQuestions > 0 ? Math.round((r.score / r.totalQuestions) * 100) : 0;
+                return `<tr><td>${r.quizId?.title || '-'}</td><td>${r.score}/${r.totalQuestions}</td><td>${pct}%</td><td>${r.completedAt ? new Date(r.completedAt).toLocaleString() : '-'}</td></tr>`;
+            }).join('');
+            const tbody = document.querySelector('#quiz-history-table tbody');
+            if (tbody) tbody.innerHTML = rows || '<tr><td colspan="4">No quiz history.</td></tr>';
+        } catch (_) {}
+    }
+
+    // Leaderboard
+    let lbSocket;
+    async function fetchLeaderboardREST(scope, period) {
+        try {
+            const query = new URLSearchParams({ scope, period }).toString();
+            const res = await fetch(`${backendUrl}/leaderboard?${query}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) return;
+            const data = await res.json();
+            renderLeaderboard(data.leaderboard || []);
+        } catch (_) {}
+    }
+    function renderLeaderboard(list) {
+        const tbody = document.querySelector('#leaderboard-table tbody');
+        if (!tbody) return;
+        const rows = list.map(x => `<tr><td>${x.rank}</td><td><img src="${x.user.avatar || 'https://via.placeholder.com/24'}" class="lb-avatar"> ${x.user.name}</td><td>${Math.round(x.compositeScore)}</td><td>${x.attempts}</td></tr>`).join('');
+        tbody.innerHTML = rows || '<tr><td colspan="4">No data</td></tr>';
+    }
+    function connectLeaderboardWS(scope, period) {
+        try {
+            const url = new URL(window.location.href);
+            const wsProto = url.protocol === 'https:' ? 'wss' : 'ws';
+            const base = backendUrl.replace(/^http(s)?:\/\//,'');
+            const host = base.split('/')[0];
+            const ws = new WebSocket(`${wsProto}://${host}/ws/leaderboard?scope=${encodeURIComponent(scope)}&period=${encodeURIComponent(period)}`);
+            lbSocket = ws;
+            ws.onmessage = (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+                    if (msg.type === 'leaderboard') renderLeaderboard(msg.leaderboard || []);
+                } catch (_) {}
+            };
+            ws.onopen = () => {};
+            ws.onerror = () => {};
+            ws.onclose = () => { lbSocket = null; };
+        } catch (_) {}
+    }
     async function fetchQuizzes() {
         try {
-            const response = await apiFetch(`/quizzes`, {
+            const response = await fetch(`${backendUrl}/quizzes`, {
                 headers: {
                     ...(token ? { 'Authorization': `Bearer ${token}` } : {})
                 }
@@ -93,15 +171,6 @@ async function apiFetch(path, options){
             } else {
                 renderIntoGrid(recommended, 'recommended-quizzes-container');
             }
-
-            if (recommended.length > 0) {
-                const lbSection = document.getElementById('leaderboard-section');
-                if (lbSection) lbSection.style.display = 'block';
-                fetchLeaderboard(recommended[0]._id);
-            }
-            const badgesSection = document.getElementById('badges-section');
-            if (badgesSection) badgesSection.style.display = 'block';
-            fetchBadges();
 
         } catch (error) {
             console.error('Error fetching quizzes:', error);
@@ -223,6 +292,37 @@ async function apiFetch(path, options){
 
     // --- Initial Page Load ---
     fetchQuizzes();
+    fetchKpis();
+    fetchRegisteredQuizzes();
+    fetchHistory();
+
+    const lbScope = document.getElementById('lb-scope');
+    const lbPeriod = document.getElementById('lb-period');
+    if (lbScope && lbPeriod) {
+        const applyLb = () => {
+            const scope = lbScope.value;
+            const period = lbPeriod.value;
+            fetchLeaderboardREST(scope, period);
+            if (lbSocket) try { lbSocket.close(); } catch(_){}
+            connectLeaderboardWS(scope, period);
+        };
+        lbScope.addEventListener('change', applyLb);
+        lbPeriod.addEventListener('change', applyLb);
+        applyLb();
+    }
+
+    // Badges
+    async function fetchBadges() {
+        try {
+            const res = await fetch(`${backendUrl}/badges/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) return;
+            const data = await res.json();
+            const row = document.getElementById('badges-row');
+            if (!row) return;
+            row.innerHTML = (data.badges || []).map(b => `<div class="badge" title="${b.description}"><span class="badge-icon">${b.icon || '🏅'}</span><span class="badge-name">${b.name}</span></div>`).join('');
+        } catch (_) {}
+    }
+    fetchBadges();
 
     // Note: The poller logic from the original file has been removed for clarity,
     // as it can cause performance issues and is better replaced by WebSockets.
@@ -297,63 +397,4 @@ function showErrorMessage(message) {
     closeBtn.addEventListener('click', () => {
         errorDiv.remove();
     });
-}
-
-async function fetchLeaderboard(quizId){
-    try {
-        const token = localStorage.getItem('token');
-        const res = await apiFetch(`/results/leaderboard/${quizId}?limit=5`, { headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-        const list = document.getElementById('leaderboard-list');
-        if (!list) return;
-        list.innerHTML = '';
-        const items = (data.leaderboard || []).map(item => {
-            const pct = item.percentage ? Math.round(item.percentage) : 0;
-            return `<div class="leaderboard-item"><span class="rank">#${item.rank}</span><span class="name">${item.user && item.user.name ? item.user.name : 'User'}</span><span class="score">${item.score} (${pct}%)</span></div>`;
-        });
-        list.innerHTML = items.join('');
-    } catch(e){
-        const list = document.getElementById('leaderboard-list');
-        if (list) list.innerHTML = '<div class="leaderboard-item"><span class="name">Unable to load leaderboard</span></div>';
-    }
-}
-
-async function fetchBadges(){
-    try {
-        const token = localStorage.getItem('token');
-        const res = await apiFetch(`/results/user`, { headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-        const results = data.results || [];
-        const total = results.length;
-        const highScore = results.some(r => {
-            const tot = r.totalQuestions || 0; const sc = r.score || 0; return tot>0 && (sc / tot) >= 0.8;
-        });
-        const fivePlus = total >= 5;
-        const threePlus = total >= 3;
-        const days = new Set(results.map(r => {
-            try { return new Date(r.completedAt).toDateString(); } catch { return null; }
-        }).filter(Boolean));
-        const consistency3 = days.size >= 3;
-        const unlocked = {
-            first: total >= 1,
-            top: highScore,
-            streak3: threePlus,
-            marathon5: fivePlus,
-            consistent3days: consistency3
-        };
-        const grid = document.getElementById('badges-grid');
-        if (!grid) return;
-        grid.innerHTML = '';
-        const cards = [
-            { key:'first', icon:'bxs-badge', title:'First Quiz', desc:'Complete your first quiz' },
-            { key:'top', icon:'bxs-badge-check', title:'Top Scorer', desc:'Score 80% or higher' },
-            { key:'streak3', icon:'bxs-bolt', title:'Streak 3', desc:'Complete 3 quizzes' },
-            { key:'marathon5', icon:'bxs-trophy', title:'Marathon 5', desc:'Complete 5 quizzes' },
-            { key:'consistent3days', icon:'bxs-calendar-check', title:'Consistent', desc:'Quiz 3 different days' }
-        ];
-        grid.innerHTML = cards.map(c => `<div class="badge-card ${unlocked[c.key]?'':'locked'}"><i class='bx ${c.icon}'></i><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div>`).join('');
-    } catch(e){
-        const grid = document.getElementById('badges-grid');
-        if (grid) grid.innerHTML = '<div class="badge-card locked"><div class="title">Unable to load badges</div></div>';
-    }
 }
