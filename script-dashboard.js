@@ -130,9 +130,15 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 } catch (_) {}
             };
             ws.onopen = () => {};
-            ws.onerror = () => {};
+            ws.onerror = () => { try { ws.close(); } catch(_){}; startLbPolling(scope, period); };
             ws.onclose = () => { lbSocket = null; };
-        } catch (_) {}
+        } catch (_) { startLbPolling(scope, period); }
+    }
+    let lbPollTimer;
+    function startLbPolling(scope, period) {
+        if (lbPollTimer) clearInterval(lbPollTimer);
+        fetchLeaderboardREST(scope, period);
+        lbPollTimer = setInterval(() => fetchLeaderboardREST(scope, period), 15000);
     }
     async function fetchQuizzes() {
         try {
