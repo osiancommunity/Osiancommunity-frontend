@@ -1,11 +1,24 @@
 document.addEventListener("DOMContentLoaded", function() {
 
     // Define the location of your backend
-const backendUrl = (location.hostname.endsWith('vercel.app'))
-  ? 'https://osiancommunity-backend.vercel.app/api'
-  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-      ? 'http://localhost:5000/api'
-      : 'https://osiancommunity-backend.vercel.app/api');
+let backendCandidates = [];
+const backendOverride = localStorage.getItem('backendOverride');
+if (backendOverride) backendCandidates.push(backendOverride);
+backendCandidates.push('https://osiancommunity-backend.vercel.app/api');
+backendCandidates.push('http://localhost:5000/api');
+let backendUrl = backendCandidates[0];
+
+async function apiFetch(path, options){
+    let lastErr = null;
+    for (const base of backendCandidates){
+        try {
+            const res = await fetch(`${base}${path}`, options);
+            if (res && res.ok !== undefined) { backendUrl = base; return res; }
+        } catch (e) { lastErr = e; }
+    }
+    if (lastErr) throw lastErr;
+    throw new Error('Backend unreachable');
+}
 
     // --- Authentication & Authorization ---
     let user = null;
@@ -57,13 +70,17 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     let questionCount = 1;
     let coverImageBase64 = null;
 
-    function createOptionRow(text, imageBase64, isCorrect){
+    function createOptionRow(text, imageBase64, isCorrect, weight){
         const row = document.createElement('div');
         row.className = 'option-row';
         row.innerHTML = `
-            <div class="form-group" style="display:flex; gap:10px; align-items:center;">
-                <input type="checkbox" class="option-correct" ${isCorrect ? 'checked' : ''} title="Mark as correct">
+            <div class="form-group option-row-fields">
+                <label class="option-correct-toggle" title="Mark as correct">
+                    <input type="checkbox" class="option-correct" ${isCorrect ? 'checked' : ''}>
+                    <span>Correct</span>
+                </label>
                 <input type="text" class="option-text" placeholder="Option text" value="${text || ''}" required style="flex:1;">
+                <input type="number" class="option-weight" placeholder="Weight (optional)" value="${Number.isFinite(weight) ? weight : ''}" min="0">
                 <input type="file" class="option-image" accept="image/*">
                 <button type="button" class="btn-remove-option">Remove</button>
             </div>`;
@@ -78,10 +95,10 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         const qImageInput = block.querySelector('.question-image');
         if (optsContainer && addOptBtn){
             if (optsContainer.children.length === 0){
-                optsContainer.appendChild(createOptionRow('', null, false));
-                optsContainer.appendChild(createOptionRow('', null, false));
+                optsContainer.appendChild(createOptionRow('', null, false, null));
+                optsContainer.appendChild(createOptionRow('', null, false, null));
             }
-            addOptBtn.onclick = function(){ optsContainer.appendChild(createOptionRow('', null, false)); };
+            addOptBtn.onclick = function(){ optsContainer.appendChild(createOptionRow('', null, false, null)); syncCorrectInputs(); };
             optsContainer.addEventListener('click', function(e){
                 if (e.target && e.target.classList.contains('btn-remove-option')) {
                     const row = e.target.closest('.option-row');
@@ -112,6 +129,55 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 const reader = new FileReader();
                 reader.onload = function(){ block.dataset.questionImage = reader.result; };
                 reader.readAsDataURL(file);
+            });
+        }
+        const collapseBtn = block.querySelector('.btn-collapse');
+        if (collapseBtn){
+            collapseBtn.addEventListener('click', function(){
+                block.classList.toggle('collapsed');
+            });
+        }
+        const duplicateBtn = block.querySelector('.btn-duplicate');
+        if (duplicateBtn){
+            duplicateBtn.addEventListener('click', function(){
+                const clone = block.cloneNode(true);
+                questionsContainer.insertBefore(clone, block.nextSibling);
+                attachQuestionEnhancements(clone);
+                renumberQuestions();
+            });
+        }
+        const previewBtn = block.querySelector('.btn-preview');
+        if (previewBtn){
+            previewBtn.addEventListener('click', function(){
+                showPreviewForBlock(block);
+            });
+        }
+
+        // Configure correct toggle type (radio vs checkbox) based on isMultiple
+        function syncCorrectInputs(){
+            const isMultiple = !!block.querySelector('.is-multiple')?.checked;
+            const gid = block.dataset.groupId || ('grp-' + Date.now() + '-' + Math.floor(Math.random()*100000));
+            block.dataset.groupId = gid;
+            const inputs = block.querySelectorAll('.option-correct');
+            inputs.forEach(inp => {
+                inp.type = isMultiple ? 'checkbox' : 'radio';
+                if (!isMultiple) inp.name = gid; else inp.removeAttribute('name');
+            });
+            if (!isMultiple) {
+                // ensure only one selected
+                let found = false;
+                inputs.forEach(inp => {
+                    if (inp.checked) {
+                        if (!found) { found = true; }
+                        else { inp.checked = false; }
+                    }
+                });
+            }
+        }
+        syncCorrectInputs();
+        if (isMultipleEl){
+            isMultipleEl.addEventListener('change', function(){
+                syncCorrectInputs();
             });
         }
     }
@@ -237,9 +303,18 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         const newQuestionBlock = document.createElement('div');
         newQuestionBlock.classList.add('question-block');
+        newQuestionBlock.setAttribute('draggable','true');
         newQuestionBlock.innerHTML = `
-            <h4>Question ${questionCount}</h4>
-            <button type="button" class="btn-remove-question">Remove</button>
+            <div class="question-card-header">
+                <span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+                <h4>Question ${questionCount}</h4>
+                <div class="question-card-actions">
+                    <button type="button" class="btn-action btn-preview">Preview</button>
+                    <button type="button" class="btn-action btn-duplicate">Duplicate</button>
+                    <button type="button" class="btn-action btn-collapse">Collapse</button>
+                    <button type="button" class="btn-remove-question">Remove</button>
+                </div>
+            </div>
             <div class="form-group">
                 <label>Question Type</label>
                 <select class="question-type" required> 
@@ -260,11 +335,15 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 <label>Explanation (optional)</label>
                 <textarea class="question-explanation" placeholder="Add explanation or solution..."></textarea>
             </div>
+            <div class="form-group">
+                <label><input type="checkbox" class="is-timed"> Timed question</label>
+                <input type="number" class="time-limit" placeholder="Time limit (seconds)" min="5" style="margin-top:8px;">
+            </div>
             <div class="mcq-only">
                 <div class="form-group" style="margin-bottom:10px;">
                     <label><input type="checkbox" class="is-multiple"> Allow multiple correct answers</label>
                 </div>
-                <div class="options-container"></div>
+                <div class="options-container options-grid"></div>
                 <button type="button" class="btn-action add-option-btn"><i class='bx bx-plus'></i> Add Option</button>
             </div>
             <div class="form-group coding-only" style="display:none;">
@@ -293,14 +372,73 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     questionsContainer.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('btn-remove-question')) {
             e.target.closest('.question-block').remove();
-            // Re-number questions
-            const allH4s = questionsContainer.querySelectorAll('h4');
-            allH4s.forEach((h4, index) => {
-                h4.textContent = `Question ${index + 1}`;
-            });
-            questionCount = allH4s.length; // Update questionCount after removal
+            renumberQuestions();
         }
     });
+
+    function renumberQuestions(){
+        const allH4s = questionsContainer.querySelectorAll('h4');
+        allH4s.forEach((h4, index) => { h4.textContent = `Question ${index + 1}`; });
+        questionCount = allH4s.length;
+        const qc = document.getElementById('questions-count');
+        if (qc) qc.textContent = `(Total in bank: ${questionCount})`;
+    }
+
+    // Drag & drop reordering
+    questionsContainer.addEventListener('dragstart', function(e){
+        const block = e.target.closest('.question-block');
+        if (!block) return;
+        block.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', '');
+    });
+    questionsContainer.addEventListener('dragend', function(e){
+        const block = e.target.closest('.question-block');
+        if (!block) return;
+        block.classList.remove('dragging');
+        renumberQuestions();
+    });
+    questionsContainer.addEventListener('dragover', function(e){
+        e.preventDefault();
+        const dragging = questionsContainer.querySelector('.question-block.dragging');
+        const after = getDragAfterElement(questionsContainer, e.clientY);
+        if (!dragging) return;
+        if (after == null) {
+            questionsContainer.appendChild(dragging);
+        } else {
+            questionsContainer.insertBefore(dragging, after);
+        }
+    });
+    function getDragAfterElement(container, y){
+        const els = [...container.querySelectorAll('.question-block:not(.dragging)')];
+        return els.reduce((closest, child)=>{
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height/2;
+            if (offset < 0 && offset > closest.offset) { return { offset, element: child }; } else { return closest; }
+        }, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
+    }
+
+    // Preview modal
+    const previewModal = document.getElementById('preview-modal');
+    const previewContent = document.getElementById('preview-content');
+    const closePreview = document.getElementById('close-preview');
+    if (closePreview){ closePreview.onclick = ()=>{ previewModal.classList.remove('active'); previewContent.innerHTML=''; }; }
+    function showPreviewForBlock(block){
+        const type = block.querySelector('.question-type').value;
+        const text = block.querySelector('.question-text').value;
+        const img = block.dataset.questionImage || '';
+        const isMultiple = !!block.querySelector('.is-multiple')?.checked;
+        previewContent.innerHTML = `
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <h4 style="margin:0;">${text}</h4>
+                ${img ? `<img src="${img}" style="max-width:100%; border-radius:8px;">` : ''}
+                ${type === 'mcq' ? `<div class="options-grid">${[...block.querySelectorAll('.option-row')].map((row,i)=>{
+                    const t = row.querySelector('.option-text').value || '';
+                    const im = row.dataset.imageBase64 || '';
+                    return `<div style=\"border:1px solid var(--border-color); padding:12px; border-radius:8px;\">${isMultiple ? '<input type=\"checkbox\" disabled>' : '<input type=\"radio\" disabled>'} <span>${String.fromCharCode(65+i)}</span> ${t}${im ? `<img src=\"${im}\" style=\"display:block; max-width:160px; margin-top:8px; border-radius:6px;\">` : ''}</div>`;
+                }).join('')}</div>` : ''}
+            </div>`;
+        previewModal.classList.add('active');
+    }
 
     // --- Handle Final Form Submission ---
     quizForm.addEventListener('submit', async function(e) {
@@ -322,13 +460,15 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 
                 const explanation = block.querySelector('.question-explanation')?.value || '';
                 const questionImage = block.dataset.questionImage || '';
-                const questionData = { questionText, questionType, marks, explanation, questionImage };
+                const isTimed = !!block.querySelector('.is-timed')?.checked;
+                const timeLimit = parseInt(block.querySelector('.time-limit')?.value) || undefined;
+                const questionData = { questionText, questionType, marks, explanation, questionImage, isTimed, timeLimit };
 
                 if (questionType === 'mcq') {
                     const optsContainer = block.querySelector('.options-container');
                     const isMultiple = !!block.querySelector('.is-multiple')?.checked;
                     const optRows = optsContainer ? Array.from(optsContainer.querySelectorAll('.option-row')) : [];
-                    const options = optRows.map((row) => ({ text: row.querySelector('.option-text').value.trim(), image: row.dataset.imageBase64 || '' }));
+                    const options = optRows.map((row) => ({ text: row.querySelector('.option-text').value.trim(), image: row.dataset.imageBase64 || '', weight: parseFloat(row.querySelector('.option-weight')?.value) || undefined }));
                     if (options.length === 0 || options.some(o => o.text === '')) throw new Error('Please add and fill all MCQ options.');
                     const correctIndices = optRows.map((row, idx) => ({ idx, ok: !!row.querySelector('.option-correct')?.checked })).filter(x => x.ok).map(x => x.idx);
                     questionData.isMultiple = isMultiple;
@@ -355,6 +495,8 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             // --- Collect Main Quiz Data ---
             const scheduleTimeValue = document.getElementById('quiz-schedule').value;
+            const randomizeQuestions = !!document.getElementById('randomize-questions')?.checked;
+            const randomizeOptions = !!document.getElementById('randomize-options')?.checked;
             const quizData = {
                 title: document.getElementById('quiz-title').value,
                 category: document.getElementById('quiz-category').value,
@@ -368,7 +510,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 visibility: document.getElementById('quiz-visibility').value,
                 coverImage: coverImageBase64, // Add the Base64 image string
                 questions: questions,
-                numQuestionsToShow: parseInt(document.getElementById('num-questions')?.value) || undefined
+                numQuestionsToShow: parseInt(document.getElementById('num-questions')?.value) || undefined,
+                randomizeQuestions,
+                randomizeOptions
             };
 
             // Basic validation for required fields
@@ -387,9 +531,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             // --- BACKEND CALL ---
             const method = isEditing ? 'PUT' : 'POST';
-            const url = isEditing ? `${backendUrl}/quizzes/${editQuizId}` : `${backendUrl}/quizzes`;
-
-            const response = await fetch(url, {
+            const response = await apiFetch(isEditing ? `/quizzes/${editQuizId}` : `/quizzes`, {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
@@ -432,7 +574,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // --- Load Quiz for Editing ---
     async function loadQuizForEditing(quizId) {
         try {
-            const response = await fetch(`${backendUrl}/quizzes/${quizId}`, {
+            const response = await apiFetch(`/quizzes/${quizId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -497,9 +639,18 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             quiz.questions.forEach((question, index) => {
                 const questionBlock = document.createElement('div');
                 questionBlock.classList.add('question-block');
+                questionBlock.setAttribute('draggable','true');
                 questionBlock.innerHTML = `
-                    <h4>Question ${index + 1}</h4>
-                    <button type="button" class="btn-remove-question">Remove</button>
+                    <div class="question-card-header">
+                        <span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+                        <h4>Question ${index + 1}</h4>
+                        <div class="question-card-actions">
+                            <button type="button" class="btn-action btn-preview">Preview</button>
+                            <button type="button" class="btn-action btn-duplicate">Duplicate</button>
+                            <button type="button" class="btn-action btn-collapse">Collapse</button>
+                            <button type="button" class="btn-remove-question">Remove</button>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label>Question Type</label>
                         <select class="question-type" required>
@@ -520,11 +671,15 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                         <label>Explanation (optional)</label>
                         <textarea class="question-explanation" placeholder="Add explanation or solution...">${question.explanation || ''}</textarea>
                     </div>
+                    <div class="form-group">
+                        <label><input type="checkbox" class="is-timed" ${question.isTimed ? 'checked' : ''}> Timed question</label>
+                        <input type="number" class="time-limit" placeholder="Time limit (seconds)" min="5" value="${Number.isFinite(question.timeLimit) ? question.timeLimit : ''}" style="margin-top:8px;">
+                    </div>
                     <div class="mcq-only" style="display: ${question.questionType === 'mcq' ? 'block' : 'none'};">
                         <div class="form-group" style="margin-bottom:10px;">
                             <label><input type="checkbox" class="is-multiple" ${question.isMultiple ? 'checked' : ''}> Allow multiple correct answers</label>
                         </div>
-                        <div class="options-container"></div>
+                        <div class="options-container options-grid"></div>
                         <button type="button" class="btn-action add-option-btn"><i class='bx bx-plus'></i> Add Option</button>
                     </div>
                     <div class="form-group coding-only" style="display: ${question.questionType === 'coding' ? 'block' : 'none'};">
@@ -551,7 +706,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     const cont = questionBlock.querySelector('.options-container');
                     const correctSet = question.isMultiple ? (Array.isArray(question.correctAnswers) ? question.correctAnswers : []) : [question.correctAnswer];
                     (question.options || []).forEach((opt, i) => {
-                        const row = createOptionRow(opt.text || '', opt.image || '', Array.isArray(correctSet) ? correctSet.includes(i) : false);
+                        const row = createOptionRow(opt.text || '', opt.image || '', Array.isArray(correctSet) ? correctSet.includes(i) : false, Number.isFinite(opt.weight) ? opt.weight : null);
                         cont.appendChild(row);
                     });
                 }
@@ -583,4 +738,195 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         priceGroup.style.display = 'none';
     }
     document.querySelectorAll('.question-block').forEach(attachQuestionEnhancements);
+
+    // Bulk upload parsing
+    const bulkUploadInput = document.getElementById('bulk-upload');
+    if (bulkUploadInput){
+        bulkUploadInput.addEventListener('change', async function(e){
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            try {
+                const ext = (file.name.split('.').pop() || '').toLowerCase();
+                if (ext === 'csv'){
+                    const text = await file.text();
+                    const rows = text.split(/\r?\n/).filter(r=>r.trim().length>0);
+                    const header = rows[0].split(',').map(h=>h.trim().toLowerCase());
+                    const dataRows = rows.slice(1);
+                    for (const r of dataRows){
+                        const cols = r.split(',');
+                        const obj = {};
+                        header.forEach((h,i)=>{ obj[h] = (cols[i]||'').trim(); });
+                        addQuestionFromParsed(obj);
+                    }
+                } else if (ext === 'xlsx' && typeof XLSX !== 'undefined'){
+                    const buf = await file.arrayBuffer();
+                    const wb = XLSX.read(buf, { type: 'array' });
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(ws, { defval:'' });
+                    json.forEach(addQuestionFromParsed);
+                } else {
+                    showToast('Unsupported file type. Use CSV or XLSX.', 'warning');
+                }
+                renumberQuestions();
+                showToast('Questions generated from upload.', 'success');
+            } catch(err){
+                showToast('Failed to parse uploaded file.', 'error');
+            }
+        });
+    }
+    function addQuestionFromParsed(obj){
+        questionCount++;
+        const block = document.createElement('div');
+        block.className = 'question-block';
+        block.setAttribute('draggable','true');
+        const type = (obj.type||obj.questionType||'mcq').toLowerCase();
+        const isMultiple = String(obj.isMultiple||'').toLowerCase() === 'true';
+        const optionsStr = obj.options||'';
+        const correctStr = obj.correctIndices||obj.correct||'';
+        const options = optionsStr ? optionsStr.split(';').map(s=>s.trim()).filter(s=>s.length>0) : [];
+        const correctArr = correctStr ? correctStr.split(',').map(s=>parseInt(s.trim())).filter(n=>Number.isFinite(n)) : [];
+        const marks = Number.isFinite(parseInt(obj.marks)) ? parseInt(obj.marks) : 1;
+        const explanation = obj.explanation||'';
+        block.innerHTML = `
+            <div class="question-card-header">
+                <span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+                <h4>Question ${questionCount}</h4>
+                <div class="question-card-actions">
+                    <button type="button" class="btn-action btn-preview">Preview</button>
+                    <button type="button" class="btn-action btn-duplicate">Duplicate</button>
+                    <button type="button" class="btn-action btn-collapse">Collapse</button>
+                    <button type="button" class="btn-remove-question">Remove</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Question Type</label>
+                <select class="question-type" required>
+                    <option value="mcq" ${type==='mcq'?'selected':''}>Multiple Choice Question (MCQ)</option>
+                    <option value="written" ${type==='written'?'selected':''}>Written Question</option>
+                    <option value="coding" ${type==='coding'?'selected':''}>Coding Question</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Question Text</label>
+                <textarea class="question-text" required>${obj.text||obj.questionText||''}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Question Image (optional)</label>
+                <input type="file" class="question-image" accept="image/*">
+            </div>
+            <div class="form-group">
+                <label>Explanation (optional)</label>
+                <textarea class="question-explanation">${explanation}</textarea>
+            </div>
+            <div class="form-group">
+                <label><input type="checkbox" class="is-timed"> Timed question</label>
+                <input type="number" class="time-limit" placeholder="Time limit (seconds)" min="5" style="margin-top:8px;">
+            </div>
+            <div class="mcq-only" style="display:${type==='mcq'?'block':'none'};">
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label><input type="checkbox" class="is-multiple" ${isMultiple?'checked':''}> Allow multiple correct answers</label>
+                </div>
+                <div class="options-container options-grid"></div>
+                <button type="button" class="btn-action add-option-btn"><i class='bx bx-plus'></i> Add Option</button>
+            </div>
+            <div class="form-group coding-only" style="display:${type==='coding'?'block':'none'};">
+                <label>Programming Language</label>
+                <select class="code-language">
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                </select>
+            </div>
+            <div class="form-group coding-only" style="display:${type==='coding'?'block':'none'};">
+                <label>Starter Code (optional)</label>
+                <textarea class="code-starter" placeholder="Provide starter template or function signature..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Marks</label>
+                <input type="number" class="question-marks" min="1" value="${marks}" required>
+            </div>
+        `;
+        questionsContainer.appendChild(block);
+        if (type==='mcq'){
+            const cont = block.querySelector('.options-container');
+            if (options.length === 0){
+                cont.appendChild(createOptionRow('', null, false, null));
+                cont.appendChild(createOptionRow('', null, false, null));
+            } else {
+                options.forEach((t,i)=>{
+                    const row = createOptionRow(t, null, correctArr.includes(i), null);
+                    cont.appendChild(row);
+                });
+            }
+        }
+        attachQuestionEnhancements(block);
+    }
+
+    // Autosave drafts
+    const autosaveIndicator = document.getElementById('autosave-indicator');
+    let autosaveTimer = null;
+    function scheduleAutosave(){
+        clearTimeout(autosaveTimer);
+        autosaveTimer = setTimeout(doAutosave, 1200);
+    }
+    function doAutosave(){
+        try {
+            const draft = {
+                title: document.getElementById('quiz-title').value,
+                category: document.getElementById('quiz-category').value,
+                field: document.getElementById('quiz-field').value,
+                difficulty: document.getElementById('quiz-difficulty').value,
+                quizType: document.getElementById('quiz-type').value,
+                duration: document.getElementById('quiz-duration').value,
+                registrationLimit: document.getElementById('quiz-limit').value,
+                scheduleTime: document.getElementById('quiz-schedule').value,
+                price: document.getElementById('quiz-price').value,
+                visibility: document.getElementById('quiz-visibility').value,
+                numQuestionsToShow: document.getElementById('num-questions').value,
+                randomizeQuestions: !!document.getElementById('randomize-questions')?.checked,
+                randomizeOptions: !!document.getElementById('randomize-options')?.checked
+            };
+            localStorage.setItem('quizDraft', JSON.stringify(draft));
+            if (autosaveIndicator){ autosaveIndicator.textContent = 'Draft saved'; }
+        } catch(_){}
+    }
+    document.getElementById('create-quiz-form').addEventListener('input', scheduleAutosave);
+    // Load draft if creating new
+    if (!isEditing){
+        try {
+            const raw = localStorage.getItem('quizDraft');
+            if (raw){
+                const d = JSON.parse(raw);
+                document.getElementById('quiz-title').value = d.title || '';
+                document.getElementById('quiz-category').value = d.category || '';
+                try { populateFieldOptions(d.category); } catch(_){}
+                if (quizFieldSelect) quizFieldSelect.value = d.field || '';
+                if (quizDifficultySelect) quizDifficultySelect.value = d.difficulty || 'basic';
+                document.getElementById('quiz-type').value = d.quizType || 'regular';
+                document.getElementById('quiz-duration').value = d.duration || '';
+                document.getElementById('quiz-limit').value = d.registrationLimit || '';
+                document.getElementById('quiz-schedule').value = d.scheduleTime || '';
+                document.getElementById('quiz-price').value = d.price || '';
+                document.getElementById('quiz-visibility').value = d.visibility || 'public';
+                document.getElementById('num-questions').value = d.numQuestionsToShow || '';
+                document.getElementById('randomize-questions').checked = !!d.randomizeQuestions;
+                document.getElementById('randomize-options').checked = !!d.randomizeOptions;
+            }
+        } catch(_){}
+    }
+
+    const setBackendBtn = document.getElementById('set-backend-btn');
+    if (setBackendBtn){
+        setBackendBtn.addEventListener('click', function(){
+            const val = prompt('Enter backend API base URL', localStorage.getItem('backendOverride') || backendUrl || '');
+            if (val && /^https?:\/\//i.test(val)){
+                localStorage.setItem('backendOverride', val.replace(/\/$/,'') + '/api');
+                backendCandidates = [localStorage.getItem('backendOverride')].concat(backendCandidates.filter(u=>u!==localStorage.getItem('backendOverride')));
+                showToast('Backend URL saved.', 'success');
+            } else {
+                showToast('Invalid URL. Must start with http or https.', 'warning');
+            }
+        });
+    }
 });

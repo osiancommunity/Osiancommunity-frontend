@@ -440,6 +440,17 @@ body {
     grid-column: span 2; /* Make this box span both columns */
 }
 
+.leaderboard-item { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border:1px solid var(--border-color); border-radius:10px; background:#fff; box-shadow: var(--shadow); margin-bottom:10px; }
+.leaderboard-item .rank { font-weight:700; color: var(--accent-color); }
+.leaderboard-item .name { font-weight:600; color: var(--text-color); }
+.leaderboard-item .score { color: var(--text-light); }
+.badge-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; }
+.badge-card { display:flex; flex-direction:column; align-items:center; gap:8px; padding:16px; border:1px solid var(--border-color); border-radius:12px; background:#fff; box-shadow: var(--shadow); }
+.badge-card.locked { opacity:0.6; }
+.badge-card i { font-size:28px; color: var(--accent-color); }
+.badge-card .title { font-weight:600; }
+.badge-card .desc { font-size:12px; color: var(--text-light); text-align:center; }
+
 /* ------------------------- */
 /* Responsive */
 /* ------------------------- */
@@ -494,10 +505,10 @@ body {
         margin-left: 0;
         align-items: flex-start;
         gap: 15px;
-    .main-header { flex-direction: column; width: 100%; }
-    .header-profile { width: 100%; justify-content: flex-end; }
-    .header-actions { margin-left: auto; }
-}
+    .main-header {
+        flex-direction: column;
+        width: 100%;
+    }
     .header-profile input {
         flex-grow: 1;
         gap: 15px;

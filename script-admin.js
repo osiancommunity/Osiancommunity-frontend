@@ -10,12 +10,21 @@ document.addEventListener("DOMContentLoaded", function() {
         el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
     }
 
-    // Define the location of your backend
-const backendUrl = (location.hostname.endsWith('vercel.app'))
-  ? 'https://osiancommunity-backend.vercel.app/api'
-  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-      ? 'http://localhost:5000/api'
-      : 'https://osiancommunity-backend.vercel.app/api');
+    // Backend selection with override and fallback
+let backendCandidates = [];
+const backendOverride = localStorage.getItem('backendOverride');
+if (backendOverride) backendCandidates.push(backendOverride);
+backendCandidates.push('https://osiancommunity-backend.vercel.app/api');
+backendCandidates.push('http://localhost:5000/api');
+let backendUrl = backendCandidates[0];
+async function apiFetch(path, options){
+    let lastErr = null;
+    for (const base of backendCandidates){
+        try { const res = await fetch(`${base}${path}`, options); if (res && res.ok !== undefined) { backendUrl = base; return res; } }
+        catch(e){ lastErr = e; }
+    }
+    if (lastErr) throw lastErr; throw new Error('Backend unreachable');
+}
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -45,7 +54,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     async function fetchRecentQuizzes() {
         try {
             // Fetch the most recent 4 quizzes created by the admin
-            const response = await fetch(`${backendUrl}/quizzes/admin?limit=4`, {
+            const response = await apiFetch(`/quizzes/admin?limit=4`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -80,7 +89,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     async function loadAdminKpis() {
         try {
-            const res = await fetch(`${backendUrl}/analytics/admin-kpis`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await apiFetch(`/analytics/admin-kpis`, { headers: { 'Authorization': `Bearer ${token}` } });
             const data = await res.json();
             const k = data.kpis || {};
             const tq = document.getElementById('kpi-total-quizzes');

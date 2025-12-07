@@ -1,12 +1,20 @@
 document.addEventListener("DOMContentLoaded", function() {
     
-    // Define the location of your backend
-const backendPrimary = (location.hostname.endsWith('vercel.app'))
-  ? 'https://osiancommunity-backend.vercel.app/api'
-  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-      ? 'http://localhost:5000/api'
-      : 'https://osiancommunity-backend.vercel.app/api');
-const backendFallback = 'https://osiancommunity-backend.vercel.app/api';
+    // Backend selection with override and fallback
+let backendCandidates = [];
+const backendOverride = localStorage.getItem('backendOverride');
+if (backendOverride) backendCandidates.push(backendOverride);
+backendCandidates.push('https://osiancommunity-backend.vercel.app/api');
+backendCandidates.push('http://localhost:5000/api');
+let backendUrl = backendCandidates[0];
+async function apiFetch(path, options){
+    let lastErr = null;
+    for (const base of backendCandidates){
+        try { const res = await fetch(`${base}${path}`, options); if (res && res.ok !== undefined) { backendUrl = base; return res; } }
+        catch(e){ lastErr = e; }
+    }
+    if (lastErr) throw lastErr; throw new Error('Backend unreachable');
+}
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -50,36 +58,27 @@ const backendFallback = 'https://osiancommunity-backend.vercel.app/api';
     // --- Fetch and Display Quizzes ---
     async function fetchQuizzes() {
         try {
-            const endpoints = backendPrimary === backendFallback ? [backendPrimary] : [backendPrimary, backendFallback];
-            let data = null;
-            for (let i = 0; i < endpoints.length; i++) {
-                const base = endpoints[i];
-                try {
-                    const response = await fetch(`${base}/quizzes`, {
-                        headers: {
-                            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                        }
-                    });
-                    if (!response.ok) {
-                        if (response.status === 401 || response.status === 403) {
-                            localStorage.removeItem('user');
-                            localStorage.removeItem('token');
-                            window.location.href = 'login.html';
-                            return;
-                        }
-                        if (response.status === 404 && i < endpoints.length - 1) continue;
-                        const errData = await response.json().catch(() => ({}));
-                        throw new Error(errData.message || 'Failed to load quizzes');
-                    }
-                    data = await response.json();
-                    break;
-                } catch (e) {
-                    if (i === endpoints.length - 1) throw e;
-                    continue;
+            const response = await apiFetch(`/quizzes`, {
+                headers: {
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                }
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('token');
+                    window.location.href = 'login.html';
+                    return; // Silently redirect
+                }
+                if (!isLocal) {
+                    showErrorMessage(`Error fetching quizzes: ${data.message}`);
+                    return;
                 }
             }
 
-            const categories = (data && data.categories) || {};
+            const categories = data.categories || {};
             const all = [
                 ...(categories.technical || []),
                 ...(categories.law || []),
@@ -95,9 +94,18 @@ const backendFallback = 'https://osiancommunity-backend.vercel.app/api';
                 renderIntoGrid(recommended, 'recommended-quizzes-container');
             }
 
+            if (recommended.length > 0) {
+                const lbSection = document.getElementById('leaderboard-section');
+                if (lbSection) lbSection.style.display = 'block';
+                fetchLeaderboard(recommended[0]._id);
+            }
+            const badgesSection = document.getElementById('badges-section');
+            if (badgesSection) badgesSection.style.display = 'block';
+            fetchBadges();
+
         } catch (error) {
             console.error('Error fetching quizzes:', error);
-            showErrorMessage(error && error.message ? error.message : 'Could not load quizzes. Server may be down.');
+            alert('Could not load quizzes. Server may be down.');
         }
     }
     
@@ -106,9 +114,7 @@ const backendFallback = 'https://osiancommunity-backend.vercel.app/api';
         if (!container) return;
         container.innerHTML = '';
         if (!quizzes || quizzes.length === 0) return;
-        let html = '';
-        quizzes.forEach(quiz => { html += createQuizCard(quiz); });
-        container.innerHTML = html;
+        quizzes.forEach(quiz => { container.innerHTML += createQuizCard(quiz); });
     }
 
     // --- NEW: Helper function to create a single quiz card with an image ---
@@ -154,9 +160,7 @@ const backendFallback = 'https://osiancommunity-backend.vercel.app/api';
         if (!container) return;
         container.innerHTML = '';
         if (!quizzes || quizzes.length === 0) return;
-        let html = '';
-        quizzes.forEach(q => { html += createQuizCard(q); });
-        container.innerHTML = html;
+        quizzes.forEach(q => { container.innerHTML += createQuizCard(q); });
     }
 
     function getContinueLearning() {
@@ -293,4 +297,63 @@ function showErrorMessage(message) {
     closeBtn.addEventListener('click', () => {
         errorDiv.remove();
     });
+}
+
+async function fetchLeaderboard(quizId){
+    try {
+        const token = localStorage.getItem('token');
+        const res = await apiFetch(`/results/leaderboard/${quizId}?limit=5`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        const list = document.getElementById('leaderboard-list');
+        if (!list) return;
+        list.innerHTML = '';
+        const items = (data.leaderboard || []).map(item => {
+            const pct = item.percentage ? Math.round(item.percentage) : 0;
+            return `<div class="leaderboard-item"><span class="rank">#${item.rank}</span><span class="name">${item.user && item.user.name ? item.user.name : 'User'}</span><span class="score">${item.score} (${pct}%)</span></div>`;
+        });
+        list.innerHTML = items.join('');
+    } catch(e){
+        const list = document.getElementById('leaderboard-list');
+        if (list) list.innerHTML = '<div class="leaderboard-item"><span class="name">Unable to load leaderboard</span></div>';
+    }
+}
+
+async function fetchBadges(){
+    try {
+        const token = localStorage.getItem('token');
+        const res = await apiFetch(`/results/user`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        const results = data.results || [];
+        const total = results.length;
+        const highScore = results.some(r => {
+            const tot = r.totalQuestions || 0; const sc = r.score || 0; return tot>0 && (sc / tot) >= 0.8;
+        });
+        const fivePlus = total >= 5;
+        const threePlus = total >= 3;
+        const days = new Set(results.map(r => {
+            try { return new Date(r.completedAt).toDateString(); } catch { return null; }
+        }).filter(Boolean));
+        const consistency3 = days.size >= 3;
+        const unlocked = {
+            first: total >= 1,
+            top: highScore,
+            streak3: threePlus,
+            marathon5: fivePlus,
+            consistent3days: consistency3
+        };
+        const grid = document.getElementById('badges-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        const cards = [
+            { key:'first', icon:'bxs-badge', title:'First Quiz', desc:'Complete your first quiz' },
+            { key:'top', icon:'bxs-badge-check', title:'Top Scorer', desc:'Score 80% or higher' },
+            { key:'streak3', icon:'bxs-bolt', title:'Streak 3', desc:'Complete 3 quizzes' },
+            { key:'marathon5', icon:'bxs-trophy', title:'Marathon 5', desc:'Complete 5 quizzes' },
+            { key:'consistent3days', icon:'bxs-calendar-check', title:'Consistent', desc:'Quiz 3 different days' }
+        ];
+        grid.innerHTML = cards.map(c => `<div class="badge-card ${unlocked[c.key]?'':'locked'}"><i class='bx ${c.icon}'></i><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div>`).join('');
+    } catch(e){
+        const grid = document.getElementById('badges-grid');
+        if (grid) grid.innerHTML = '<div class="badge-card locked"><div class="title">Unable to load badges</div></div>';
+    }
 }

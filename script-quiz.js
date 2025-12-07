@@ -41,6 +41,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     const warningModal = document.getElementById('warning-modal');
     const autoSubmitModal = document.getElementById('auto-submit-modal');
     const finalSubmitModal = document.getElementById('final-submit-modal');
+    const confirmSubmitModal = document.getElementById('confirm-submit-modal');
+    const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
+    const cancelSubmitBtn = document.getElementById('cancel-submit-btn');
     const startQuizBtn = document.getElementById('start-quiz-btn');
     const quizContainer = document.getElementById('quiz-container');
     const timeLeftDisplay = document.getElementById('time-left');
@@ -144,6 +147,35 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             }
 
             currentQuizData = await response.json();
+
+            // Apply randomization and per-user question selection
+            const originalQuestions = Array.isArray(currentQuizData.questions) ? currentQuizData.questions.slice() : [];
+            const shouldRandQ = !!currentQuizData.randomizeQuestions;
+            const shouldRandO = !!currentQuizData.randomizeOptions;
+            const toShow = Number.isFinite(parseInt(currentQuizData.numQuestionsToShow)) ? parseInt(currentQuizData.numQuestionsToShow) : originalQuestions.length;
+            const indices = originalQuestions.map((_,i)=>i);
+            if (shouldRandQ){ indices.sort(()=>Math.random()-0.5); }
+            const displayQuestionIndices = indices.slice(0, Math.min(toShow, indices.length));
+            const optionIndexMaps = {}; // map display option index -> original option index per displayed question idx
+            const visibleQuestions = displayQuestionIndices.map((origIdx)=>{
+                const q = JSON.parse(JSON.stringify(originalQuestions[origIdx]));
+                if (q && q.questionType === 'mcq' && Array.isArray(q.options)){
+                    const map = q.options.map((_,i)=>i);
+                    if (shouldRandO){ map.sort(()=>Math.random()-0.5); }
+                    const shuffled = map.map((origOptionIdx)=>{
+                        const opt = q.options[origOptionIdx];
+                        return { text: opt.text, image: opt.image, weight: opt.weight };
+                    });
+                    optionIndexMaps[displayQuestionIndices.indexOf(origIdx)] = map; // store mapping at display position
+                    q.options = shuffled;
+                }
+                return q;
+            });
+            // Keep original for submission mapping
+            currentQuizData._originalQuestions = originalQuestions;
+            currentQuizData._displayQuestionIndices = displayQuestionIndices;
+            currentQuizData._optionIndexMaps = optionIndexMaps;
+            currentQuizData.questions = visibleQuestions;
 
             // Set up the quiz page
             document.querySelector('.quiz-info h3').textContent = currentQuizData.title;
@@ -419,7 +451,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 questionIndex: currentQuestionIndex,
                 answerIndex: selectedAnswerIndex
             });
-        }
+    }
     }
 
     function toggleMultiSelection(e) {
@@ -475,17 +507,19 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     }
 
     submitQuizBtn.addEventListener('click', () => {
-        let el = document.getElementById('osian-toast');
-        if (!el) { el = document.createElement('div'); el.id = 'osian-toast'; el.className = 'osian-toast'; document.body.appendChild(el); }
-        el.className = 'osian-toast warning';
-        el.innerHTML = `Confirm submission? <span class="actions"><button id="toast-confirm">Submit</button> <button id="toast-cancel">Cancel</button></span>`;
-        el.classList.add('show');
-        const confirmBtn = document.getElementById('toast-confirm');
-        const cancelBtn = document.getElementById('toast-cancel');
-        const hide = ()=>{ el.classList.remove('show'); el.innerHTML=''; };
-        if (confirmBtn) confirmBtn.onclick = function(){ hide(); submitQuiz("User submitted"); };
-        if (cancelBtn) cancelBtn.onclick = function(){ hide(); };
+        if (confirmSubmitModal) confirmSubmitModal.classList.add('active');
     });
+    if (confirmSubmitBtn) {
+        confirmSubmitBtn.addEventListener('click', function(){
+            if (confirmSubmitModal) confirmSubmitModal.classList.remove('active');
+            submitQuiz('User submitted');
+        });
+    }
+    if (cancelSubmitBtn) {
+        cancelSubmitBtn.addEventListener('click', function(){
+            if (confirmSubmitModal) confirmSubmitModal.classList.remove('active');
+        });
+    }
 
     async function submitQuiz(reason, wasAutoSubmitted = false) {
         clearInterval(timerInterval); // Stop the clock
@@ -515,14 +549,27 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 },
                 body: JSON.stringify({
                     quizId: quizId,
-                    answers: currentQuizData.questions.map((question, index) => {
-                        const mcqAnswer = userAnswers.find(a => a.questionIndex === index);
-                        const writtenAnswer = writtenAnswers.find(w => w.questionIndex === index);
-                        const codeAnswer = codeAnswers.find(c => c.questionIndex === index);
+                    answers: currentQuizData.questions.map((question, displayIdx) => {
+                        const originalQuestionIndex = currentQuizData._displayQuestionIndices[displayIdx];
+                        const mcqAnswer = userAnswers.find(a => a.questionIndex === displayIdx);
+                        const writtenAnswer = writtenAnswers.find(w => w.questionIndex === displayIdx);
+                        const codeAnswer = codeAnswers.find(c => c.questionIndex === displayIdx);
+                        let selectedSingleOrig = null;
+                        let selectedMultiOrig = undefined;
+                        if (question.questionType === 'mcq'){
+                            const map = currentQuizData._optionIndexMaps[displayIdx] || [];
+                            if (!question.isMultiple && mcqAnswer && typeof mcqAnswer.answerIndex === 'number'){
+                                const disp = mcqAnswer.answerIndex;
+                                selectedSingleOrig = Number.isFinite(disp) && map[disp] != null ? map[disp] : disp;
+                            }
+                            if (question.isMultiple && mcqAnswer && Array.isArray(mcqAnswer.selectedAnswers)){
+                                selectedMultiOrig = mcqAnswer.selectedAnswers.map(disp => (Number.isFinite(disp) && map[disp] != null) ? map[disp] : disp);
+                            }
+                        }
                         return {
-                            questionIndex: index,
-                            selectedAnswer: (!question.isMultiple && mcqAnswer && typeof mcqAnswer.answerIndex === 'number') ? mcqAnswer.answerIndex : null,
-                            selectedAnswers: (question.isMultiple && mcqAnswer && Array.isArray(mcqAnswer.selectedAnswers)) ? mcqAnswer.selectedAnswers : undefined,
+                            questionIndex: originalQuestionIndex,
+                            selectedAnswer: selectedSingleOrig,
+                            selectedAnswers: selectedMultiOrig,
                             writtenAnswer: writtenAnswer ? writtenAnswer.answer : '',
                             codeAnswer: codeAnswer ? codeAnswer.code : '',
                             timeSpent: 0

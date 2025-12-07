@@ -6,42 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const passwordInput = document.getElementById('password');
     const errorMessage = document.getElementById('error-message');
     
-const backendPrimary = (location.hostname.endsWith('vercel.app'))
-  ? 'https://osiancommunity-backend.vercel.app/api'
-  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-      ? 'http://localhost:5000/api'
-      : 'https://osiancommunity-backend.vercel.app/api');
-const backendFallback = 'https://osiancommunity-backend.vercel.app/api';
-
-async function loginWithFallback(email, password) {
-  const endpoints = backendPrimary === backendFallback
-    ? [backendPrimary]
-    : [backendPrimary, backendFallback];
-
-  for (let i = 0; i < endpoints.length; i++) {
-    const base = endpoints[i];
-    try {
-      const response = await fetch(`${base}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      if (!response.ok) {
-        // If local returns 404 or network issues, try next endpoint
-        if (response.status === 404 && i < endpoints.length - 1) continue;
-        const dataErr = await response.json().catch(() => ({}));
-        throw new Error(dataErr.message || 'Invalid email or password');
-      }
-      // Success
-      const data = await response.json();
-      return data;
-    } catch (e) {
-      if (i === endpoints.length - 1) throw e;
-      // Try the next endpoint (likely cloud)
-      continue;
-    }
-  }
-}
+const backendUrl = 'http://localhost:5000/api';
 
     // --- 1. Check if already logged in ---
     // If a user visits login.html but is already logged in, send them to their dashboard.
@@ -78,7 +43,29 @@ async function loginWithFallback(email, password) {
             submitButton.textContent = 'Logging in...';
 
             try {
-                const data = await loginWithFallback(email, password);
+                const response = await fetch(`${backendUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // If response is not 200-299, it's an error (e.g., 401, 404)
+                    // For 500 errors, the response might not be JSON.
+                    if (response.status >= 500) {
+                        throw new Error('Server error. Please try again later.');
+                    }
+                    // For other errors (400, 401, 404), we expect a JSON message.
+                    if (data && data.message) {
+                        throw new Error(data.message);
+                    } else {
+                        throw new Error('Invalid email or password');
+                    }
+                }
 
                 // --- THIS IS THE CRITICAL FIX ---
                 // Check that the API returned BOTH token and user
@@ -107,10 +94,7 @@ async function loginWithFallback(email, password) {
             } catch (error) {
                 // Show error message to the user
                 if (errorMessage) {
-                    const msg = (error && error.message && !String(error.message).includes('Failed to fetch'))
-                      ? error.message
-                      : 'Unable to connect to the server. Please try again later.';
-                    errorMessage.textContent = msg;
+                    errorMessage.textContent = error.message;
                     errorMessage.style.display = 'block';
                 }
                 console.error('Login error:', error);

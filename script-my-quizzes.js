@@ -10,12 +10,21 @@ document.addEventListener("DOMContentLoaded", function() {
         el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
     }
 
-    // Define the location of your backend
-const backendUrl = (location.hostname.endsWith('vercel.app'))
-  ? 'https://osiancommunity-backend.vercel.app/api'
-  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-      ? 'http://localhost:5000/api'
-      : 'https://osiancommunity-backend.vercel.app/api');
+    // Backend selection with override and fallback
+let backendCandidates = [];
+const backendOverride = localStorage.getItem('backendOverride');
+if (backendOverride) backendCandidates.push(backendOverride);
+backendCandidates.push('https://osiancommunity-backend.vercel.app/api');
+backendCandidates.push('http://localhost:5000/api');
+let backendUrl = backendCandidates[0];
+async function apiFetch(path, options){
+    let lastErr = null;
+    for (const base of backendCandidates){
+        try { const res = await fetch(`${base}${path}`, options); if (res && res.ok !== undefined) { backendUrl = base; return res; } }
+        catch(e){ lastErr = e; }
+    }
+    if (lastErr) throw lastErr; throw new Error('Backend unreachable');
+}
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -54,7 +63,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // --- Fetch Admin's Quizzes ---
     async function fetchMyQuizzes() {
         try {
-            const response = await fetch(`${backendUrl}/quizzes/admin`, {
+            const response = await apiFetch(`/quizzes/admin`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -238,7 +247,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     window.deleteQuiz = async function(quizId) {
         showToastConfirm('Delete this quiz? This action cannot be undone.', async function(){
             try {
-                const response = await fetch(`${backendUrl}/quizzes/${quizId}`, {
+                const response = await apiFetch(`/quizzes/${quizId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`

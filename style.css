@@ -9,10 +9,16 @@
 body, html {
     height: 100%;
     width: 100%;
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: 
+      radial-gradient(80px 80px at 10% 20%, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.00) 60%),
+      radial-gradient(120px 120px at 85% 10%, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.00) 60%),
+      radial-gradient(160px 160px at 15% 85%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.00) 60%),
+      linear-gradient(135deg, #6C00FF 0%, #3b82f6 100%);
     position: relative;
     overflow: hidden;
-    overflow-x: hidden;
 }
 
 body::before, body::after {
@@ -25,12 +31,12 @@ body::before, body::after {
 body::before {
     width: 340px; height: 340px; border-radius: 50%;
     left: -80px; top: -80px;
-    background: none;
+    background: radial-gradient(circle, rgba(255,255,255,0.55), rgba(255,255,255,0));
 }
 body::after {
     width: 420px; height: 420px; border-radius: 50%;
     right: -100px; bottom: -120px;
-    background: none;
+    background: radial-gradient(circle, rgba(255,255,255,0.40), rgba(255,255,255,0));
 }
 
 .osian-toast {
@@ -55,9 +61,7 @@ body::after {
 .login-container {
     display: flex;
     width: 1060px;
-    height: auto;
-    min-height: 640px;
-    margin: 40px auto;
+    height: 700px;
     border-radius: 20px;
     overflow: hidden;
     position: relative;
@@ -261,11 +265,23 @@ body::after {
 }
 
 @media (max-width: 768px) {
-    .login-container { flex-direction: column; height: auto; width: 95%; max-width: 520px; margin: 0 auto; }
+    .login-container {
+        flex-direction: column;
+        height: auto;
+        width: 95%;
+        max-width: 520px;
+    }
 
-    .info-section { width: 100%; height: auto; padding: 28px; }
+    .info-section {
+        width: 100%;
+        height: auto;
+        padding: 28px;
+    }
 
-    .form-section { width: 100%; padding: 24px; }
+    .form-section {
+        width: 100%;
+        padding: 24px;
+    }
 }
 
 .form-illustration { margin-top: 18px; display: flex; justify-content: center; }
@@ -306,48 +322,3 @@ a, button {
 
 .social-icon:hover { transform: translateY(-2px) scale(1.02); }
 .forgot-password:hover { color: #3e00b8; }
-
-.login-page { background: #f8fafc; display: block; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.login-page::before, .login-page::after { content: none; }
-.login-page * { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif; }
-.login-page .login-container { width: 960px; max-width: 96%; height: auto; min-height: 80vh; box-shadow: 0 12px 30px rgba(15,23,42,0.06); border-radius: 16px; }
-.login-page .info-section { background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%); color: #0f172a; }
-.login-page .info-section::after { content: none; }
-.login-page .info-content .logo-name { font-weight: 700; color: #0f172a; }
-.login-page .info-content .slogan { font-weight: 500; color: #334155; }
-.login-page .form-section { background: #f8fafc; }
-.login-page .form-wrapper { background: #ffffff; border: 1px solid #e5e7eb; backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: 0 8px 24px rgba(15,23,42,0.06); border-radius: 16px; }
-.login-page .input-group input { background: #ffffff; border: 1px solid #e5e7eb; }
-.login-page .input-group input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
-.login-page .input-group .input-icon { color: #64748b; }
-.login-page .forgot-password { color: #2563eb; }
-.login-page .register-link a { color: #2563eb; }
-.login-page .login-btn { background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 8px 18px rgba(37,99,235,0.25); }
-.login-page .login-btn:hover { background: linear-gradient(135deg, #1d4ed8, #2563eb); }
-.login-page .form-hint { font-size: 12px; color: #64748b; margin-top: 8px; }
-.error-text { font-size: 12px; color: #ef4444; margin-top: 8px; }
-
-/* Illustration card and brand copy */
-.login-page .illustration-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; box-shadow: 0 8px 24px rgba(15,23,42,0.06); padding: 20px; display: flex; justify-content: center; align-items: center; }
-.login-page .illustration-img { width: 100%; max-width: 460px; height: auto; object-fit: contain; border-radius: 12px; }
-.login-page .brand-copy { margin-top: 18px; text-align: center; }
-.login-page .brand-title { font-size: 20px; font-weight: 700; color: #0f172a; }
-.login-page .brand-subtitle { font-size: 14px; color: #475569; margin-top: 6px; }
-
-/* Mobile tweaks for alignment and scaling */
-@media (max-width: 768px) {
-  .login-page .login-container { width: 100%; max-width: 560px; box-shadow: none; border-radius: 0; }
-  .login-page .info-section { padding: 24px; }
-  .login-page .illustration-img { max-width: 100%; }
-  .login-page .form-section { padding: 20px; }
-  .login-page .form-wrapper { border-radius: 12px; }
-}
-
-@media (max-width: 480px) {
-  .login-page .info-section { padding: 16px; }
-  .login-page .form-section { padding: 16px; }
-  .login-page .brand-title { font-size: 18px; }
-  .login-page .brand-subtitle { font-size: 13px; }
-}
-
-img { max-width: 100%; height: auto; }

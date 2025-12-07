@@ -4,23 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OSIAN - Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=20251206">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
-<body class="login-page">
+<body>
     <div class="login-container">
         
         <div class="info-section">
             <div class="info-content">
-                <div class="illustration-card">
-                    <img class="illustration-img" src="https://i.ibb.co/HTMgy3HX/Screenshot-2025-12-07-085652.png" alt="OSIAN Quiz Illustration">
+                <img class="shield-logo" src="https://i.ibb.co/hJdD1t55/Whats-App-Image-2025-11-21-at-12-37-59-759b8c1f.jpg" alt="OSIAN Shield Logo">
+                <h1 class="logo-name">OSIAN</h1>
+                <p class="slogan">India’s Largest Inter-College Quiz Championship</p>
                 </div>
-                <div class="brand-copy">
-                    <h3 class="brand-title">India’s Largest Inter-College Quiz Championship</h3>
-                    <p class="brand-subtitle">Test your knowledge, compete nationwide, and unlock new opportunities.</p>
-                </div>
-            </div>
         </div>
 
         <div class="form-section">
@@ -42,7 +37,6 @@
                             <input type="password" id="password" placeholder="Enter your password" required autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
                         </div>
                     </div>
-                    <p class="form-hint">Having trouble logging in? Try disabling extensions or use incognito.</p>
                     
                     <div class="form-options">
                         <a href="forgot-password.html" class="forgot-password">Forgot Password?</a>
@@ -50,13 +44,19 @@
                     
                     <button type="submit" class="login-btn">Login</button>
                 </form>
-                <p id="error-message" class="error-text" style="display: none;"></p>
+                <p id="error-message" style="margin-top: 10px; color: #d00; display: none;"></p>
 
     
                 <div class="register-link">
                     <p>Don't have an account? <a href="register.html">Sign up</a></p>
                 </div>
-                
+                <!-- Note about browser extensions -->
+                <div class="extension-note" style="margin-top: 20px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; font-size: 14px; color: #856404;">
+                    <strong>Note:</strong> If you encounter errors or issues, try disabling browser extensions (e.g., ad blockers) or use incognito mode. Some extensions may interfere with the login process.
+                </div>
+                <div class="form-illustration">
+                    <img src="https://images.unsplash.com/photo-1513258498670-6ff090d96358?fm=jpg&q=60&w=1200" alt="Education themed illustration">
+                </div>
             </div>
         </div>
     </div>

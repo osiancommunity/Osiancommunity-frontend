@@ -35,6 +35,8 @@
                 <div class="header-title">
                     <h1>Create a New Quiz</h1>
                     <p>Fill in the details to build and launch your quiz.</p>
+                    <span id="autosave-indicator" title="Drafts are autosaved">Draft saved</span>
+                    <button id="set-backend-btn" class="btn-secondary" style="margin-left:10px;">Set Backend URL</button>
                 </div>
                 <div class="header-profile">
                     <img src="https://via.placeholder.com/40" alt="Admin Profile Picture">
@@ -42,7 +44,7 @@
                 </div>
             </header>
 
-            <form id="create-quiz-form">
+            <form id="create-quiz-form" class="create-quiz-page">
                 <div class="content-card">
                     <h3>Quiz Details</h3>
                     <div class="form-grid">
@@ -116,18 +118,40 @@
                             <small>Image will be automatically converted to 16:9 aspect ratio</small>
                         </div>
                         <div class="form-group">
+                            <label for="bulk-upload">Bulk Upload Questions (CSV/Excel)</label>
+                            <input type="file" id="bulk-upload" accept=".csv,.xlsx" title="Upload CSV/XLSX to auto-generate questions">
+                            <small>Use CSV/XLSX with columns: type, text, isMultiple, options(;), correctIndices(,), marks, explanation</small>
+                        </div>
+                        <div class="form-group">
                             <label for="num-questions">Number of questions to show</label>
                             <input type="number" id="num-questions" placeholder="e.g., 10">
                             <small>Leave blank to show all uploaded questions</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Randomization</label>
+                            <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                                <label><input type="checkbox" id="randomize-questions"> Randomize question order</label>
+                                <label><input type="checkbox" id="randomize-options"> Randomize option order</label>
+                            </div>
+                            <small>Questions can be randomized per user attempt</small>
                         </div>
                     </div>
                 </div>
 
                 <div class="content-card">
-                    <h3>Quiz Questions</h3>
+                    <h3>Quiz Questions <small id="questions-count" style="font-weight:500; color: var(--text-light);"></small></h3>
                     <div id="questions-container">
-                        <div class="question-block">
-                            <h4>Question 1</h4>
+                        <div class="question-block" draggable="true">
+                            <div class="question-card-header">
+                                <span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+                                <h4>Question 1</h4>
+                                <div class="question-card-actions">
+                                    <button type="button" class="btn-action btn-preview">Preview</button>
+                                    <button type="button" class="btn-action btn-duplicate">Duplicate</button>
+                                    <button type="button" class="btn-action btn-collapse">Collapse</button>
+                                    <button type="button" class="btn-remove-question">Remove</button>
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <label>Question Type</label>
                                 <select class="question-type" required>
@@ -148,11 +172,15 @@
                                 <label>Explanation (optional)</label>
                                 <textarea class="question-explanation" placeholder="Add explanation or solution..."></textarea>
                             </div>
+                            <div class="form-group">
+                                <label><input type="checkbox" class="is-timed"> Timed question</label>
+                                <input type="number" class="time-limit" placeholder="Time limit (seconds)" min="5" style="margin-top:8px;">
+                            </div>
                             <div class="mcq-only">
                                 <div class="form-group" style="margin-bottom:10px;">
                                     <label><input type="checkbox" class="is-multiple"> Allow multiple correct answers</label>
                                 </div>
-                                <div class="options-container"></div>
+                                <div class="options-container options-grid"></div>
                                 <button type="button" class="btn-action add-option-btn"><i class='bx bx-plus'></i> Add Option</button>
                             </div>
                             <div class="form-group coding-only" style="display:none;">
@@ -188,6 +216,17 @@
     </div>
 
     <script src="script-toast-helper.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="script-create-quiz.js"></script>
+
+    <div id="preview-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Question Preview</h3>
+            <div id="preview-content"></div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="close-preview">Close</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
