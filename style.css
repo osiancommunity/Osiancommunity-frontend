@@ -12,32 +12,12 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: 
-      radial-gradient(80px 80px at 10% 20%, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.00) 60%),
-      radial-gradient(120px 120px at 85% 10%, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.00) 60%),
-      radial-gradient(160px 160px at 15% 85%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.00) 60%),
-      linear-gradient(135deg, #6C00FF 0%, #3b82f6 100%);
+    background: #ffffff;
     position: relative;
     overflow: hidden;
 }
 
-body::before, body::after {
-    content: "";
-    position: absolute;
-    filter: blur(40px);
-    opacity: 0.35;
-    z-index: 0;
-}
-body::before {
-    width: 340px; height: 340px; border-radius: 50%;
-    left: -80px; top: -80px;
-    background: radial-gradient(circle, rgba(255,255,255,0.55), rgba(255,255,255,0));
-}
-body::after {
-    width: 420px; height: 420px; border-radius: 50%;
-    right: -100px; bottom: -120px;
-    background: radial-gradient(circle, rgba(255,255,255,0.40), rgba(255,255,255,0));
-}
+body::before, body::after { content: none; }
 
 .osian-toast {
     position: fixed;
@@ -65,7 +45,8 @@ body::after {
     border-radius: 20px;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
+    background: #fff;
 }
 
 /* ------------------------- */
@@ -73,8 +54,8 @@ body::after {
 /* ------------------------- */
 .info-section {
     width: 50%;
-    background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-    color: #fff;
+    background: url('https://images.unsplash.com/photo-1513258498670-6ff090d96358?fm=jpg&q=60&w=1200') center/cover no-repeat;
+    color: #0f172a;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -82,19 +63,11 @@ body::after {
     text-align: center;
     position: relative;
 }
-.info-section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(120px 120px at 20% 30%, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.00) 60%),
-      radial-gradient(180px 180px at 80% 70%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.00) 60%);
-    pointer-events: none;
-}
+.info-section::after { content: ""; position: absolute; inset: 0; background: rgba(255,255,255,0.65); }
 
-.info-content .shield-logo { height: 72px; width: auto; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
-.info-content .logo-name { font-size: 52px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-.info-content .slogan { font-size: 18px; font-weight: 600; opacity: 0.95; }
+.info-content .shield-logo { height: 72px; width: auto; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+.info-content .logo-name { font-size: 52px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; color: #6a00e0; }
+.info-content .slogan { font-size: 18px; font-weight: 600; opacity: 0.95; color: #334155; }
 
 .info-content p {
     font-size: 24px;
@@ -110,18 +83,16 @@ body::after {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: transparent;
+    background: #ffffff;
 }
 
 .form-wrapper {
     width: 100%;
     max-width: 420px;
-    background: rgba(255,255,255,0.18);
-    border: 1px solid rgba(255,255,255,0.35);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    background: #ffffff;
+    border: 1px solid #e9eef2;
     border-radius: 18px;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.08);
     padding: 32px 28px;
 }
 
@@ -152,7 +123,7 @@ body::after {
     border: 1px solid rgba(15,23,42,0.12);
     border-radius: 12px;
     font-size: 16px;
-    background: rgba(255,255,255,0.65);
+    background: #ffffff;
 }
 
 .input-group input:focus {
@@ -186,7 +157,7 @@ body::after {
     padding: 14px 16px;
     border: none;
     border-radius: 14px;
-    background: linear-gradient(135deg, #6C00FF, #3b82f6);
+    background: #6a00e0;
     color: #fff;
     font-size: 16px;
     font-weight: 700;
@@ -196,8 +167,8 @@ body::after {
 }
 
 .login-btn:hover {
-    background: linear-gradient(135deg, #7b1cff, #4aa0ff);
-    box-shadow: 0 16px 36px rgba(108,0,255,0.35), 0 10px 24px rgba(59,130,246,0.25);
+    background: #5300b8;
+    box-shadow: 0 16px 36px rgba(108,0,255,0.25), 0 10px 24px rgba(59,130,246,0.15);
 }
 .login-btn:active { transform: translateY(1px); }
 
