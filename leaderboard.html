@@ -1,84 +1,857 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leaderboard • OSIAN</title>
-  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-  <link rel="stylesheet" href="style-dashboard.css?v=20251207">
-</head>
-<body>
-  <div class="dashboard-container">
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <a href="dashboard-user.html" class="logo">OSIAN</a>
-      </div>
-      <ul class="sidebar-menu">
-        <li><a href="dashboard-user.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
-        <li><a href="quiz-progress.html"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
-        <li class="active"><a href="leaderboard.html"><i class='bx bx-trophy'></i><span>Leaderboard</span></a></li>
-        <li><a href="mentorship-user.html"><i class='bx bx-video'></i><span>Mentorship</span></a></li>
-        <li><a href="notifications.html"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
-        <li><a href="profile.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
-      </ul>
-      <div class="sidebar-footer">
-        <a href="login.html" class="logout-btn"><i class='bx bx-log-out'></i><span>Log Out</span></a>
-      </div>
-    </aside>
-    <main class="main-content">
-      <header class="main-header">
-        <div class="header-title">
-          <h1>Top Users</h1>
-          <p>Live ranking across Global and Batch scopes.</p>
-        </div>
-        <div class="header-profile">
-          <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
-          <a href="profile.html"><img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar"></a>
-        </div>
-      </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>OSIAN — Top Users</title>
 
-      <section class="content-card minimal">
-        <div class="leaderboard-controls">
-          <input type="text" id="lb-search" placeholder="Search users" aria-label="Search users">
-          <select id="lb-scope" aria-label="Leaderboard scope">
-            <option value="global">Global</option>
-            <option value="batch">Batch</option>
-          </select>
-          <select id="lb-period" aria-label="Leaderboard period">
-            <option value="all">All-time</option>
-            <option value="30d">30d</option>
-            <option value="7d">Weekly</option>
-          </select>
+    <!-- icons -->
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --accent: #4c8dff;
+        --accent2: #6a5cd8;
+        --muted: #6b7380;
+        --card: #fff;
+        --radius: 14px;
+        --shadow: 0 16px 48px rgba(20, 40, 90, 0.06);
+        --avatar-sm: 48px;
+        --avatar-lg: 110px;
+        --sidebar-w: 260px;
+        font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto,
+          Arial, sans-serif;
+        color: #071129;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: radial-gradient(
+          900px 420px at 0% 0%,
+          #f7fbff 0%,
+          #eaf4ff 100%
+        );
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      img {
+        display: block;
+        max-width: 100%;
+      }
+
+      /* layout: sidebar + main */
+      .app {
+        display: flex;
+        min-height: 100vh;
+        gap: 18px;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: var(--sidebar-w);
+        flex-shrink: 0;
+        background: linear-gradient(180deg, #fff, #f7fbff);
+        border-right: 1px solid #e9f2ff;
+        padding: 18px;
+        border-radius: 0 18px 18px 0;
+        box-shadow: 8px 12px 40px rgba(20, 40, 80, 0.03);
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .logo {
+        font-weight: 900;
+        color: #355bd6;
+        font-size: 20px;
+        letter-spacing: 0.4px;
+      }
+      .side-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 6px;
+      }
+      .side-nav a {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 10px;
+        border-radius: 12px;
+        color: #5b6570;
+        font-weight: 700;
+      }
+      .side-nav a.active {
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        color: #fff;
+        box-shadow: 0 10px 30px rgba(76, 141, 255, 0.12);
+      }
+      .sidebar-footer {
+        margin-top: auto;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      /* main container */
+      .main-wrap {
+        flex: 1;
+        padding: 28px;
+        min-width: 0;
+      }
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .title h1 {
+        margin: 0;
+        font-size: clamp(26px, 4.6vw, 40px);
+        font-weight: 900;
+        letter-spacing: -0.5px;
+      }
+      .title p {
+        margin: 8px 0 0;
+        color: var(--muted);
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(230, 240, 255, 0.7);
+      }
+
+      /* controls */
+      .controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+      }
+      .controls input[type="search"],
+      .controls select {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #eef6ff;
+        background: #fff;
+        outline: none;
+        min-width: 180px;
+      }
+      .controls .spacer {
+        flex: 1;
+      }
+      .btn {
+        padding: 10px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 800;
+        border: 0;
+      }
+      .btn-ghost {
+        background: #fff;
+        border: 1px solid #eef4ff;
+        box-shadow: 0 8px 24px rgba(10, 20, 40, 0.04);
+      }
+      .btn-primary {
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+        color: #fff;
+        box-shadow: 0 12px 30px rgba(76, 141, 255, 0.12);
+      }
+
+      /* hero (top-3) */
+      .top-hero {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+      }
+      .lb-hero-card {
+        position: relative;
+        flex: 1;
+        border-radius: 12px;
+        padding: 18px;
+        text-align: center;
+        background: linear-gradient(180deg, #fff, #fbfdff);
+        box-shadow: 0 12px 30px rgba(20, 40, 90, 0.05);
+        border: 1px solid #eef6ff;
+        min-width: 220px;
+      }
+      .lb-hero-card.gold {
+        padding: 26px;
+      }
+      .medal {
+        position: absolute;
+        top: -12px;
+        right: -12px;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: #ffbd2e;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+      }
+      .lb-hero-card.silver .medal {
+        background: #c9d5e8;
+        color: #17233a;
+        left: -12px;
+        right: auto;
+      }
+      .lb-hero-card.bronze .medal {
+        background: #e6e6e6;
+        color: #17233a;
+      }
+
+      .avatar {
+        width: var(--avatar-lg);
+        height: var(--avatar-lg);
+        border-radius: 999px;
+        overflow: hidden;
+        margin: 0 auto 8px;
+        border: 6px solid #fff;
+        box-shadow: 0 12px 30px rgba(10, 20, 40, 0.06);
+        object-fit: cover;
+        background: linear-gradient(180deg, #f0f6ff, #fff);
+      }
+      .initials {
+        width: var(--avatar-lg);
+        height: var(--avatar-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #f4f8ff;
+        color: var(--muted);
+        font-weight: 900;
+        font-size: 28px;
+        margin: 0 auto 8px;
+        border: 6px solid #fff;
+        box-shadow: 0 10px 28px rgba(10, 20, 40, 0.04);
+      }
+
+      .lb-hero-card .name {
+        font-weight: 900;
+        margin-top: 6px;
+        font-size: 18px;
+      }
+      .lb-hero-card .score {
+        font-weight: 900;
+        color: var(--accent);
+        font-size: 28px;
+        margin-top: 8px;
+      }
+      .lb-hero-card .meta {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 6px;
+      }
+
+      /* list rows */
+      .lb-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 12px;
+        margin-top: 10px;
+      }
+      .lb-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 12px;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #fff, #fcfdff);
+        box-shadow: 0 10px 30px rgba(20, 40, 80, 0.03);
+        border: 1px solid #eef6ff;
+      }
+      .lb-row .rank {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: #f5f7ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        color: #32429b;
+      }
+      .lb-row .initials,
+      .lb-row img {
+        width: var(--avatar-sm);
+        height: var(--avatar-sm);
+        border-radius: 999px;
+        overflow: hidden;
+        border: 4px solid #fff;
+        box-shadow: 0 8px 18px rgba(10, 20, 40, 0.06);
+      }
+      .lb-row .content {
+        flex: 1;
+        min-width: 0;
+      }
+      .lb-row .title {
+        font-weight: 800;
+        font-size: 14px;
+      }
+      .lb-row .meta {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 4px;
+      }
+      .lb-row .spark {
+        width: 100px;
+        height: 28px;
+        margin-top: 8px;
+        display: block;
+      }
+
+      /* mini current user card */
+      .mini {
+        margin-top: 12px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 12px;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #fff, #fbfdff);
+        border: 1px solid #eef6ff;
+        box-shadow: 0 12px 30px rgba(20, 40, 80, 0.03);
+      }
+      .mini .initials,
+      .mini img {
+        width: var(--avatar-sm);
+        height: var(--avatar-sm);
+        border-radius: 999px;
+        overflow: hidden;
+        border: 4px solid #fff;
+        box-shadow: 0 8px 18px rgba(10, 20, 40, 0.06);
+      }
+      .mini .title {
+        font-weight: 800;
+        font-size: 14px;
+      }
+      .mini .meta {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .pager {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: flex-end;
+        margin-top: 12px;
+      }
+
+      /* bottom nav (mobile) — provided earlier */
+      .bottom-nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 74px;
+        padding: env(safe-area-inset-bottom, 12px) 10px 12px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(180deg, #ffffff, #fbfdff);
+        border-top: 1px solid rgba(230, 240, 255, 0.9);
+        box-shadow: 0 -8px 30px rgba(10, 20, 40, 0.04);
+        z-index: 9999;
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+      }
+      .bottom-nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #7b8792;
+        text-decoration: none;
+        width: 64px;
+        padding: 6px;
+        border-radius: 12px;
+        transition: background 0.18s ease, color 0.18s ease,
+          transform 0.12s ease;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .bottom-nav a i {
+        font-size: 20px;
+        line-height: 1;
+        display: block;
+      }
+      .bottom-nav a.active {
+        color: var(--accent);
+        font-weight: 800;
+        background: linear-gradient(
+          180deg,
+          rgba(69, 125, 255, 0.06),
+          rgba(106, 92, 216, 0.03)
+        );
+        box-shadow: 0 8px 22px rgba(76, 141, 255, 0.08);
+        transform: translateY(-2px);
+      }
+      @media (min-width: 980px) {
+        .bottom-nav {
+          display: none;
+        }
+      }
+      @media (max-width: 980px) {
+        .sidebar {
+          display: none;
+        } /* hide left nav on small screens */
+        .main-wrap {
+          padding: 18px;
+        }
+        .container {
+          padding-bottom: 120px;
+        } /* room for bottom nav */
+      }
+
+      @media (max-width: 900px) {
+        .top-hero {
+          flex-direction: column;
+        }
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar" role="navigation" aria-label="Main sidebar">
+        <div class="logo">OSIAN</div>
+
+        <nav class="side-nav" aria-label="Main nav">
+          <a href="dashboard-user.html" id="nav-dashboard"
+            ><i class="bx bxs-dashboard"></i> Dashboard</a
+          >
+          <a href="quiz-progress.html" id="nav-quizzes"
+            ><i class="bx bx-file-blank"></i> Quizzes</a
+          >
+          <a href="leaderboard.html" id="nav-leaderboard" class="active"
+            ><i class="bx bxs-trophy"></i> Leaderboard</a
+          >
+          <a href="notifications.html" id="nav-notifs"
+            ><i class="bx bx-bell"></i> Notifications</a
+          >
+          <a href="profile.html" id="nav-profile"
+            ><i class="bx bxs-user"></i> Profile</a
+          >
+        </nav>
+
+        <div class="sidebar-footer">
+          <a
+            class="btn-ghost"
+            href="index.html"
+            style="display: block; text-align: center"
+            >Log Out <i class="bx bx-log-out"></i
+          ></a>
         </div>
-      </section>
+      </aside>
 
-      <section class="content-card" id="leaderboard-card" aria-label="Leaderboard">
-        <div id="lb-user-mini" class="lb-user-mini" role="button" tabindex="0" aria-label="Current user card"></div>
-        <div id="lb-hero" class="lb-hero" aria-live="polite"></div>
-        <div id="lb-list" class="lb-list"></div>
-        <div class="lb-pagination">
-          <button id="lb-prev" class="btn-edit" aria-label="Previous">Prev</button>
-          <span id="lb-page-info">Page 1</span>
-          <button id="lb-next" class="btn-edit" aria-label="Next">Next</button>
+      <!-- Main content -->
+      <main class="main-wrap" role="main">
+        <div class="container">
+          <header class="header">
+            <div class="title">
+              <h1>Top Users</h1>
+              <p>
+                Live ranking across Global and Batch scopes — updated
+                automatically.
+              </p>
+            </div>
+            <div><!-- reserved for actions --></div>
+          </header>
+
+          <section class="card">
+            <div class="controls" role="search">
+              <input
+                id="lb-search"
+                type="search"
+                placeholder="Search users by name"
+                aria-label="Search users"
+              />
+              <select id="lb-scope" aria-label="Scope">
+                <option value="global">Global</option>
+                <option value="batch">Batch</option>
+                <option value="quiz">Quiz</option>
+              </select>
+              <select id="lb-period" aria-label="Period">
+                <option value="all">All-time</option>
+                <option value="30d">Last 30 days</option>
+                <option value="7d">Last 7 days</option>
+              </select>
+              <select id="lb-limit" aria-label="Limit">
+                <option value="10">Top 10</option>
+                <option value="25">Top 25</option>
+                <option value="50">Top 50</option>
+              </select>
+
+              <div class="spacer" aria-hidden="true"></div>
+
+              <button id="lb-refresh" class="btn btn-ghost" title="Refresh">
+                <i class="bx bx-refresh"></i> Refresh
+              </button>
+            </div>
+
+            <!-- top-3 hero -->
+            <div id="lb-hero" class="top-hero" aria-live="polite"></div>
+
+            <!-- mini current user -->
+            <div
+              id="lb-user-mini"
+              class="mini"
+              style="display: none"
+              aria-live="polite"
+            ></div>
+
+            <!-- list of others -->
+            <div id="lb-list" class="lb-list" aria-live="polite"></div>
+
+            <div class="pager">
+              <div style="flex: 1"></div>
+              <button id="lb-prev" class="btn btn-ghost">Prev</button>
+              <div
+                id="lb-page"
+                style="
+                  align-self: center;
+                  color: var(--muted);
+                  font-weight: 800;
+                "
+              >
+                Page 1
+              </div>
+              <button id="lb-next" class="btn btn-ghost">Next</button>
+              <button id="lb-export" class="btn btn-primary">
+                <i class="bx bx-download"></i> Export
+              </button>
+            </div>
+          </section>
         </div>
-      </section>
-    </main>
-  </div>
+      </main>
+    </div>
 
-  <div class="bottom-nav">
-    <a href="dashboard-user.html" id="nav-dashboard"><i class='bx bxs-dashboard'></i><span>Home</span></a>
-    <a href="quiz-progress.html" id="nav-quizzes"><i class='bx bx-file-blank'></i><span>Quizzes</span></a>
-    <a href="leaderboard.html" id="nav-leaderboard" class="active"><i class='bx bx-trophy'></i><span>Top</span></a>
-  </div>
+    <!-- bottom nav (mobile) -->
+    <nav class="bottom-nav" role="navigation" aria-label="mobile nav">
+      <a href="dashboard-user.html" id="nav-dashboard-mobile"
+        ><i class="bx bxs-dashboard"></i><span>Home</span></a
+      >
+      <a href="quiz-progress.html" id="nav-quizzes-mobile"
+        ><i class="bx bx-file-blank"></i><span>Quizzes</span></a
+      >
+      <a href="leaderboard.html" id="nav-leaderboard-mobile" class="active"
+        ><i class="bx bxs-trophy"></i><span>Top</span></a
+      >
+      <a href="notifications.html" id="nav-notifs-mobile"
+        ><i class="bx bx-bell"></i><span>Alerts</span></a
+      >
+      <a href="profile.html" id="nav-profile-mobile"
+        ><i class="bx bxs-user"></i><span>Profile</span></a
+      >
+    </nav>
 
-  <script src="script-toast-helper.js?v=20251207"></script>
-  <script src="script-leaderboard.js?v=20251207"></script>
-  <script>
-  (function(){
-    const toggle = document.getElementById('sidebar-toggle');
-    const sidebar = document.querySelector('.sidebar');
-    if (toggle && sidebar) toggle.addEventListener('click', function(){ sidebar.classList.toggle('open'); });
-  })();
-  </script>
-</body>
+    <!-- leaderboard JS (your provided script, wired to controls) -->
+    <script>
+      const backendUrl = location.hostname.endsWith("vercel.app")
+        ? "https://osiancommunity-backend.vercel.app/api"
+        : location.hostname === "localhost" || location.hostname === "127.0.0.1"
+        ? "http://localhost:5000/api"
+        : "https://osiancommunity-backend.vercel.app/api";
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const token = localStorage.getItem("token");
+        const scopeEl = document.getElementById("lb-scope");
+        const periodEl = document.getElementById("lb-period");
+        const searchEl = document.getElementById("lb-search");
+        const hero = document.getElementById("lb-hero");
+        const listEl = document.getElementById("lb-list");
+        const mini = document.getElementById("lb-user-mini");
+        const limitEl = document.getElementById("lb-limit");
+        const refreshBtn = document.getElementById("lb-refresh");
+
+        // pagination state
+        let page = 1;
+        const perPage = 6;
+
+        async function fetchLeaderboard(scope, period, limit) {
+          try {
+            const query = new URLSearchParams({
+              scope,
+              period,
+              limit,
+            }).toString();
+            const res = await fetch(`${backendUrl}/leaderboard?${query}`, {
+              headers: {
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+            });
+            if (!res.ok) {
+              console.warn("Leaderboard fetch failed", res.status);
+              return render([]);
+            }
+            const data = await res.json();
+            const list = data.leaderboard || [];
+            window._lbAll = list;
+            page = 1;
+            render(list);
+          } catch (err) {
+            console.error("Leaderboard fetch error", err);
+            render([]);
+          }
+        }
+
+        function render(list) {
+          if (!hero || !listEl) return;
+          const top3 = list.slice(0, 3);
+          const rest = list.slice(3);
+
+          // render hero
+          hero.innerHTML = top3
+            .map((x, i) => {
+              const cls =
+                i === 0
+                  ? "lb-hero-card gold"
+                  : i === 1
+                  ? "lb-hero-card silver"
+                  : "lb-hero-card bronze";
+              const name =
+                x.display_name || x.user?.name || x.user?.username || "User";
+              const initials = name
+                .split(" ")
+                .map((w) => w[0])
+                .slice(0, 2)
+                .join("")
+                .toUpperCase();
+              const avatarEl =
+                x.avatar_url || x.user?.avatar
+                  ? `<img src="${
+                      x.avatar_url || x.user?.avatar
+                    }" loading="lazy" alt="${name}" class="avatar">`
+                  : `<div class="initials">${initials}</div>`;
+              const score = Math.round(
+                x.composite_score ||
+                  x.compositeScore ||
+                  x.avg_score ||
+                  x.avgScore ||
+                  0
+              );
+              const rank = x.rank ?? x.position ?? "";
+              const college = x.college || x.user?.college || "";
+              return `<div class="${cls}" role="button" tabindex="0"><div class="medal">${
+                rank || i + 1
+              }</div>${avatarEl}<div class="name">${name}</div><div class="meta">${college}</div><div class="score">${score}</div></div>`;
+            })
+            .join("");
+          if (top3.length < 3) {
+            for (let k = top3.length; k < 3; k++) {
+              const cls =
+                k === 0
+                  ? "lb-hero-card gold"
+                  : k === 1
+                  ? "lb-hero-card silver"
+                  : "lb-hero-card bronze";
+              hero.innerHTML += `<div class="${cls}"><div class="medal">${
+                k + 1
+              }</div><div class="initials" style="opacity:.35">—</div><div class="name">Unknown</div><div class="meta">—</div><div class="score">0</div></div>`;
+            }
+          }
+
+          // render list with pagination
+          const start = (page - 1) * perPage;
+          const pageItems = rest.slice(start, start + perPage);
+          listEl.innerHTML = pageItems
+            .map((x, idx) => {
+              const name =
+                x.display_name || x.user?.name || x.user?.username || "User";
+              const initials = name
+                .split(" ")
+                .map((w) => w[0])
+                .slice(0, 2)
+                .join("")
+                .toUpperCase();
+              const avatarUrl = x.avatar_url || x.user?.avatar || "";
+              const avatarEl = avatarUrl
+                ? `<img src="${avatarUrl}" loading="lazy" alt="${name}">`
+                : `<div class="initials">${initials}</div>`;
+              const spark = (x.sparkline || []).slice(0, 20);
+              let path = "";
+              if (spark.length > 0) {
+                path = spark
+                  .map(
+                    (v, idx) =>
+                      `${idx === 0 ? "M" : "L"} ${
+                        idx * (120 / Math.max(1, spark.length - 1))
+                      } ${
+                        24 -
+                        Math.min(
+                          24,
+                          Math.max(
+                            0,
+                            Math.round((v / Math.max(...(spark || [1]))) * 20)
+                          )
+                        )
+                      }`
+                  )
+                  .join(" ");
+              }
+              const score = Math.round(
+                x.avg_score ||
+                  x.avgScore ||
+                  x.composite_score ||
+                  x.compositeScore ||
+                  0
+              );
+              const attempts = x.attempts || 0;
+              const rank = x.rank ?? x.position ?? start + idx + 4;
+              const badges = (x.badges || [])
+                .map(
+                  (b) =>
+                    `<div class="badge" title="${b.name}"><span class="badge-icon">🏅</span><span>${b.name}</span></div>`
+                )
+                .join("");
+              return `<div class="lb-row card-row"><div class="rank">${rank}</div>${avatarEl}<div class="content"><div class="title">${name}</div><div class="meta">Avg ${score} • Attempts ${attempts}</div>${
+                path
+                  ? `<svg class="spark" viewBox="0 0 120 24" preserveAspectRatio="none"><path d="${path}" stroke="${
+                      x.rank === 1 || x.position === 1 ? "#ffbd2e" : "#4C8DFF"
+                    }" fill="none" stroke-width="2"/></svg>`
+                  : ""
+              }<div class="badges" style="margin-top:8px">${badges}</div></div></div>`;
+            })
+            .join("");
+
+          // current user mini card
+          const userObj =
+            JSON.parse(localStorage.getItem("user") || "{}") || {};
+          const me = list.find(
+            (x) =>
+              String(x.user_id || x.user?.id || x.user?._id) ===
+              String(userObj._id || userObj.id)
+          );
+          if (me && (me.rank ?? 0) > 3) {
+            mini.style.display = "flex";
+            const score = Math.round(
+              me.composite_score || me.compositeScore || me.avg_score || 0
+            );
+            const name = me.display_name || me.user?.name || "You";
+            const initials = name
+              .split(" ")
+              .map((w) => w[0])
+              .slice(0, 2)
+              .join("")
+              .toUpperCase();
+            const avatarEl =
+              me.avatar_url || me.user?.avatar
+                ? `<img src="${
+                    me.avatar_url || me.user?.avatar
+                  }" loading="lazy" alt="${name}" style="width:var(--avatar-sm);height:var(--avatar-sm);border-radius:999px">`
+                : `<div class="initials" style="width:var(--avatar-sm);height:var(--avatar-sm)">${initials}</div>`;
+            mini.innerHTML = `${avatarEl}<div class="content"><div class="title">You • Rank ${
+              me.rank || me.position
+            }</div><div class="meta">${score} pts</div></div><a class="btn btn-ghost" href="profile.html" style="margin-left:auto;align-self:center">View profile</a>`;
+          } else {
+            mini.style.display = "none";
+            mini.innerHTML = "";
+          }
+
+          // update page text
+          document.getElementById("lb-page").textContent = `Page ${page}`;
+        }
+
+        // controls wiring
+        const apply = () => {
+          fetchLeaderboard(scopeEl.value, periodEl.value, limitEl.value);
+        };
+        scopeEl.onchange = apply;
+        periodEl.onchange = apply;
+        limitEl.onchange = apply;
+        document.getElementById("lb-prev").addEventListener("click", () => {
+          if (page > 1) {
+            page--;
+            render(window._lbAll || []);
+          }
+        });
+        document.getElementById("lb-next").addEventListener("click", () => {
+          const restCount = (window._lbAll || []).slice(3).length;
+          const maxPage = Math.max(1, Math.ceil(restCount / perPage));
+          if (page < maxPage) {
+            page++;
+            render(window._lbAll || []);
+          }
+        });
+
+        document.getElementById("lb-export").addEventListener("click", () => {
+          const rows = [["Rank", "Name", "Score", "Attempts", "Accuracy"]];
+          (window._lbAll || []).forEach((r) => {
+            const rank = r.rank || r.position || "";
+            const name =
+              r.display_name || r.user?.name || r.user?.username || "";
+            const score = Math.round(
+              r.composite_score || r.compositeScore || r.avg_score || 0
+            );
+            const attempts = r.attempts || 0;
+            const acc =
+              typeof r.accuracy === "number"
+                ? Math.round(r.accuracy * 100) + "%"
+                : r.accuracy || "";
+            rows.push([rank, name, score, attempts, acc]);
+          });
+          const csv = rows
+            .map((r) =>
+              r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")
+            )
+            .join("\n");
+          const blob = new Blob([csv], { type: "text/csv" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "leaderboard.csv";
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+
+        searchEl.oninput = () => {
+          const q = searchEl.value.toLowerCase();
+          const all = window._lbAll || [];
+          const filtered = all.filter((x) =>
+            (x.display_name || x.user?.name || "").toLowerCase().includes(q)
+          );
+          render(filtered);
+        };
+
+        refreshBtn.addEventListener("click", () => {
+          refreshBtn.textContent = "Refreshing...";
+          apply();
+          setTimeout(() => (refreshBtn.textContent = "Refresh"), 800);
+        });
+
+        // initial fetch
+        apply();
+      });
+    </script>
+  </body>
 </html>
