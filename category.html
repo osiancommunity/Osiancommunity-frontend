@@ -1,68 +1,674 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OSIAN - Category</title>
-  <link rel="stylesheet" href="style-dashboard.css">
-  <link rel="stylesheet" href="assets/boxicons-local.css">
-</head>
-<body>
-  <div class="dashboard-container">
-    <aside class="sidebar">
-      <div class="sidebar-header"><a href="dashboard-user.html" class="logo">OSIAN</a></div>
-      <ul class="sidebar-menu">
-        <li><a href="dashboard-user.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
-        <li><a href="quiz-progress.html"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
-        <li><a href="mentorship-user.html"><i class='bx bx-video'></i><span>Mentorship</span></a></li>
-        <li><a href="notifications.html"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
-        <li><a href="profile.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
-      </ul>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>OSIAN — Technical (Category)</title>
+
+    <!-- Boxicons for icons (CDN) -->
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Self-contained styles so this is a single file -->
+    <style>
+      :root {
+        --bg: #f4faff;
+        --card: #fff;
+        --accent: #4c8dff;
+        --muted: #6b7380;
+        --shadow: 0 12px 32px rgba(20, 60, 120, 0.06);
+        --radius: 14px;
+        font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial;
+        color: #111;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: radial-gradient(
+          900px 400px at 0% 0%,
+          #f7fbff 0%,
+          #eaf4ff 100%
+        );
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .header h1 {
+        font-size: 34px;
+        margin: 0;
+      }
+      .header p {
+        margin: 4px 0 0;
+        color: var(--muted);
+      }
+      .hero {
+        background: linear-gradient(180deg, #fff, #f7faff);
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 22px;
+      }
+      /* Topics area */
+      .card {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: var(--shadow);
+      }
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 20px;
+        margin: 0 0 12px;
+      }
+      .topics-grid {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 16px;
+      }
+      .topic-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        border-radius: 12px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.18s ease, box-shadow 0.18s ease,
+          border-color 0.12s ease;
+      }
+      .topic-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+      }
+      .topic-card.selected {
+        border-color: rgba(76, 141, 255, 0.18);
+        box-shadow: 0 22px 44px rgba(76, 141, 255, 0.06);
+        transform: translateY(-8px);
+      }
+      .topic-media {
+        width: 100%;
+        height: 220px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #f6f9ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .topic-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .topic-title {
+        font-weight: 700;
+        font-size: 18px;
+        margin-top: 6px;
+        text-align: center;
+      }
+      .topic-desc {
+        color: var(--muted);
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 6px;
+      }
+      /* Responsive columns for topics */
+      @media (min-width: 700px) {
+        .topics-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (min-width: 1000px) {
+        .topics-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      /* Side column: Levels */
+      .side-col {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .levels-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .level-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        border-radius: 10px;
+        background: var(--card);
+        cursor: pointer;
+        border: 1px solid #eef4ff;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
+      }
+      .level-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.06);
+      }
+      .level-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: #f7faff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        font-size: 18px;
+      }
+
+      /* Recommended grid */
+      .recommended-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 8px;
+      }
+      .rec-card {
+        display: flex;
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+      .rec-hero {
+        width: 46%;
+        min-height: 120px;
+        overflow: hidden;
+      }
+      .rec-hero img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .rec-body {
+        padding: 12px;
+        flex: 1;
+      }
+      .rec-title {
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .rec-desc {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      /* Mobile adjustments */
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .side-col {
+          order: 2;
+        }
+        .bottom-nav {
+          display: none;
+        }
+        .topics-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 520px) {
+        .topics-grid {
+          grid-template-columns: 1fr;
+        }
+        .topic-media {
+          height: 160px;
+        }
+      }
+
+      /* Placeholder for failing images */
+      .img-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f2f7ff;
+        color: var(--accent);
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      /* small UI helpers */
+      .btn {
+        background: var(--card);
+        border: 1px solid #eef4ff;
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .selected-badge {
+        display: inline-block;
+        background: rgba(76, 141, 255, 0.08);
+        color: var(--accent);
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        margin-left: 8px;
+      }
+      .muted {
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="page">
+      <div class="header">
+        <div>
+          <h1>Technical</h1>
+          <p class="muted">Explore topics and levels for this category</p>
+        </div>
+        <div>
+          <button class="btn" onclick="location.href='dashboard-user.html'">
+            <i class="bx bx-left-arrow-alt"></i> Back
+          </button>
+        </div>
+      </div>
+
+      <div class="hero">
+        <div>
+          <h2 style="margin: 0 0 6px">Explore Technical quizzes</h2>
+          <div class="muted">
+            Select a topic and then choose a level to find quizzes
+          </div>
+        </div>
+        <div
+          style="
+            width: 72px;
+            height: 72px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #eaf4ff, #fff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.04);
+          "
+        >
+          <i
+            class="bx bx-chip"
+            style="color: var(--accent); font-size: 28px"
+          ></i>
+        </div>
+      </div>
+
+      <div class="layout">
+        <!-- LEFT: Topics + Recommended -->
+        <div>
+          <div class="card">
+            <h3 class="section-title"><span>Topics</span></h3>
+
+            <!-- Topics grid -->
+            <div class="topics-grid" id="topicsGrid">
+              <!-- Python -->
+              <div
+                class="topic-card"
+                data-field="Python"
+                tabindex="0"
+                aria-label="Python topic"
+              >
+                <div class="topic-media">
+                  <img
+                    src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1200&q=80"
+                    alt="Python"
+                    onerror="imgFallback(this)"
+                  />
+                </div>
+                <div class="topic-title">Python</div>
+                <div class="topic-desc">Interpreted, versatile language</div>
+              </div>
+
+              <!-- Java -->
+              <div
+                class="topic-card"
+                data-field="Java"
+                tabindex="0"
+                aria-label="Java topic"
+              >
+                <div class="topic-media">
+                  <img
+                    src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"
+                    alt="Java"
+                    onerror="imgFallback(this)"
+                  />
+                </div>
+                <div class="topic-title">Java</div>
+                <div class="topic-desc">Object-oriented, JVM ecosystem</div>
+              </div>
+
+              <!-- C++ -->
+              <div
+                class="topic-card"
+                data-field="C++"
+                tabindex="0"
+                aria-label="C++ topic"
+              >
+                <div class="topic-media">
+                  <img
+                    src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80"
+                    alt="C++"
+                    onerror="imgFallback(this)"
+                  />
+                </div>
+                <div class="topic-title">C++</div>
+                <div class="topic-desc">Systems & performance</div>
+              </div>
+
+              <!-- Computer Networks -->
+              <div
+                class="topic-card"
+                data-field="Computer Networks"
+                tabindex="0"
+                aria-label="Computer Networks topic"
+              >
+                <div class="topic-media">
+                  <img
+                    src="https://images.unsplash.com/photo-1559757175-5703870d8ff2?auto=format&fit=crop&w=1200&q=80"
+                    alt="Computer Networks"
+                    onerror="imgFallback(this)"
+                  />
+                </div>
+                <div class="topic-title">Computer Networks</div>
+                <div class="topic-desc">Routing, switching, protocols</div>
+              </div>
+
+              <!-- (Optional placeholder to keep grid neat) -->
+              <div style="visibility: hidden"></div>
+              <div style="visibility: hidden"></div>
+            </div>
+          </div>
+
       
-    </aside>
+        <!-- RIGHT: Levels -->
+        <aside class="side-col" id="levelsColumn" aria-label="Levels column">
+          <div class="card">
+            <h3 class="section-title">
+              <span>Levels</span>
+              <span
+                id="chosenBadge"
+                style="display: none"
+                class="selected-badge"
+                aria-live="polite"
+              ></span>
+            </h3>
 
-    <main class="main-content">
-      <header class="main-header premium-header">
-        <div class="header-title">
-          <h1 id="category-title">Category</h1>
-          <p id="category-sub">Explore topics and levels for this category</p>
-        </div>
-        <div class="header-profile"><button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button></div>
-      </header>
+            <div class="levels-list" id="levelsList">
+              <div
+                class="level-card"
+                data-level="Basic"
+                tabindex="0"
+                role="button"
+                aria-pressed="false"
+              >
+                <div class="level-icon">
+                  <i class="bx bx-bar-chart-alt-2"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 700">Basic</div>
+                  <div class="muted">Quick warm-up</div>
+                </div>
+              </div>
 
-      <section class="header-hero premium-hero">
-        <div class="hero-content-left">
-          <h2 id="hero-heading">Start learning in this category</h2>
-          <p>Select a topic and level to find matching quizzes</p>
-        </div>
-        <div class="hero-illustration"><div class="hero-wave"></div><i id="category-icon" class='bx bx-category'></i></div>
-      </section>
+              <div
+                class="level-card"
+                data-level="Medium"
+                tabindex="0"
+                role="button"
+                aria-pressed="false"
+              >
+                <div class="level-icon">
+                  <i class="bx bx-bar-chart-alt-2"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 700">Medium</div>
+                  <div class="muted">Moderate difficulty</div>
+                </div>
+              </div>
 
-      <section class="content-card minimal">
-        <h2><i class='bx bx-grid'></i> Topics</h2>
-        <div class="category-grid" id="topic-grid"></div>
-      </section>
+              <div
+                class="level-card"
+                data-level="Hard"
+                tabindex="0"
+                role="button"
+                aria-pressed="false"
+              >
+                <div class="level-icon">
+                  <i class="bx bx-bar-chart-alt-2"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 700">Hard</div>
+                  <div class="muted">Challenge yourself</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <section class="content-card minimal">
-        <h2><i class='bx bx-signal-4'></i> Levels</h2>
-        <div class="category-grid" id="level-grid"></div>
-      </section>
+              <!-- Recommended area (backend can replace the cards) -->
+              <div class="card" style="margin-top: 18px">
+                <h3 class="section-title"><span>Recommended</span></h3>
+                <div class="recommended-grid">
+                  <div class="rec-card">
+                    <div class="rec-hero">
+                      <img
+                        src="https://images.unsplash.com/photo-1526378721006-1b3b0d0c2b56?auto=format&fit=crop&w=1200&q=70"
+                        alt="Recommended 1"
+                        onerror="imgFallback(this)"
+                      />
+                    </div>
+                    <div class="rec-body">
+                      <div class="rec-title">Technical Demo #1</div>
+                      <div class="rec-desc">
+                        Scanned notes & sample problems — great for practice.
+                      </div>
+                    </div>
+                  </div>
+    
+                  <div class="rec-card">
+                    <div class="rec-hero">
+                      <img
+                        src="https://images.unsplash.com/photo-1526378721006-1b3b0d0c2b56?auto=format&fit=crop&w=1200&q=70"
+                        alt="Recommended 2"
+                        onerror="imgFallback(this)"
+                      />
+                    </div>
+                    <div class="rec-body">
+                      <div class="rec-title">Software Dev Basics</div>
+                      <div class="rec-desc">
+                        Introductory quizzes for fundamentals.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+    
+          <div class="card">
+            <strong>Tip</strong>
+            <div style="color: var(--muted); margin-top: 6px">
+              Click a topic — the page will scroll to Levels. Then choose a
+              level to open quizzes.
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
 
-      <section class="quiz-list-section">
-        <h2><i class='bx bx-star'></i> Recommended</h2>
-        <div class="quiz-list-grid" id="category-recommended"></div>
-      </section>
-    </main>
-  </div>
+    <!-- bottom nav (kept but hidden on small screens via media queries) -->
+    <nav
+      class="bottom-nav"
+      style="
+        position: fixed;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999;
+        background: #fff;
+        padding: 8px 12px;
+        border-radius: 999px;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+        display: flex;
+        gap: 12px;
+      "
+    >
+      <a
+        href="dashboard-user.html"
+        style="text-decoration: none; color: var(--muted); font-size: 14px"
+        ><i class="bx bxs-dashboard"></i> Home</a
+      >
+      <a
+        href="quiz-progress.html"
+        style="text-decoration: none; color: var(--muted); font-size: 14px"
+        ><i class="bx bx-file-blank"></i> Quizzes</a
+      >
+      <a
+        href="leaderboard.html"
+        style="text-decoration: none; color: var(--muted); font-size: 14px"
+        ><i class="bx bxs-trophy"></i> Leaderboard</a
+      >
+      <a
+        href="notifications.html"
+        style="text-decoration: none; color: var(--muted); font-size: 14px"
+        ><i class="bx bx-bell"></i> Alerts</a
+      >
+      <a
+        href="profile.html"
+        style="text-decoration: none; color: var(--muted); font-size: 14px"
+        ><i class="bx bxs-user"></i> Profile</a
+      >
+    </nav>
 
-  <script src="script-toast-helper.js"></script>
-  <script src="script-category.js"></script>
-  <script>
-    (function(){
-      const toggle = document.getElementById('sidebar-toggle');
-      const sidebar = document.querySelector('.sidebar');
-      if (toggle && sidebar) toggle.addEventListener('click', function(){ sidebar.classList.toggle('open'); });
-    })();
-  </script>
-</body>
+    <!-- Behavior scripts -->
+    <script>
+      /*
+      Behavior:
+      - Clicking a topic selects/highlights it, stores selectedField
+      - Smooth-scrolls down to the Levels section and shows chosen field badge
+      - Clicking a level navigates to quiz-list.html?category=Technical&field=...&level=...
+      - Image fallback replaces broken <img> with placeholder block
+    */
+
+      // fallback helper for images
+      function imgFallback(img) {
+        try {
+          const parent = img.parentNode;
+          // if already replaced, skip
+          if (!parent) return;
+          img.remove();
+          const ph = document.createElement("div");
+          ph.className = "img-placeholder";
+          ph.textContent = "Image";
+          parent.appendChild(ph);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+
+      // topic selection behavior
+      let selectedField = null;
+      const topicCards = document.querySelectorAll(".topic-card");
+      const levelsList = document.getElementById("levelsList");
+      const chosenBadge = document.getElementById("chosenBadge");
+
+      topicCards.forEach((card) => {
+        const activate = () => {
+          // clear previous
+          topicCards.forEach((c) => c.classList.remove("selected"));
+          card.classList.add("selected");
+          selectedField = card.getAttribute("data-field") || "";
+          // show chosen badge near Levels header
+          chosenBadge.style.display = "inline-block";
+          chosenBadge.textContent = selectedField;
+          // smooth scroll to levels area
+          document
+            .getElementById("levelsList")
+            .scrollIntoView({ behavior: "smooth", block: "center" });
+          // focus first level for keyboard users
+          const firstLevel = document.querySelector(".level-card");
+          if (firstLevel) firstLevel.focus();
+        };
+
+        card.addEventListener("click", activate);
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            activate();
+          }
+        });
+      });
+
+      // level click behavior
+      document.querySelectorAll(".level-card").forEach((lc) => {
+        lc.addEventListener("click", () => {
+          if (!selectedField) {
+            // if no topic selected, scroll up to topics
+            document
+              .getElementById("topicsGrid")
+              .scrollIntoView({ behavior: "smooth", block: "center" });
+            return;
+          }
+          const level = lc.getAttribute("data-level") || "";
+          const url =
+            "quiz-list.html?category=" +
+            encodeURIComponent("Technical") +
+            "&field=" +
+            encodeURIComponent(selectedField) +
+            "&level=" +
+            encodeURIComponent(level);
+          // navigate to quiz list (backend reads query params)
+          window.location.href = url;
+        });
+
+        lc.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            lc.click();
+          }
+        });
+      });
+
+      // handle broken images on load
+      window.addEventListener("load", () => {
+        document.querySelectorAll("img").forEach((img) => {
+          if (!img.complete || img.naturalWidth === 0) {
+            imgFallback(img);
+          }
+          img.addEventListener("error", function () {
+            imgFallback(this);
+          });
+        });
+      });
+    </script>
+  </body>
 </html>
