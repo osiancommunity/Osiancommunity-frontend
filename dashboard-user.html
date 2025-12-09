@@ -1,111 +1,546 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OSIAN - User Dashboard</title>
-    <link rel="stylesheet" href="style-dashboard.css">
-    <link rel="stylesheet" href="assets/boxicons-local.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-</head>
-<body>
 
+    <!-- Keep your existing stylesheet(s) -->
+    <link rel="stylesheet" href="style-dashboard.css" />
+    <link rel="stylesheet" href="assets/boxicons-local.css" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <div class="dashboard-container">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <a href="dashboard-user.html" class="logo">OSIAN</a>
+        </div>
 
-        <aside class="sidebar">
-                 <div class="sidebar-header">
-                <a href="dashboard-user.html" class="logo">OSIAN</a>
+        <ul class="sidebar-menu">
+          <!-- Reduced to five key links -->
+          <li class="active">
+            <a href="dashboard-user.html" class="active"
+              ><i class="bx bxs-dashboard"></i><span>Dashboard</span></a
+            >
+          </li>
+          <li>
+            <a href="quiz-progress.html"
+              ><i class="bx bx-file-blank"></i><span>My Quizzes</span></a
+            >
+          </li>
+          <li>
+            <a href="leaderboard.html"
+              ><i class="bx bxs-trophy"></i><span>Leaderboard</span></a
+            >
+          </li>
+          <li>
+            <a href="notifications.html"
+              ><i class="bx bx-bell"></i><span>Notifications</span></a
+            >
+          </li>
+          <li>
+            <a href="profile.html"
+              ><i class="bx bxs-user"></i><span>My Profile</span></a
+            >
+          </li>
+        </ul>
+      </aside>
+
+      <main class="main-content">
+        <header class="main-header premium-header">
+          <div class="header-title">
+            <h1>Welcome Back, Kudoz Kundan!</h1>
+            <p>Let's find a quiz for you.</p>
+          </div>
+          <div class="header-profile">
+            <button class="sidebar-toggle" id="sidebar-toggle">
+              <i class="bx bx-menu"></i>
+            </button>
+            <div class="header-actions">
+              <a href="profile.html"
+                ><img
+                  src="https://i.ibb.co/jP9JWBBy/diljj.png"
+                  alt="Profile Picture"
+                  id="header-avatar"
+              /></a>
+              <a href="index.html" class="header-link logout-direct"
+                ><i class="bx bx-log-out"></i> Log Out</a
+              >
             </div>
-            <ul class="sidebar-menu">
-                <li class="active"><a href="dashboard-user.html" class="active"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
-                <li><a href="quiz-progress.html"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
-               <li><a href="mentorship-user.html"><i class='bx bx-video'></i><span>Mentorship</span></a></li>
-                <li><a href="notifications.html"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
-             <li><a href="profile.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+          </div>
+        </header>
 
-            </ul>
-            
-        </aside>
+        <section class="header-hero premium-hero">
+          <div class="hero-content-left">
+            <h2>Keep learning, keep growing</h2>
+            <p>Pick a category to jump right in or continue your progress</p>
+          </div>
+          <div class="hero-illustration">
+            <div class="hero-wave"></div>
+            <i class="bx bxs-graduation"></i>
+          </div>
+        </section>
 
-        <main class="main-content">
-            <header class="main-header premium-header">
-                <div class="header-title">
-                    <h1>Welcome Back, Kudoz Kundan!</h1>
-                    <p>Let's find a quiz for you.</p>
-                </div>
-                <div class="header-profile">
-                    <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
-                    <div class="header-actions">
-                        <a href="profile.html"><img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar"></a>
-                        <a href="index.html" class="header-link logout-direct"><i class='bx bx-log-out'></i> Log Out</a>
-                    </div>
-                </div>
-            </header>
+        <!-- Categories with photographic thumbnails (larger) -->
+        <section class="content-card minimal" id="category-select-panel">
+          <h2><i class="bx bx-category"></i> Categories</h2>
 
-            <section class="header-hero premium-hero">
-                <div class="hero-content-left">
-                    <h2>Keep learning, keep growing</h2>
-                    <p>Pick a category to jump right in or continue your progress</p>
-                </div>
-                <div class="hero-illustration">
-                    <div class="hero-wave"></div>
-                    <i class='bx bxs-graduation'></i>
-                </div>
-            </section>
+          <div class="category-grid premium-categories" id="category-pills">
+            <div
+              class="category-card"
+              data-category="Technical"
+              tabindex="0"
+              role="button"
+              aria-pressed="false"
+            >
+              <div
+                class="cat-media"
+                style="
+                  width: 180px;
+                  height: 180px;
+                  border-radius: 16px;
+                  overflow: hidden;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: #f7fbff;
+                  box-shadow: 0 10px 26px rgba(76, 141, 255, 0.07);
+                "
+              >
+                <img
+                  class="cat-img"
+                  src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80"
+                  alt="Technical"
+                  style="
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                  "
+                />
+              </div>
+              <span style="margin-top: 12px; display: block; font-weight: 600"
+                >Technical</span
+              >
+            </div>
 
+            <div
+              class="category-card"
+              data-category="Law"
+              tabindex="0"
+              role="button"
+              aria-pressed="false"
+            >
+              <div
+                class="cat-media"
+                style="
+                  width: 180px;
+                  height: 180px;
+                  border-radius: 16px;
+                  overflow: hidden;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: #f7fbff;
+                  box-shadow: 0 10px 26px rgba(76, 141, 255, 0.07);
+                "
+              >
+                <img
+                  class="cat-img"
+                  src="https://images.unsplash.com/photo-1535914254981-b5012eebbd15?auto=format&fit=crop&w=800&q=80"
+                  alt="Law"
+                  style="
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                  "
+                />
+              </div>
+              <span style="margin-top: 12px; display: block; font-weight: 600"
+                >Law</span
+              >
+            </div>
 
-            <section class="content-card minimal" id="category-select-panel">
-                <h2><i class='bx bx-category'></i> Categories</h2>
-                <div class="category-grid premium-categories" id="category-pills">
-                    <div class="category-card" data-category="Technical"><i class='bx bx-chip'></i><span>Technical</span></div>
-                    <div class="category-card" data-category="Law"><i class='bx bx-gavel'></i><span>Law</span></div>
-                    <div class="category-card" data-category="Engineering"><i class='bx bx-cog'></i><span>Engineering</span></div>
-                    <div class="category-card" data-category="General Knowledge"><i class='bx bx-brain'></i><span>General Knowledge</span></div>
-                    <div class="category-card" data-category="Sports"><i class='bx bx-football'></i><span>Sports</span></div>
-                </div>
-            </section>
-            <section class="content-card minimal" id="field-select-panel" style="display:none"></section>
-            <section class="content-card minimal" id="level-select-panel" style="display:none"></section>
-            <section class="quiz-list-section fullscreen" id="recommended-section">
-                <h2><i class='bx bx-star'></i> Recommended For You</h2>
-                <div class="quiz-list-grid" id="recommended-quizzes-container"></div>
-            </section>
+            <div
+              class="category-card"
+              data-category="Engineering"
+              tabindex="0"
+              role="button"
+              aria-pressed="false"
+            >
+              <div
+                class="cat-media"
+                style="
+                  width: 180px;
+                  height: 180px;
+                  border-radius: 16px;
+                  overflow: hidden;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: #f7fbff;
+                  box-shadow: 0 10px 26px rgba(76, 141, 255, 0.07);
+                "
+              >
+                <img
+                  class="cat-img"
+                  src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80"
+                  alt="Engineering"
+                  style="
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                  "
+                />
+              </div>
+              <span style="margin-top: 12px; display: block; font-weight: 600"
+                >Engineering</span
+              >
+            </div>
 
-            <!-- Removed KPIs, Registered, History, Leaderboard, Badges from Dashboard -->
-            
-            
+            <div
+              class="category-card"
+              data-category="General Knowledge"
+              tabindex="0"
+              role="button"
+              aria-pressed="false"
+            >
+              <div
+                class="cat-media"
+                style="
+                  width: 180px;
+                  height: 180px;
+                  border-radius: 16px;
+                  overflow: hidden;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: #f7fbff;
+                  box-shadow: 0 10px 26px rgba(76, 141, 255, 0.07);
+                "
+              >
+                <img
+                  class="cat-img"
+                  src="https://images.unsplash.com/photo-1504198453319-5ce911bafcde?auto=format&fit=crop&w=800&q=80"
+                  alt="General Knowledge"
+                  style="
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                  "
+                />
+              </div>
+              <span style="margin-top: 12px; display: block; font-weight: 600"
+                >General Knowledge</span
+              >
+            </div>
 
-            
+            <div
+              class="category-card"
+              data-category="Sports"
+              tabindex="0"
+              role="button"
+              aria-pressed="false"
+            >
+              <div
+                class="cat-media"
+                style="
+                  width: 180px;
+                  height: 180px;
+                  border-radius: 16px;
+                  overflow: hidden;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: #f7fbff;
+                  box-shadow: 0 10px 26px rgba(76, 141, 255, 0.07);
+                "
+              >
+                <img
+                  class="cat-img"
+                  src="https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=80"
 
-        </main>
+                  alt="Sports"
+                  style="
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                  "
+                />
+              </div>
+              <span style="margin-top: 12px; display: block; font-weight: 600"
+                >Sports</span
+              >
+            </div>
+          </div>
+        </section>
+
+        <!-- Field & Level panels -->
+        <section
+          class="content-card minimal"
+          id="field-select-panel"
+          style="display: none"
+          aria-hidden="true"
+        >
+          <h2><i class="bx bx-list-ul"></i> Fields</h2>
+          <div
+            id="fields-container"
+            style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px"
+          ></div>
+
+          <div style="margin-top: 14px">
+            <button
+              id="show-levels-btn"
+              class="btn-secondary"
+              type="button"
+              style="
+                display: none;
+                padding: 8px 14px;
+                border-radius: 10px;
+                border: 1px solid #e9eef2;
+                background: #fff;
+                cursor: pointer;
+              "
+            >
+              Show levels
+            </button>
+          </div>
+        </section>
+
+        <section
+          class="content-card minimal"
+          id="level-select-panel"
+          style="display: none"
+          aria-hidden="true"
+        >
+          <h2><i class="bx bx-layer"></i> Levels</h2>
+          <div
+            id="levels-container"
+            style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px"
+          ></div>
+        </section>
+
+        <section class="quiz-list-section fullscreen" id="recommended-section">
+          <h2><i class="bx bx-star"></i> Recommended For You</h2>
+          <div class="quiz-list-grid" id="recommended-quizzes-container">
+            <!-- Leave empty for backend -->
+          </div>
+        </section>
+      </main>
     </div>
 
     <div class="bottom-nav">
-        <a href="dashboard-user.html" id="nav-dashboard"><i class='bx bxs-dashboard'></i><span>Home</span></a>
-        <a href="quiz-progress.html" id="nav-quizzes"><i class='bx bx-file-blank'></i><span>Quizzes</span></a>
-        <a href="mentorship-user.html" id="nav-mentorship"><i class='bx bx-video'></i><span>Mentor</span></a>
-        <a href="notifications.html" id="nav-notifs"><i class='bx bx-bell'></i><span>Alerts</span></a>
-        <a href="profile.html" id="nav-profile"><i class='bx bxs-user'></i><span>Profile</span></a>
+      <a href="dashboard-user.html" id="nav-dashboard"
+        ><i class="bx bxs-dashboard"></i><span>Home</span></a
+      >
+      <a href="quiz-progress.html" id="nav-quizzes"
+        ><i class="bx bx-file-blank"></i><span>Quizzes</span></a
+      >
+      <a href="leaderboard.html" id="nav-leaderboard"
+        ><i class="bx bxs-trophy"></i><span>Leaderboard</span></a
+      >
+      <a href="notifications.html" id="nav-notifs"
+        ><i class="bx bx-bell"></i><span>Alerts</span></a
+      >
+      <a href="profile.html" id="nav-profile"
+        ><i class="bx bxs-user"></i><span>Profile</span></a
+      >
     </div>
 
+    <!-- Keep your helper scripts if you use them -->
     <script src="script-toast-helper.js?v=20251206"></script>
     <script src="script-dashboard.js?v=20251207"></script>
+
     <script>
-    (function(){
-        var el = document.getElementById('nav-dashboard');
-        if (el) el.classList.add('active');
-    })();
+      // bottom nav active
+      (function () {
+        var el = document.getElementById("nav-dashboard");
+        if (el) el.classList.add("active");
+      })();
     </script>
+
     <script>
-    (function(){
-        const toggle = document.getElementById('sidebar-toggle');
-        const sidebar = document.querySelector('.sidebar');
+      // sidebar toggle
+      (function () {
+        const toggle = document.getElementById("sidebar-toggle");
+        const sidebar = document.querySelector(".sidebar");
         if (toggle && sidebar) {
-            toggle.addEventListener('click', function(){
-                sidebar.classList.toggle('open');
-            });
+          toggle.addEventListener("click", function () {
+            sidebar.classList.toggle("open");
+          });
         }
-    })();
+      })();
     </script>
-</body>
+
+    <script>
+      /**********************
+       * Category -> Fields behavior
+       * - clicking a category shows the Fields panel only
+       * - 'Show levels' button reveals Levels panel (levels not auto-opened)
+       * - fields/levels buttons navigate to quiz-list.html with query params
+       **********************/
+      (function () {
+        // Updated Technical fields per your request:
+        // Data Structures -> Python
+        // removed "Programming"
+
+        const LEVELS = ["Beginner", "Intermediate", "Advanced"];
+
+        const categoryCards = document.querySelectorAll(".category-card");
+        const fieldPanel = document.getElementById("field-select-panel");
+        const fieldsContainer = document.getElementById("fields-container");
+        const showLevelsBtn = document.getElementById("show-levels-btn");
+        const levelPanel = document.getElementById("level-select-panel");
+        const levelsContainer = document.getElementById("levels-container");
+
+        function clearActive() {
+          categoryCards.forEach((c) => c.classList.remove("active-category"));
+        }
+
+        function createFieldButton(category, fieldName) {
+          const btn = document.createElement("button");
+          btn.className = "btn-secondary field-btn";
+          btn.type = "button";
+          btn.textContent = fieldName;
+          btn.style.padding = "8px 14px";
+          btn.style.borderRadius = "10px";
+          btn.style.border = "1px solid #e9eef2";
+          btn.style.background = "#fff";
+          btn.style.cursor = "pointer";
+          btn.addEventListener("click", () => {
+            const url = `quiz-list.html?category=${encodeURIComponent(
+              category
+            )}&field=${encodeURIComponent(fieldName)}`;
+            window.location.href = url;
+          });
+          return btn;
+        }
+
+        function populateLevels(category) {
+          levelsContainer.innerHTML = "";
+          LEVELS.forEach((lvl) => {
+            const b = document.createElement("button");
+            b.className = "btn-secondary level-btn";
+            b.type = "button";
+            b.textContent = lvl;
+            b.style.padding = "8px 14px";
+            b.style.borderRadius = "10px";
+            b.style.border = "1px solid #e9eef2";
+            b.style.background = "#fff";
+            b.style.cursor = "pointer";
+            b.addEventListener("click", () => {
+              const url = `quiz-list.html?category=${encodeURIComponent(
+                category
+              )}&level=${encodeURIComponent(lvl)}`;
+              window.location.href = url;
+            });
+            levelsContainer.appendChild(b);
+          });
+        }
+
+        categoryCards.forEach((card) => {
+          card.addEventListener("click", () => {
+            const category = card.getAttribute("data-category");
+            if (!category) return;
+
+            clearActive();
+            card.classList.add("active-category");
+
+            // populate fields
+            fieldsContainer.innerHTML = "";
+            const fields = CATEGORY_FIELDS[category] || [];
+            if (fields.length === 0) {
+              fieldsContainer.innerHTML =
+                '<div class="no-data">No fields available.</div>';
+            } else {
+              fields.forEach((f) =>
+                fieldsContainer.appendChild(createFieldButton(category, f))
+              );
+            }
+
+            // show field panel
+            fieldPanel.style.display = "block";
+            fieldPanel.setAttribute("aria-hidden", "false");
+
+            // hide levels and show the "Show levels" button
+            levelPanel.style.display = "none";
+            levelPanel.setAttribute("aria-hidden", "true");
+            showLevelsBtn.style.display = "inline-block";
+            showLevelsBtn.textContent = "Show levels";
+
+            // on Show levels click toggle levels
+            showLevelsBtn.onclick = function () {
+              if (
+                levelPanel.style.display === "none" ||
+                levelPanel.style.display === ""
+              ) {
+                populateLevels(category);
+                levelPanel.style.display = "block";
+                levelPanel.setAttribute("aria-hidden", "false");
+                showLevelsBtn.textContent = "Hide levels";
+                levelPanel.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
+                });
+              } else {
+                levelPanel.style.display = "none";
+                levelPanel.setAttribute("aria-hidden", "true");
+                showLevelsBtn.textContent = "Show levels";
+              }
+            };
+
+            // smooth scroll to the fields panel
+            fieldPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+          });
+
+          // keyboard accessibility
+          card.addEventListener("keydown", (ev) => {
+            if (ev.key === "Enter" || ev.key === " ") {
+              ev.preventDefault();
+              card.click();
+            }
+          });
+        });
+      })();
+    </script>
+
+    <script>
+      // Image fallback for category images: replace broken photos with a simple placeholder
+      (function () {
+        function makeFallback(el) {
+          const parent = el.parentElement || document.body;
+          el.style.display = "none";
+          const box = document.createElement("div");
+          box.className = "img-fallback";
+          box.setAttribute("role", "img");
+          box.setAttribute("aria-label", "image placeholder");
+          box.style.width = "100%";
+          box.style.height = "100%";
+          box.style.display = "flex";
+          box.style.alignItems = "center";
+          box.style.justifyContent = "center";
+          box.style.background = "#f0f6ff";
+          box.style.color = "#4C8DFF";
+          box.style.fontWeight = "700";
+          box.style.borderRadius = "12px";
+          box.style.fontSize = "16px";
+          box.textContent = "Image";
+          parent.appendChild(box);
+        }
+
+        document.querySelectorAll(".cat-img").forEach((img) => {
+          img.addEventListener("error", () => makeFallback(img));
+          if (img.complete && img.naturalWidth === 0) makeFallback(img);
+        });
+      })();
+    </script>
+  </body>
 </html>
