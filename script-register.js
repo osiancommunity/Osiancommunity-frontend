@@ -1,11 +1,37 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-    // Define the location of your backend API
-const backendUrl = (location.hostname.endsWith('vercel.app'))
-  ? 'https://osiancommunity-backend.vercel.app/api'
-  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-      ? 'http://localhost:5000/api'
-      : 'https://osiancommunity-backend.vercel.app/api');
+    const backendPrimary = (location.hostname.endsWith('vercel.app'))
+      ? 'https://osiancommunity-backend.vercel.app/api'
+      : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+          ? 'http://localhost:5000/api'
+          : 'https://osiancommunity-backend.vercel.app/api');
+    const backendFallback = 'https://osiancommunity-backend.vercel.app/api';
+
+    async function postWithFallback(path, payload) {
+        const endpoints = backendPrimary === backendFallback
+          ? [backendPrimary]
+          : [backendPrimary, backendFallback];
+        for (let i = 0; i < endpoints.length; i++) {
+            const base = endpoints[i];
+            try {
+                const response = await fetch(`${base}${path}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    if (response.status === 404 && i < endpoints.length - 1) continue;
+                    const dataErr = await response.json().catch(() => ({}));
+                    throw new Error(dataErr.message || 'Request failed');
+                }
+                const data = await response.json();
+                return data;
+            } catch (e) {
+                if (i === endpoints.length - 1) throw e;
+                continue;
+            }
+        }
+    }
 
     const registerForm = document.getElementById("register-form");
     const registerBtn = document.getElementById("register-btn");
@@ -23,7 +49,6 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
         const confirmPassword = document.getElementById("confirm-password").value;
-        const fieldPreference = document.getElementById("field-preference").value;
 
         if (password !== confirmPassword) {
             alert("Passwords do not match!");
@@ -39,35 +64,19 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         registerBtn.textContent = "Registering...";
 
         try {
-            // --- BACKEND CALL: /auth/register ---
-            const response = await fetch(`${backendUrl}/auth/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: fullName,
-                    email: email,
-                    password: password,
-                    profile: { fieldPreference }
-                })
+            const data = await postWithFallback('/auth/register', {
+                name: fullName,
+                email: email,
+                password: password
             });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                // Handle backend errors (e.g., email already in use)
-                alert(`Registration failed: ${data.message}`);
-            } else {
-                // --- SUCCESS: Show OTP Section ---
-                currentUserId = data.userId;
-                registerForm.style.display = 'none';
-                otpSection.style.display = 'block';
-                document.getElementById('otp-input').focus();
-                try { localStorage.setItem('fieldPreference', fieldPreference); } catch(_){}
-            }
+            currentUserId = data.userId;
+            registerForm.style.display = 'none';
+            otpSection.style.display = 'block';
+            document.getElementById('otp-input').focus();
 
         } catch (error) {
             console.error('Registration Error:', error);
-            alert('A network error occurred. Please ensure the backend server is running.');
+            alert(error && error.message ? error.message : 'Unable to connect to the server. Please try again later.');
         } finally {
             registerBtn.disabled = false;
             registerBtn.textContent = "Register";
@@ -87,32 +96,18 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         this.textContent = 'Verifying...';
 
         try {
-            const response = await fetch(`${backendUrl}/auth/verify-otp`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: document.getElementById("email").value,
-                    otp: otp
-                })
+            const data = await postWithFallback('/auth/verify-otp', {
+                email: document.getElementById("email").value,
+                otp: otp
             });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                alert(`OTP verification failed: ${data.message}`);
-            } else {
-                // --- SUCCESS: Save token and redirect ---
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                try { if (data.user && data.user.profile && data.user.profile.fieldPreference) { localStorage.setItem('fieldPreference', data.user.profile.fieldPreference); } } catch(_){}
-
-                alert('Registration and verification successful! Redirecting to Dashboard.');
-                window.location.href = "dashboard-user.html";
-            }
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            alert('Registration and verification successful! Redirecting to Dashboard.');
+            window.location.href = "dashboard-user.html";
 
         } catch (error) {
             console.error('OTP Verification Error:', error);
-            alert('A network error occurred during verification.');
+            alert(error && error.message ? error.message : 'Unable to connect to the server. Please try again later.');
         } finally {
             this.disabled = false;
             this.textContent = 'Verify OTP';
@@ -130,27 +125,16 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         this.textContent = 'Sending...';
 
         try {
-            const response = await fetch(`${backendUrl}/auth/resend-otp`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: currentUserId
-                })
+            const data = await postWithFallback('/auth/resend-otp', {
+                userId: currentUserId
             });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                alert(`Failed to resend OTP: ${data.message}`);
-            } else {
-                alert('OTP sent successfully! Check your email.');
-                document.getElementById('otp-input').value = '';
-                document.getElementById('otp-input').focus();
-            }
+            alert('OTP sent successfully! Check your email.');
+            document.getElementById('otp-input').value = '';
+            document.getElementById('otp-input').focus();
 
         } catch (error) {
             console.error('Resend OTP Error:', error);
-            alert('A network error occurred while resending OTP.');
+            alert(error && error.message ? error.message : 'Unable to connect to the server. Please try again later.');
         } finally {
             this.disabled = false;
             this.textContent = 'Resend OTP';
