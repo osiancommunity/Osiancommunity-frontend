@@ -385,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Event listener for avatar upload
-avatarUpload.addEventListener('change', async (e) => {
+    avatarUpload.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
@@ -420,7 +420,7 @@ avatarUpload.addEventListener('change', async (e) => {
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
-                        profilePicture: avatarDataUrl
+                        profile: { avatar: avatarDataUrl }
                     })
                 });
 
@@ -448,6 +448,8 @@ avatarUpload.addEventListener('change', async (e) => {
         };
         reader.readAsDataURL(file);
     });
+
+    
 
     // Function to get role from URL
     function getRoleFromURL() {
