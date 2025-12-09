@@ -1,152 +1,994 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OSIAN - My Quiz Progress</title>
-    <link rel="stylesheet" href="style-dashboard.css">
-    <link rel="stylesheet" href="assets/boxicons-local.css">
-</head>
-<body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>OSIAN — My Quiz Progress</title>
 
-    <div class="dashboard-container">
+    <!-- Boxicons CDN (icons) -->
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
 
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <a href="dashboard-user.html" class="logo">OSIAN</a>
+    <style>
+      /* ====== Variables & base ====== */
+      :root {
+        --bg: #f7fbff;
+        --card: #ffffff;
+        --accent: #4c8dff;
+        --accent-2: #6a5cd8;
+        --muted: #6b7380;
+        --radius: 14px;
+        --shadow-soft: 0 12px 32px rgba(20, 60, 120, 0.06);
+        --shadow-strong: 0 18px 42px rgba(20, 60, 120, 0.08);
+        --success: #10b981;
+        --danger: #ef4444;
+        font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto,
+          Arial, sans-serif;
+        color: #0f1724;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: radial-gradient(
+          900px 400px at 0% 0%,
+          #f7fbff 0%,
+          #eaf4ff 100%
+        );
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button {
+        font-family: inherit;
+      }
+
+      /* ====== Layout ====== */
+      .page {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 18px;
+        padding-bottom: 120px; /* room for mobile nav */
+      }
+      .header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .title-block h1 {
+        font-size: 28px;
+        margin: 0;
+      }
+      .title-block p {
+        margin: 6px 0 0;
+        color: var(--muted);
+      }
+
+      /* header actions: small icons + profile */
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .btn-ghost {
+        background: var(--card);
+        border: 1px solid #eef4ff;
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: var(--shadow-soft);
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        font-weight: 600;
+      }
+
+      /* ====== Grid: left (profile & stats) / right (content) ====== */
+      .grid {
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: 18px;
+      }
+      @media (max-width: 980px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ====== Profile card ====== */
+      .card {
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: 18px;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid #eef4ff;
+      }
+      .profile-card {
+        text-align: center;
+        padding-bottom: 22px;
+      }
+      .profile-avatar {
+        width: 96px;
+        height: 96px;
+        border-radius: 999px;
+        overflow: hidden;
+        margin: 0 auto 12px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+        border: 6px solid #fff;
+      }
+      .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .profile-name {
+        font-weight: 700;
+        font-size: 18px;
+        margin-top: 6px;
+      }
+      .profile-meta {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 4px;
+      }
+
+      .badges-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 12px;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #f6f9ff;
+        border-radius: 12px;
+        padding: 8px 12px;
+        border: 1px solid #e8f2ff;
+        font-weight: 600;
+        color: var(--accent);
+        font-size: 13px;
+      }
+
+      /* ====== KPIs ====== */
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 18px;
+      }
+      @media (min-width: 720px) {
+        .kpi-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .kpi {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #fff, #fbfdff);
+        box-shadow: var(--shadow-soft);
+      }
+      .kpi i {
+        font-size: 30px;
+        color: var(--accent);
+        background: linear-gradient(180deg, #f0f6ff, #fff);
+        padding: 10px;
+        border-radius: 10px;
+      }
+      .kpi .value {
+        font-weight: 700;
+        font-size: 20px;
+      }
+      .kpi .label {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      /* ====== Main content header ====== */
+      .content-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+      .content-header h2 {
+        margin: 0;
+      }
+      .content-controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      /* ====== Registered quizzes grid ====== */
+      .quizzes-grid {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: repeat(3, 1fr);
+      }
+      @media (max-width: 1000px) {
+        .quizzes-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 600px) {
+        .quizzes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .quiz-card {
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--card);
+        box-shadow: var(--shadow-soft);
+        border: 1px solid #eef4ff;
+        display: flex;
+        flex-direction: column;
+      }
+      .quiz-hero {
+        width: 100%;
+        height: 150px;
+        overflow: hidden;
+        background: #f4f8ff;
+      }
+      .quiz-hero img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .quiz-body {
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .quiz-title {
+        font-weight: 700;
+      }
+      .quiz-meta {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .quiz-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: auto;
+      }
+      .btn {
+        padding: 9px 14px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .btn-primary {
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(76, 141, 255, 0.18);
+      }
+      .btn-ghost-sm {
+        background: #fff;
+        border: 1px solid #dbe9ff;
+        color: var(--accent);
+        padding: 8px 12px;
+        border-radius: 10px;
+      }
+
+      /* ====== Quiz history table ====== */
+      .table-wrap {
+        margin-top: 18px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #eef4ff;
+        background: var(--card);
+        box-shadow: var(--shadow-soft);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid #f2f6fb;
+      }
+      th {
+        background: #fff;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .result-pill {
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 700;
+        color: #fff;
+      }
+      .result-pass {
+        background: var(--success);
+      }
+      .result-fail {
+        background: var(--danger);
+      }
+      .result-pending {
+        background: #f59e0b;
+      }
+
+      /* ====== Pagination and footer area ====== */
+      .pager {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: flex-end;
+        padding: 12px;
+      }
+      .pager .page-info {
+        color: var(--muted);
+      }
+      .pager button {
+        background: #fff;
+        border: 1px solid #e8f0fb;
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+
+      /* ====== bottom nav mobile ====== */
+      .bottom-nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 74px;
+        background: var(--card);
+        border-top: 1px solid #eef4ff;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 9999;
+        box-shadow: 0 -6px 20px rgba(10, 20, 40, 0.04);
+      }
+      .bottom-nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #7a7a7a;
+        font-size: 12px;
+        text-decoration: none;
+      }
+      .bottom-nav a.active {
+        color: var(--accent);
+      }
+      .bottom-nav i {
+        font-size: 20px;
+        margin-bottom: 4px;
+      }
+
+      /* ====== helpers ====== */
+      .muted {
+        color: var(--muted);
+      }
+      .center {
+        text-align: center;
+      }
+      .spacer {
+        height: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- Header -->
+      <div class="header-row">
+        <div class="title-block">
+          <h1>My Quiz Progress</h1>
+          <p>Track your scores, attempts, and performance over time.</p>
+        </div>
+
+        <div class="header-actions">
+          <!-- small quick buttons -->
+          <button class="btn-ghost" id="btn-switch-view">
+            <i class="bx bx-grid-alt"></i> Dashboard
+          </button>
+          <button class="btn-ghost" id="btn-logout">
+            <i class="bx bx-log-out"></i> Log Out
+          </button>
+        </div>
+      </div>
+
+      <!-- 2-column layout -->
+      <div class="grid">
+        <!-- LEFT column: profile + KPIs -->
+        <div>
+          <div class="card profile-card" id="profileCard">
+            <div class="profile-avatar" id="profileAvatarWrap">
+              <img id="profileAvatar" src="" alt="Profile" />
             </div>
-            <ul class="sidebar-menu">
-                <li><a href="dashboard-user.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
-                <li class="active"><a href="quiz-progress.html"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
-                <li><a href="leaderboard.html"><i class='bx bx-trophy'></i><span>Leaderboard</span></a></li>
-              <li><a href="mentorship-user.html"><i class='bx bx-video'></i><span>Mentorship</span></a></li>
-                 <li><a href="notifications.html"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
-                <li><a href="profile.html"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
-
-                </ul>
-            <div class="sidebar-footer">
-                <a href="login.html" class="logout-btn">
-                    <i class='bx bx-log-out'></i><span>Log Out</span>
-                </a>
-
+            <div class="profile-name" id="profileName">Kudoz Kundan</div>
+            <div class="profile-meta" id="profileMeta">
+              Student • Computer Science
             </div>
-        </aside>
 
-        <main class="main-content">
-            
-            <header class="main-header">
-                <div class="header-title">
-                    <h1>My Quiz Progress</h1>
-                    <p>Track your scores, attempts, and performance over time.</p>
-                </div>
-                <div class="header-profile">
-                    <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
-                    <a href="profile.html"><img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar"></a>
-                </div>
-            </header>
+            <div class="badges-row" id="badgesRow">
+              <!-- badges inserted by JS -->
+            </div>
 
-            <section class="kpi-grid-user">
-                <div class="kpi-card-user">
-                    <i class='bx bx-file-blank'></i>
-                    <div class="card-info">
-                        <h2>14</h2>
-                        <p>Quizzes Attempted</p>
-                    </div>
-                </div>
-                <div class="kpi-card-user">
-                    <i class='bx bx-check-double'></i>
-                    <div class="card-info">
-                        <h2>9</h2>
-                        <p>Quizzes Passed</p>
-                    </div>
-                </div>
-                <div class="kpi-card-user">
-                    <i class='bx bxs-bar-chart-alt-2'></i>
-                    <div class="card-info">
-                        <h2>82%</h2>
-                        <p>Average Score</p>
-                    </div>
-                </div>
-            </section>
+            <div class="spacer"></div>
 
-            <!-- Registered Quizzes Section -->
-            <section class="content-card full-width-table">
-                <h3>My Registered Quizzes</h3>
-                <div class="quiz-grid" id="registered-quizzes">
-                    <!-- Registered quizzes will be loaded here -->
+            <div class="kpi-grid">
+              <div class="kpi">
+                <i class="bx bx-file-blank"></i>
+                <div>
+                  <div class="value" id="kpiAttempt">0</div>
+                  <div class="label">Quizzes Attempted</div>
                 </div>
-                <div class="table-controls" style="margin-top:12px;display:flex;align-items:center;gap:12px;">
-                    <button class="btn-edit" id="reg-prev">Prev</button>
-                    <span id="reg-page-info">Page 1 of 1</span>
-                    <button class="btn-edit" id="reg-next">Next</button>
+              </div>
+
+              <div class="kpi">
+                <i class="bx bx-check-double"></i>
+                <div>
+                  <div class="value" id="kpiPassed">0</div>
+                  <div class="label">Quizzes Passed</div>
                 </div>
-            </section>
+              </div>
 
-            <!-- Quiz History Section -->
-            <section class="content-card full-width-table">
-                <h3>My Quiz History</h3>
-                <table class="quiz-history-table">
-                    <thead>
-                        <tr>
-                            <th>Quiz Title</th>
-                            <th>Category</th>
-                            <th>Type</th>
-                            <th>Date Attempted</th>
-                            <th>Score</th>
-                            <th>Result</th>
-                        </tr>
-                    </thead>
-                    <tbody id="quiz-history-body">
-                        <!-- Quiz history will be loaded here -->
-                    </tbody>
-                </table>
-                <div class="table-controls" style="margin-top:12px;display:flex;align-items:center;gap:12px;">
-                    <button class="btn-edit" id="hist-prev">Prev</button>
-                    <span id="hist-page-info">Page 1 of 1</span>
-                    <button class="btn-edit" id="hist-next">Next</button>
+              <div class="kpi">
+                <i class="bx bxs-bar-chart-alt-2"></i>
+                <div>
+                  <div class="value" id="kpiAvg">0%</div>
+                  <div class="label">Average Score</div>
                 </div>
-            </section>
+              </div>
+            </div>
+          </div>
 
-            <!-- Leaderboard removed as requested; separate page will be created -->
+       
+        <!-- RIGHT column: quizzes + history -->
+        <div>
+          <div class="content-header">
+            <h2>My Registered Quizzes</h2>
+            <div class="content-controls">
+              <select
+                id="filterCategory"
+                style="
+                  padding: 8px;
+                  border-radius: 8px;
+                  border: 1px solid #eef4ff;
+                "
+              >
+                <option value="">All categories</option>
+                <option>Technical</option>
+                <option>General Knowledge</option>
+                <option>Sports</option>
+                <option>Law</option>
+              </select>
+              <input
+                id="searchInput"
+                placeholder="Search quizzes..."
+                style="
+                  padding: 8px;
+                  border-radius: 8px;
+                  border: 1px solid #eef4ff;
+                "
+              />
+            </div>
+          </div>
 
-            
+          <!-- Registered quizzes grid -->
+          <div
+            id="registeredQuizzesWrap"
+            class="quizzes-grid card"
+            style="padding: 16px"
+          >
+            <!-- cards rendered by JS -->
+          </div>
 
-            <!-- Badges Section -->
-            <section class="content-card" id="badges-section">
-                <h2><i class='bx bx-award'></i> Badges</h2>
-                <div class="badges-row" id="badges-row"></div>
-            </section>
+          <!-- Pagination for registered quizzes -->
+          <div class="pager" style="margin-top: 12px">
+            <div class="page-info" id="regPageInfo">Page 1 of 1</div>
+            <div style="flex: 1"></div>
+            <button id="regPrev">Prev</button>
+            <button id="regNext">Next</button>
+          </div>
 
-        </main>
+          <!-- History section -->
+          <h2 style="margin-top: 18px">My Quiz History</h2>
+          <div class="table-wrap">
+            <table id="historyTable" aria-describedby="historyDesc">
+              <thead>
+                <tr>
+                  <th>Quiz Title</th>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Date Attempted</th>
+                  <th>Score</th>
+                  <th>Result</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody">
+                <!-- filled by JS -->
+              </tbody>
+            </table>
+
+            <div class="pager">
+              <div class="page-info" id="histPageInfo">Page 1 of 1</div>
+              <div style="flex: 1"></div>
+              <button id="histPrev">Prev</button>
+              <button id="histNext">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- grid end -->
     </div>
+    <!-- page end -->
 
-    <div class="bottom-nav">
-        <a href="dashboard-user.html" id="nav-dashboard"><i class='bx bxs-dashboard'></i><span>Home</span></a>
-        <a href="quiz-progress.html" id="nav-quizzes"><i class='bx bx-file-blank'></i><span>Quizzes</span></a>
-        <a href="mentorship-user.html" id="nav-mentorship"><i class='bx bx-video'></i><span>Mentor</span></a>
-        <a href="leaderboard.html" id="nav-leaderboard"><i class='bx bx-trophy'></i><span>Top</span></a>
-        <a href="notifications.html" id="nav-notifs"><i class='bx bx-bell'></i><span>Alerts</span></a>
-        <a href="profile.html" id="nav-profile"><i class='bx bxs-user'></i><span>Profile</span></a>
-    </div>
+    <!-- bottom nav (mobile) -->
+    <nav class="bottom-nav" role="navigation" aria-label="mobile nav">
+      <a href="dashboard-user.html" id="nav-dashboard" class="active"
+        ><i class="bx bxs-dashboard"></i><span>Home</span></a
+      >
+      <a href="quiz-progress.html" id="nav-quizzes"
+        ><i class="bx bx-file-blank"></i><span>Quizzes</span></a
+      >
+      <a href="leaderboard.html" id="nav-leaderboard"
+        ><i class="bx bxs-trophy"></i><span>Leaderboard</span></a
+      >
+      <a href="notifications.html" id="nav-notifs"
+        ><i class="bx bx-bell"></i><span>Alerts</span></a
+      >
+      <a href="profile.html" id="nav-profile"
+        ><i class="bx bxs-user"></i><span>Profile</span></a
+      >
+    </nav>
 
-   <script src="script-toast-helper.js?v=20251207"></script>
-   <script src="script-quiz-progress.js?v=20251207"></script>
-   <script>
-   (function(){
-       var el = document.getElementById('nav-quizzes');
-       if (el) el.classList.add('active');
-   })();
-   </script>
-   <script>
-   (function(){
-       const toggle = document.getElementById('sidebar-toggle');
-       const sidebar = document.querySelector('.sidebar');
-       if (toggle && sidebar) {
-           toggle.addEventListener('click', function(){
-               sidebar.classList.toggle('open');
-           });
-       }
-   })();
-   </script>
-</body>
+    <script>
+      /* ===========================
+       Sample data & rendering
+       Replace SAMPLE arrays with real API calls when ready.
+       =========================== */
+
+      // Sample user — in real app you would fetch this from backend/auth
+      const USER = {
+        name: "Kudoz Kundan",
+        role: "Student",
+        course: "Computer Science",
+        // load image from localStorage if admin or user set earlier. Fallback below handles missing one.
+        imageKey: "osian_profile_image", // optional localStorage key
+      };
+
+      // SAMPLE Registered quizzes (you will load these from backend)
+      const REGISTERED_QUIZZES = [
+        {
+          id: "r1",
+          title: "Handwritten DS Notes",
+          category: "Technical",
+          type: "Regular",
+          date: "2025-12-01",
+          image:
+            "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+          id: "r2",
+          title: "Software Dev Basics",
+          category: "Technical",
+          type: "Regular",
+          date: "2025-12-05",
+          image:
+            "https://images.unsplash.com/photo-1526378721006-1b3b0d0c2b56?auto=format&fit=crop&w=1200&q=70",
+        },
+        {
+          id: "r3",
+          title: "GK Quick Quiz",
+          category: "General Knowledge",
+          type: "Regular",
+          date: "2025-12-03",
+          image:
+            "https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+          id: "r4",
+          title: "Networks Practice",
+          category: "Technical",
+          type: "Live",
+          date: "2025-11-20",
+          image:
+            "https://images.unsplash.com/photo-1559757175-5703870d8ff2?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+          id: "r5",
+          title: "Sports Trivia",
+          category: "Sports",
+          type: "Regular",
+          date: "2025-12-02",
+          image:
+            "https://images.unsplash.com/photo-1509228627156-0d4e5a4a9b99?auto=format&fit=crop&w=1200&q=80",
+        },
+      ];
+
+      // SAMPLE History (attempts)
+      const HISTORY = [
+        {
+          title: "technical",
+          category: "technical",
+          type: "regular",
+          date: "2025-12-09",
+          score: "1 / 3",
+          result: "Fail",
+        },
+        {
+          title: "Diljot",
+          category: "technical",
+          type: "regular",
+          date: "2025-12-07",
+          score: "0 / 1",
+          result: "Fail",
+        },
+        {
+          title: "Diljot",
+          category: "technical",
+          type: "regular",
+          date: "2025-12-07",
+          score: "0 / 1",
+          result: "Fail",
+        },
+        {
+          title: "GK Quick Quiz",
+          category: "General Knowledge",
+          type: "regular",
+          date: "2025-12-03",
+          score: "3 / 3",
+          result: "Pass",
+        },
+        {
+          title: "Software Dev Basics",
+          category: "Technical",
+          type: "regular",
+          date: "2025-12-05",
+          score: "5 / 6",
+          result: "Pass",
+        },
+        // ... you can add more for pagination demo
+      ];
+
+      /* ========== utility functions ========== */
+      function el(q) {
+        return document.querySelector(q);
+      }
+      function qAll(q) {
+        return Array.from(document.querySelectorAll(q));
+      }
+
+      function fallbackImg(imgEl) {
+        if (!imgEl) return;
+        // fade out and replace with neutral placeholder
+        const parent = imgEl.parentElement;
+        if (!parent) return;
+        imgEl.remove();
+        const ph = document.createElement("div");
+        ph.style.width = "100%";
+        ph.style.height = "100%";
+        ph.style.display = "flex";
+        ph.style.alignItems = "center";
+        ph.style.justifyContent = "center";
+        ph.style.background = "#f4f8ff";
+        ph.style.color = "var(--accent)";
+        ph.style.fontWeight = "700";
+        ph.textContent = "Image";
+        parent.appendChild(ph);
+      }
+
+      /* ========== profile & badges ========== */
+      function loadProfile() {
+        // try to get saved image from localStorage (app may save data URI or url earlier)
+        let imgSrc = null;
+        try {
+          imgSrc = localStorage.getItem(USER.imageKey);
+        } catch (e) {
+          imgSrc = null;
+        }
+        if (!imgSrc) {
+          // default random face (unsplash) - will usually load
+          imgSrc =
+            "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80";
+        }
+        const avatar = el("#profileAvatar");
+        avatar.src = imgSrc;
+        avatar.alt = USER.name;
+
+        el("#profileName").textContent = USER.name;
+        el("#profileMeta").textContent = `${USER.role} • ${USER.course}`;
+
+        avatar.onerror = () => fallbackImg(avatar);
+
+        // compute initial KPI values from history and registered for demo
+        const attempts = HISTORY.length;
+        const passed = HISTORY.filter(
+          (h) => h.result.toLowerCase() === "pass"
+        ).length;
+        const avg = computeAverage(HISTORY); // percent
+
+        el("#kpiAttempt").textContent = attempts;
+        el("#kpiPassed").textContent = passed;
+        el("#kpiAvg").textContent = avg + "%";
+
+        renderBadges({ attempts, passed, avg });
+      }
+
+      function computeAverage(history) {
+        // History score field sample: "5 / 6" or "0 / 1"
+        if (!history || history.length === 0) return 0;
+        let totalPercent = 0,
+          count = 0;
+        history.forEach((h) => {
+          const parts = (h.score || "").split("/");
+          if (parts.length === 2) {
+            const got = parseFloat(parts[0]) || 0;
+            const tot = parseFloat(parts[1]) || 1;
+            totalPercent += (got / tot) * 100;
+            count++;
+          }
+        });
+        if (count === 0) return 0;
+        return Math.round(totalPercent / count);
+      }
+
+      function renderBadges({ attempts, passed, avg }) {
+        const wrap = el("#badgesRow");
+        wrap.innerHTML = "";
+        // Badge 1: streak / score
+        const scoreBadge = document.createElement("div");
+        scoreBadge.className = "badge";
+        scoreBadge.innerHTML = `<i class='bx bx-flame' style="color: #ff7a59"></i> Score ${avg}%`;
+        wrap.appendChild(scoreBadge);
+
+        // Badge 2: quizzes completed
+        const qBadge = document.createElement("div");
+        qBadge.className = "badge";
+        qBadge.innerHTML = `<i class='bx bx-medal' style="color: #f5b301"></i> ${attempts} Attempts`;
+        wrap.appendChild(qBadge);
+
+        // Badge 3: Passed count
+        const passBadge = document.createElement("div");
+        passBadge.className = "badge";
+        passBadge.innerHTML = `<i class='bx bx-award' style="color: #9b7cff"></i> ${passed} Passed`;
+        wrap.appendChild(passBadge);
+
+        // Suggestion badge (if avg low)
+        if (avg < 50) {
+          const help = document.createElement("div");
+          help.className = "badge";
+          help.style.background = "#fff6f6";
+          help.style.color = "var(--danger)";
+          help.innerHTML = `<i class='bx bx-support' style="color:var(--danger)"></i> Try Practice Mode`;
+          wrap.appendChild(help);
+        }
+      }
+
+      /* ========== Registered quizzes rendering & pagination ========== */
+      let regPage = 1,
+        regPerPage = 3;
+      function renderRegisteredQuizzes(page = 1, filters = {}) {
+        const wrap = el("#registeredQuizzesWrap");
+        wrap.innerHTML = "";
+
+        // apply filters (category and search)
+        const categoryFilter = (
+          el("#filterCategory").value || ""
+        ).toLowerCase();
+        const search = (el("#searchInput").value || "").toLowerCase();
+
+        let filtered = REGISTERED_QUIZZES.filter((q) => {
+          if (categoryFilter && q.category.toLowerCase() !== categoryFilter)
+            return false;
+          if (
+            search &&
+            !(
+              q.title.toLowerCase().includes(search) ||
+              (q.category && q.category.toLowerCase().includes(search))
+            )
+          )
+            return false;
+          return true;
+        });
+
+        const total = filtered.length;
+        const pageCount = Math.max(1, Math.ceil(total / regPerPage));
+        if (page > pageCount) page = pageCount;
+        regPage = page;
+
+        const start = (page - 1) * regPerPage;
+        const pageItems = filtered.slice(start, start + regPerPage);
+
+        pageItems.forEach((q) => {
+          const card = document.createElement("div");
+          card.className = "quiz-card";
+          const hero = document.createElement("div");
+          hero.className = "quiz-hero";
+          const img = document.createElement("img");
+          img.src = q.image;
+          img.alt = q.title;
+          img.onerror = () => fallbackImg(img);
+          hero.appendChild(img);
+
+          const body = document.createElement("div");
+          body.className = "quiz-body";
+          const title = document.createElement("div");
+          title.className = "quiz-title";
+          title.textContent = q.title;
+          const meta = document.createElement("div");
+          meta.className = "quiz-meta";
+          meta.textContent = `${q.category} • ${q.type} • ${q.date}`;
+
+          const actions = document.createElement("div");
+          actions.className = "quiz-actions";
+          const btnStart = document.createElement("button");
+          btnStart.className = "btn btn-primary";
+          btnStart.textContent = "▶ Start";
+          btnStart.addEventListener("click", () => {
+            // navigate to quiz play; backend should decide route
+            window.location.href = `quiz-play.html?quizId=${encodeURIComponent(
+              q.id
+            )}`;
+          });
+          const btnDetails = document.createElement("button");
+          btnDetails.className = "btn btn-ghost-sm";
+          btnDetails.textContent = "ℹ Details";
+          btnDetails.addEventListener("click", () => {
+            window.location.href = `quiz-details.html?quizId=${encodeURIComponent(
+              q.id
+            )}`;
+          });
+
+          actions.appendChild(btnStart);
+          actions.appendChild(btnDetails);
+
+          body.appendChild(title);
+          body.appendChild(meta);
+          body.appendChild(actions);
+
+          card.appendChild(hero);
+          card.appendChild(body);
+          wrap.appendChild(card);
+        });
+
+        // update pagination UI
+        el("#regPageInfo").textContent = `Page ${regPage} of ${pageCount}`;
+        el("#regPrev").disabled = regPage <= 1;
+        el("#regNext").disabled = regPage >= pageCount;
+      }
+
+      document
+        .getElementById("regPrev")
+        .addEventListener("click", () => renderRegisteredQuizzes(regPage - 1));
+      document
+        .getElementById("regNext")
+        .addEventListener("click", () => renderRegisteredQuizzes(regPage + 1));
+      document
+        .getElementById("filterCategory")
+        .addEventListener("change", () => renderRegisteredQuizzes(1));
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", () => renderRegisteredQuizzes(1));
+
+      /* ========== History table rendering & pagination ========== */
+      let histPage = 1,
+        histPerPage = 5;
+      function renderHistory(page = 1) {
+        const tbody = el("#historyBody");
+        tbody.innerHTML = "";
+
+        const total = HISTORY.length;
+        const pageCount = Math.max(1, Math.ceil(total / histPerPage));
+        if (page > pageCount) page = pageCount;
+        histPage = page;
+
+        const start = (page - 1) * histPerPage;
+        const pageItems = HISTORY.slice(start, start + histPerPage);
+
+        pageItems.forEach((row) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${escapeHtml(row.title)}</td>
+                        <td>${escapeHtml(row.category)}</td>
+                        <td>${escapeHtml(row.type)}</td>
+                        <td>${escapeHtml(row.date)}</td>
+                        <td>${escapeHtml(row.score)}</td>
+                        <td><span class="result-pill ${
+                          row.result.toLowerCase() === "pass"
+                            ? "result-pass"
+                            : row.result.toLowerCase() === "fail"
+                            ? "result-fail"
+                            : "result-pending"
+                        }">${escapeHtml(row.result)}</span></td>`;
+          tbody.appendChild(tr);
+        });
+
+        el("#histPageInfo").textContent = `Page ${histPage} of ${pageCount}`;
+        el("#histPrev").disabled = histPage <= 1;
+        el("#histNext").disabled = histPage >= pageCount;
+      }
+
+      document
+        .getElementById("histPrev")
+        .addEventListener("click", () => renderHistory(histPage - 1));
+      document
+        .getElementById("histNext")
+        .addEventListener("click", () => renderHistory(histPage + 1));
+
+      /* ========== small helpers & actions ========== */
+      function escapeHtml(s) {
+        if (!s) return "";
+        return s.replace(
+          /[&<>"]/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])
+        );
+      }
+
+      // quick demo: clicking dashboard switch navigates to dashboard
+      document
+        .getElementById("btn-switch-view")
+        .addEventListener(
+          "click",
+          () => (window.location.href = "dashboard-user.html")
+        );
+      document
+        .getElementById("btn-logout")
+        .addEventListener("click", () => (window.location.href = "index.html"));
+
+      // allow creating new quiz (demo)
+      document.getElementById("btnNewQuiz").addEventListener("click", () => {
+        alert(
+          "Open the quiz create flow in your admin/dashboard — this is a placeholder."
+        );
+      });
+
+      // refresh button reloads data (placeholder)
+      document.getElementById("btn-refresh").addEventListener("click", () => {
+        loadAll(); // re-render
+        el("#btn-refresh").textContent = "Refreshed";
+        setTimeout(() => (el("#btn-refresh").textContent = "Refresh"), 1100);
+      });
+
+      /* ========== initialization ========== */
+      function loadAll() {
+        loadProfile();
+        renderRegisteredQuizzes(1);
+        renderHistory(1);
+      }
+
+      // On page load: ensure images fallback
+      window.addEventListener("load", () => {
+        loadAll();
+        document.querySelectorAll("img").forEach((img) => {
+          if (!img.complete || img.naturalWidth === 0) fallbackImg(img);
+          img.addEventListener("error", () => fallbackImg(img));
+        });
+      });
+
+      /* ======================
+       Integration notes:
+       - Replace REGISTERED_QUIZZES and HISTORY with API fetches:
+           e.g. fetch('/api/user/registered-quizzes').then(res=>res.json()).then(data=>{ REGISTERED_QUIZZES = data; renderRegisteredQuizzes(1); })
+       - Replace USER data with auth/profile data.
+       - Save profile image URL to localStorage under KEY: USER.imageKey if you want persisted custom profile image.
+       - Update per-page counts regPerPage/histPerPage to match your desired layout.
+       ====================== */
+    </script>
+  </body>
 </html>
