@@ -404,7 +404,9 @@
               <img
                 src="https://i.ibb.co/jP9JWBBy/diljj.png"
                 alt="Profile"
+                id="header-avatar"
                 style="width: 36px; height: 36px; border-radius: 50%"
+                loading="lazy"
               />
             </a>
             <a class="header-link" href="index.html" title="Log out"
@@ -429,7 +431,7 @@
            - General Knowledge: globe / books
            - Sports: cyclists
          -->
-         <!-- Categories --> <section class="category-grid" id="categoryGrid"> <div class="category-card" role="button" tabindex="0" data-category="Technical" > <div class="category-media"> <img src="https://i.ibb.co/vCktJR6N/IT-Sector.jpg" alt="Technical" onerror="fallback(this)" /> </div> <div class="category-label">Technical</div> </div> <div class="category-card" role="button" tabindex="0" data-category="Law" > <div class="category-media"> <img src="https://i.ibb.co/S4zrfB1z/image.jpg" alt="Law" onerror="fallback(this)" /> </div> <div class="category-label">Law</div> </div> <div class="category-card" role="button" tabindex="0" data-category="Engineering" > <div class="category-media"> <img src="https://i.ibb.co/V0synVwC/Wallpaper-4-K-Electronic-Gallery.jpg" alt="Engineering" onerror="fallback(this)" /> </div> <div class="category-label">Engineering</div> </div> <div class="category-card" role="button" tabindex="0" data-category="General Knowledge" > <div class="category-media"> <img src="https://i.ibb.co/k65BKMVn/dua-Libra.jpg" alt="General Knowledge" onerror="fallback(this)" /> </div> <div class="category-label">General Knowledge</div> </div> <div class="category-card" role="button" tabindex="0" data-category="Sports" > <div class="category-media"> <img src="https://i.ibb.co/4R4ZtnRk/All-sports-elements-on-dark-background-Premium-AI-generated-image.jpg" alt="Sports" onerror="fallback(this)" /> </div> <div class="category-label">Sports</div> </div> </div> </section>
+         <!-- Categories --> <section class="category-grid" id="categoryGrid"> <div class="category-card" role="button" tabindex="0" data-category="Technical" > <div class="category-media"> <img src="https://i.ibb.co/vCktJR6N/IT-Sector.jpg" alt="Technical" onerror="fallback(this)" loading="lazy" decoding="async" /> </div> <div class="category-label">Technical</div> </div> <div class="category-card" role="button" tabindex="0" data-category="Law" > <div class="category-media"> <img src="https://i.ibb.co/S4zrfB1z/image.jpg" alt="Law" onerror="fallback(this)" loading="lazy" decoding="async" /> </div> <div class="category-label">Law</div> </div> <div class="category-card" role="button" tabindex="0" data-category="Engineering" > <div class="category-media"> <img src="https://i.ibb.co/V0synVwC/Wallpaper-4-K-Electronic-Gallery.jpg" alt="Engineering" onerror="fallback(this)" loading="lazy" decoding="async" /> </div> <div class="category-label">Engineering</div> </div> <div class="category-card" role="button" tabindex="0" data-category="General Knowledge" > <div class="category-media"> <img src="https://i.ibb.co/k65BKMVn/dua-Libra.jpg" alt="General Knowledge" onerror="fallback(this)" loading="lazy" decoding="async" /> </div> <div class="category-label">General Knowledge</div> </div> <div class="category-card" role="button" tabindex="0" data-category="Sports" > <div class="category-media"> <img src="https://i.ibb.co/4R4ZtnRk/All-sports-elements-on-dark-background-Premium-AI-generated-image.jpg" alt="Sports" onerror="fallback(this)" loading="lazy" decoding="async" /> </div> <div class="category-label">Sports</div> </div> </div> </section>
 
         <!-- Recommended -->
         <section class="content-card">
@@ -572,6 +574,13 @@
           if (side) side.classList.add("active");
         } catch (e) {}
       });
+
+      // Set header avatar from saved profile data if available
+      try {
+        var data = JSON.parse(localStorage.getItem('osianUserData')) || {};
+        var img = document.getElementById('header-avatar');
+        if (img && data.avatar) { img.src = data.avatar; }
+      } catch (_) {}
     </script>
   </body>
 </html>
