@@ -185,10 +185,9 @@ body {
 }
 
 /* ------------------------- */
-/* Main Content */
 /* ------------------------- */
 .main-content {
-  margin-left: 260px; /* Same as sidebar width */
+  margin-left: 260px;
   flex-grow: 1;
   padding: 30px;
   display: flex;
@@ -196,17 +195,27 @@ body {
   gap: 30px;
 }
 
-.premium-header .header-title h1 {
-  font-size: 32px;
+/* Updated Header Title Styling */
+.header-title h1 {
+  font-size: clamp(42px, 5vw, 52px); /* Responsive + looks premium */
+  font-weight: 700;
+  margin: 0;
+  color: #0f172a;
 }
-.premium-header .header-title p {
-  color: var(--text-light);
+
+.header-title p {
+  font-size: clamp(16px, 2vw, 22px); /* Bigger subtitle, still elegant */
+  color: var(--muted);
+  margin-top: 6px;
 }
+
+/* Header Actions */
 .header-actions {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+
 .header-link {
   display: inline-flex;
   align-items: center;
