@@ -48,4 +48,15 @@
 
   window.showToast = window.showToast || showToast;
   window.showToastConfirm = window.showToastConfirm || showToastConfirm;
+  document.addEventListener('DOMContentLoaded', function(){
+    var btns = document.querySelectorAll('.logout-btn, .logout-direct');
+    btns.forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        try { localStorage.removeItem('token'); } catch(_){ }
+        try { localStorage.removeItem('user'); } catch(_){ }
+        window.location.href = 'index.html';
+      });
+    });
+  });
 })();
