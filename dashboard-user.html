@@ -203,6 +203,8 @@
         border: 1px solid #edf2f7;
         transition: transform 0.15s, box-shadow 0.15s;
         height: 100%;
+        /* help equal heights */
+        min-height: 100%;
       }
       .category-card:hover {
         transform: translateY(-6px);
@@ -343,6 +345,7 @@
       }
     </style>
   </head>
+
   <body>
     <div class="dashboard-container">
       <!-- Sidebar -->
@@ -381,6 +384,7 @@
 
         <div class="sidebar-footer">
           <a
+            id="logoutBtnSidebar"
             class="header-link"
             href="index.html"
             style="display: inline-flex; align-items: center; gap: 10px"
@@ -399,7 +403,6 @@
           </div>
 
           <div class="header-actions" aria-label="User actions">
-            <!-- left the action group compact and anchored to the right so headings won't push them down -->
             <a class="header-link" href="profile.html" title="Profile">
               <img
                 src="https://i.ibb.co/jP9JWBBy/diljj.png"
@@ -409,13 +412,15 @@
                 loading="lazy"
               />
             </a>
-            <a class="header-link" href="index.html" title="Log out"
+            <a
+              id="logoutBtnHeader"
+              class="header-link"
+              href="index.html"
+              title="Log out"
               ><i class="bx bx-log-out"></i> Log Out</a
             >
           </div>
         </header>
-
-       
 
         <!-- Categories -->
         <section class="content-card" aria-labelledby="categories-heading">
@@ -423,66 +428,105 @@
             <i class="bx bx-category"></i> Categories
           </h2>
 
-          <!--
-           Images used: reliable Unsplash/IBB links.
-           - Technical: IT data/servers
-           - Law: scales book
-           - Engineering: electronics board
-           - General Knowledge: globe / books
-           - Sports: cyclists
-         -->
-         <!-- Categories --> <section class="category-grid" id="categoryGrid"> <div class="category-card" role="button" tabindex="0" data-category="Technical" > <div class="category-media"> <img src="https://i.ibb.co/vCktJR6N/IT-Sector.jpg" alt="Technical" onerror="fallback(this)" loading="lazy" decoding="async" /> </div> <div class="category-label">Technical</div> </div> <div class="category-card" role="button" tabindex="0" data-category="Law" > <div class="category-media"> <img src="https://i.ibb.co/S4zrfB1z/image.jpg" alt="Law" onerror="fallback(this)" loading="lazy" decoding="async" /> </div> <div class="category-label">Law</div> </div> <div class="category-card" role="button" tabindex="0" data-category="Engineering" > <div class="category-media"> <img src="https://i.ibb.co/V0synVwC/Wallpaper-4-K-Electronic-Gallery.jpg" alt="Engineering" onerror="fallback(this)" loading="lazy" decoding="async" /> </div> <div class="category-label">Engineering</div> </div> <div class="category-card" role="button" tabindex="0" data-category="General Knowledge" > <div class="category-media"> <img src="https://i.ibb.co/k65BKMVn/dua-Libra.jpg" alt="General Knowledge" onerror="fallback(this)" loading="lazy" decoding="async" /> </div> <div class="category-label">General Knowledge</div> </div> <div class="category-card" role="button" tabindex="0" data-category="Sports" > <div class="category-media"> <img src="https://i.ibb.co/4R4ZtnRk/All-sports-elements-on-dark-background-Premium-AI-generated-image.jpg" alt="Sports" onerror="fallback(this)" loading="lazy" decoding="async" /> </div> <div class="category-label">Sports</div> </div> </div> </section>
-
-        <!-- Recommended -->
-        <section class="content-card">
-          <h2><i class="bx bx-star"></i> Recommended For You</h2>
-          <div class="quiz-list-grid">
-            <div class="quiz-card">
-              <img
-                src="https://images.unsplash.com/photo-1526378721006-1b3b0d0c2b56?auto=format&fit=crop&w=1200&q=70"
-                alt="Notes"
-                loading="lazy"
-                onerror="imgFallback(this)"
-              />
-              <div class="quiz-body">
-                <div style="font-weight: 700">
-                  Handwritten Data Structures Notes
-                </div>
-                <div style="color: var(--muted)">
-                  Scanned notes ideal for Technical practice.
-                </div>
-                <div style="margin-top: 8px">
-                  <button
-                    class="btn-primary"
-                    onclick="location.href='quiz-play.html?quizId=demo1'"
-                  >
-                    Open Quiz
-                  </button>
-                </div>
+          <!-- Categories -->
+          <section class="category-grid" id="categoryGrid">
+            <div
+              class="category-card"
+              role="button"
+              tabindex="0"
+              data-category="Technical"
+            >
+              <div class="category-media">
+                <img
+                  src="https://i.ibb.co/vCktJR6N/IT-Sector.jpg"
+                  alt="Technical"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
+              <div class="category-label">Technical</div>
             </div>
 
-            <div class="quiz-card">
-              <img
-                src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"
-                alt="Software Dev"
-                loading="lazy"
-                onerror="imgFallback(this)"
-              />
-              <div class="quiz-body">
-                <div style="font-weight: 700">Software Dev Basics</div>
-                <div style="color: var(--muted)">
-                  Introductory quizzes for fundamentals and best practices.
-                </div>
-                <div style="margin-top: 8px">
-                  <button
-                    class="btn-primary"
-                    onclick="location.href='quiz-play.html?quizId=demo2'"
-                  >
-                    Open Quiz
-                  </button>
-                </div>
+            <div
+              class="category-card"
+              role="button"
+              tabindex="0"
+              data-category="Law"
+            >
+              <div class="category-media">
+                <img
+                  src="https://i.ibb.co/S4zrfB1z/image.jpg"
+                  alt="Law"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
+              <div class="category-label">Law</div>
+            </div>
+
+            <div
+              class="category-card"
+              role="button"
+              tabindex="0"
+              data-category="Engineering"
+            >
+              <div class="category-media">
+                <img
+                  src="https://i.ibb.co/V0synVwC/Wallpaper-4-K-Electronic-Gallery.jpg"
+                  alt="Engineering"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="category-label">Engineering</div>
+            </div>
+
+            <div
+              class="category-card"
+              role="button"
+              tabindex="0"
+              data-category="General Knowledge"
+            >
+              <div class="category-media">
+                <img
+                  src="https://i.ibb.co/k65BKMVn/dua-Libra.jpg"
+                  alt="General Knowledge"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="category-label">General Knowledge</div>
+            </div>
+
+            <div
+              class="category-card"
+              role="button"
+              tabindex="0"
+              data-category="Sports"
+            >
+              <div class="category-media">
+                <img
+                  src="https://i.ibb.co/4R4ZtnRk/All-sports-elements-on-dark-background-Premium-AI-generated-image.jpg"
+                  alt="Sports"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="category-label">Sports</div>
+            </div>
+          </section>
+        </section>
+
+        <!-- Recommended -->
+        <section class="content-card" aria-labelledby="recommended-heading">
+          <h2 id="recommended-heading">
+            <i class="bx bx-star"></i> Recommended For You
+          </h2>
+          <!-- This container will be populated by JS -->
+          <div class="quiz-list-grid" id="recommendedContainer">
+            <!-- Loading skeleton or message will be injected by JS while fetching -->
+            <div id="recommendedLoading" style="color: var(--muted)">
+              Loading recommendations…
             </div>
           </div>
         </section>
@@ -509,78 +553,323 @@
     </nav>
 
     <script>
-      // Replace broken images with a friendly placeholder
-      function imgFallback(img) {
-        try {
-          if (!img || !img.parentNode) return;
-          const parent = img.parentNode;
+      (function () {
+        // ---------------- CONFIG: backend URL detection (same logic as your login script) ----------------
+        const backendUrl = location.hostname.endsWith("vercel.app")
+          ? "https://osiancommunity-backend.vercel.app/api"
+          : location.hostname === "localhost" ||
+            location.hostname === "127.0.0.1"
+          ? "http://localhost:5000/api"
+          : "https://osiancommunity-backend.vercel.app/api";
+
+        // Recommended API route (adjust if needed)
+        const RECOMMENDED_API = backendUrl + "/quizzes/recommended";
+
+        // ---------------- Utilities ----------------
+        function safeJSONParse(val) {
+          try {
+            return JSON.parse(val);
+          } catch (e) {
+            return null;
+          }
+        }
+        function createImgPlaceholder() {
           const placeholder = document.createElement("div");
           placeholder.className = "img-placeholder";
           placeholder.textContent = "Image";
-          parent.replaceChild(placeholder, img);
-        } catch (e) {
-          console.error(e);
+          return placeholder;
         }
-      }
+        function imgFallback(img) {
+          try {
+            if (!img || !img.parentNode) return;
+            const parent = img.parentNode;
+            if (
+              parent.querySelector &&
+              parent.querySelector(".img-placeholder")
+            )
+              return;
+            const placeholder = createImgPlaceholder();
+            parent.replaceChild(placeholder, img);
+          } catch (e) {
+            console.error(e);
+          }
+        }
 
-      // Make category cards clickable + keyboard accessible
-      document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".category-card").forEach((card) => {
-          card.addEventListener("click", () => {
-            const cat =
-              card.dataset.category ||
-              card.querySelector(".category-label")?.textContent ||
-              "Category";
-            // Navigate to category page with parameter
-            window.location.href =
-              "category.html?category=" + encodeURIComponent(cat);
-          });
-          card.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              card.click();
+        // ---------------- Populate recommended quizzes ----------------
+        function buildQuizCard(q) {
+          const card = document.createElement("div");
+          card.className = "quiz-card";
+
+          const img = document.createElement("img");
+          img.alt = q.title || "Quiz image";
+          img.loading = "lazy";
+          img.decoding = "async";
+          if (q.image) img.src = q.image;
+
+          img.addEventListener("error", () => imgFallback(img));
+          img.style.cursor = "zoom-in";
+          img.addEventListener("click", (e) => {
+            const cardParent = img.closest(".category-card, .quiz-card");
+            if (cardParent && cardParent.getAttribute("role") === "button")
+              return;
+            try {
+              window.open(q.image || img.src, "_blank", "noopener");
+            } catch (err) {
+              location.href = q.image || img.src;
             }
           });
-        });
 
-        // image fallback for any other <img> that failed to load
-        document.querySelectorAll("img").forEach((img) => {
-          if (!img.complete || img.naturalWidth === 0) {
-            img.onerror = null;
-            imgFallback(img);
-          } else {
-            img.addEventListener("error", () => imgFallback(img));
+          const body = document.createElement("div");
+          body.className = "quiz-body";
+
+          const title = document.createElement("div");
+          title.style.fontWeight = "700";
+          title.textContent = q.title || "Untitled Quiz";
+
+          const desc = document.createElement("div");
+          desc.style.color = "var(--muted)";
+          desc.textContent = q.description || "";
+
+          const actions = document.createElement("div");
+          actions.style.marginTop = "8px";
+          const openBtn = document.createElement("button");
+          openBtn.className = "btn-primary";
+          openBtn.type = "button";
+          openBtn.textContent = "Open Quiz";
+          openBtn.addEventListener("click", () => {
+            const id = encodeURIComponent(q.quizId || q.id || "");
+            if (!id) {
+              alert("Quiz id missing.");
+              return;
+            }
+            location.href = `quiz-play.html?quizId=${id}`;
+          });
+
+          actions.appendChild(openBtn);
+          body.appendChild(title);
+          body.appendChild(desc);
+          body.appendChild(actions);
+
+          card.appendChild(img);
+          card.appendChild(body);
+
+          return card;
+        }
+
+        async function fetchRecommended() {
+          const container = document.getElementById("recommendedContainer");
+          const loadingEl = document.getElementById("recommendedLoading");
+          if (!container) return;
+          // show loading
+          container.innerHTML = "";
+          container.appendChild(loadingEl);
+          loadingEl.style.display = "block";
+
+          try {
+            const token = localStorage.getItem("token");
+            const headers = {};
+            if (token) headers["Authorization"] = "Bearer " + token;
+
+            const res = await fetch(RECOMMENDED_API, {
+              method: "GET",
+              credentials: "include",
+              headers,
+            });
+
+            if (res.status === 401) {
+              // not authenticated: show empty state
+              container.innerHTML =
+                '<div style="color:var(--muted)">Please log in to see recommendations.</div>';
+              return;
+            }
+            if (!res.ok) {
+              console.error("Failed to fetch recommended quizzes", res.status);
+              container.innerHTML =
+                '<div style="color:var(--muted)">Could not load recommendations.</div>';
+              return;
+            }
+            let data = null;
+            try {
+              data = await res.json();
+            } catch (e) {
+              data = null;
+            }
+            const arr = Array.isArray(data)
+              ? data
+              : data && data.quizzes
+              ? data.quizzes
+              : [];
+            // render
+            container.innerHTML = "";
+            if (!arr || arr.length === 0) {
+              container.innerHTML =
+                '<div style="color:var(--muted)">No recommended quizzes yet.</div>';
+              return;
+            }
+            arr.forEach((q) => {
+              container.appendChild(buildQuizCard(q));
+            });
+          } catch (err) {
+            console.error("Error fetching recommended quizzes", err);
+            container.innerHTML =
+              '<div style="color:var(--muted)">Could not load recommendations.</div>';
           }
+        }
+
+        // ---------------- Category cards & general image handling ----------------
+        function wireCategoryCards() {
+          document.querySelectorAll(".category-card").forEach((card) => {
+            card.addEventListener("click", () => {
+              const cat =
+                card.dataset.category ||
+                card.querySelector(".category-label")?.textContent ||
+                "Category";
+              window.location.href =
+                "category.html?category=" + encodeURIComponent(cat);
+            });
+            card.addEventListener("keydown", (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                card.click();
+              }
+            });
+          });
+        }
+
+        // ---------------- Logout handler ----------------
+        function clearCookie(name) {
+          try {
+            document.cookie = name + "=; Max-Age=0; path=/; SameSite=Lax";
+            document.cookie =
+              name + "=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+          } catch (e) {}
+        }
+
+        async function doLogout() {
+          try {
+            // server call to clear session cookie if backend supports it
+            await fetch(backendUrl + "/auth/logout", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+            }).catch(() => {});
+
+            // Clear client storage keys used by login script
+            try {
+              localStorage.removeItem("token");
+            } catch (e) {}
+            try {
+              localStorage.removeItem("user");
+            } catch (e) {}
+
+            // legacy/alternate keys (backwards compatibility)
+            try {
+              localStorage.removeItem("osianAuthToken");
+            } catch (e) {}
+            try {
+              localStorage.removeItem("osianUserData");
+            } catch (e) {}
+
+            // Clear likely cookies (best-effort)
+            clearCookie("authToken");
+            clearCookie("osianAuth");
+
+            // Unregister service workers to avoid cached dashboard re-appearing
+            if ("serviceWorker" in navigator) {
+              navigator.serviceWorker
+                .getRegistrations()
+                .then((regs) => {
+                  regs.forEach((r) => {
+                    try {
+                      r.unregister();
+                    } catch (e) {}
+                  });
+                })
+                .catch(() => {});
+            }
+
+            // Redirect to index, replace history
+            window.location.replace("/index.html");
+          } catch (err) {
+            console.error("Logout error", err);
+            window.location.replace("/index.html");
+          }
+        }
+
+        // ---------------- Navigation active state ----------------
+        function setActiveNav() {
+          try {
+            const path = location.pathname.split("/").pop();
+            const navMap = {
+              "dashboard-user.html": ["#nav-dashboard", "#side-dashboard"],
+              "quiz-progress.html": ["#nav-quizzes", "#side-quizzes"],
+              "leaderboard.html": ["#nav-leaderboard", "#side-leaderboard"],
+              "notifications.html": ["#nav-notifs", "#side-notifs"],
+              "profile.html": ["#nav-profile", "#side-profile"],
+            };
+            const pair = navMap[path] || ["#nav-dashboard", "#side-dashboard"];
+            document
+              .querySelectorAll(".bottom-nav a, .sidebar-menu a")
+              .forEach((a) => a.classList.remove("active"));
+            const small = document.querySelector(pair[0]);
+            if (small) small.classList.add("active");
+            const side = document.querySelector(pair[1]);
+            if (side) side.classList.add("active");
+          } catch (e) {
+            /* ignore */
+          }
+        }
+
+        // ---------------- Header avatar from stored user ----------------
+        function setHeaderAvatar() {
+          try {
+            const data = safeJSONParse(localStorage.getItem("user")) || {};
+            const img = document.getElementById("header-avatar");
+            if (img && data.avatar) img.src = data.avatar;
+          } catch (_) {}
+        }
+
+        // ---------------- Bootstrapping ----------------
+        document.addEventListener("DOMContentLoaded", function () {
+          // Wire up logout buttons
+          const sidebarLogout = document.getElementById("logoutBtnSidebar");
+          const headerLogout = document.getElementById("logoutBtnHeader");
+          if (sidebarLogout)
+            sidebarLogout.addEventListener("click", (e) => {
+              e.preventDefault();
+              doLogout();
+            });
+          if (headerLogout)
+            headerLogout.addEventListener("click", (e) => {
+              e.preventDefault();
+              doLogout();
+            });
+
+          // wire category cards and images
+          wireCategoryCards();
+
+          // ensure images have only error handlers (do not preemptively replace)
+          document.querySelectorAll("img").forEach((img) => {
+            img.addEventListener("error", () => imgFallback(img));
+            // clicking image opens in new tab (unless inside clickable card)
+            img.style.cursor = "zoom-in";
+            img.addEventListener("click", (e) => {
+              const cardParent = img.closest(".category-card, .quiz-card");
+              if (cardParent && cardParent.getAttribute("role") === "button")
+                return;
+              try {
+                window.open(img.src, "_blank", "noopener");
+              } catch (err) {
+                location.href = img.src;
+              }
+            });
+          });
+
+          setActiveNav();
+          setHeaderAvatar();
+          fetchRecommended();
         });
-
-        // Set active nav item based on path
-        try {
-          const path = location.pathname.split("/").pop();
-          const navMap = {
-            "dashboard-user.html": ["#nav-dashboard", "#side-dashboard"],
-            "quiz-progress.html": ["#nav-quizzes", "#side-quizzes"],
-            "leaderboard.html": ["#nav-leaderboard", "#side-leaderboard"],
-            "notifications.html": ["#nav-notifs", "#side-notifs"],
-            "profile.html": ["#nav-profile", "#side-profile"],
-          };
-          const pair = navMap[path] || ["#nav-dashboard", "#side-dashboard"];
-          // remove all active
-          document
-            .querySelectorAll(".bottom-nav a, .sidebar-menu a")
-            .forEach((a) => a.classList.remove("active"));
-          const small = document.querySelector(pair[0]);
-          if (small) small.classList.add("active");
-          const side = document.querySelector(pair[1]);
-          if (side) side.classList.add("active");
-        } catch (e) {}
-      });
-
-      // Set header avatar from saved profile data if available
-      try {
-        var data = JSON.parse(localStorage.getItem('osianUserData')) || {};
-        var img = document.getElementById('header-avatar');
-        if (img && data.avatar) { img.src = data.avatar; }
-      } catch (_) {}
+      })();
     </script>
   </body>
 </html>
