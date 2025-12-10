@@ -47,13 +47,29 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             submitButton.textContent = 'Logging in...';
 
             try {
-                const response = await fetch(`${backendUrl}/auth/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
+                const hostedUrl = 'https://osiancommunity-backend.vercel.app/api';
+                let response;
+                try {
+                    response = await fetch(`${backendUrl}/auth/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+                } catch (networkErr) {
+                    if (backendUrl.startsWith('http://localhost')) {
+                        response = await fetch(`${hostedUrl}/auth/login`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ email, password })
+                        });
+                    } else {
+                        throw networkErr;
+                    }
+                }
 
                 const data = await response.json();
 

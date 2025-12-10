@@ -35,21 +35,21 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     }
 
     // Handle Logout
-    const logoutBtn = document.querySelector('.logout-btn');
-    if (logoutBtn) {
+    const logoutBtns = document.querySelectorAll('.logout-btn, .logout-direct');
+    logoutBtns.forEach((logoutBtn) => {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = 'index.html';
         });
-    }
+    });
 
     // --- Page Elements ---
     const kpiAttempted = document.querySelector('.kpi-grid-user .kpi-card-user:nth-child(1) h2');
     const kpiPassed = document.querySelector('.kpi-grid-user .kpi-card-user:nth-child(2) h2');
     const kpiAvgScore = document.querySelector('.kpi-grid-user .kpi-card-user:nth-child(3) h2');
-    const historyTableBody = document.querySelector('.quiz-history-table tbody');
+    const historyGrid = document.getElementById('quiz-history-grid');
     const regPrevBtn = document.getElementById('reg-prev');
     const regNextBtn = document.getElementById('reg-next');
     const regPageInfo = document.getElementById('reg-page-info');
@@ -63,8 +63,8 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     const historyPageSize = 10;
 
     async function fetchMyResults(page = 1) {
-        if (!historyTableBody) return; // In case element isn't found
-        historyTableBody.innerHTML = '<tr><td colspan="6">Loading your results...</td></tr>';
+        if (!historyGrid) return;
+        historyGrid.innerHTML = '<div class="quiz-card"><div>Loading your results...</div></div>';
 
         try {
             const userId = user?._id;
@@ -105,11 +105,11 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             // Populate the page with the data
             populateStats(results);
-            populateHistoryTable(results);
+            populateHistoryCards(results);
 
         } catch (error) {
             console.error('Error fetching results:', error);
-            historyTableBody.innerHTML = `<tr><td colspan="6">Error: ${error.message}</td></tr>`;
+            historyGrid.innerHTML = `<div class="quiz-card"><div>Error: ${error.message}</div></div>`;
         }
     }
 
@@ -303,47 +303,43 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     }
 
     // --- Function to Populate History Table ---
-    function populateHistoryTable(results) {
-        const historyTableBody = document.getElementById('quiz-history-body');
-
-        if (!historyTableBody) return;
-
-        historyTableBody.innerHTML = ''; // Clear loading message
-
+    function populateHistoryCards(results) {
+        if (!historyGrid) return;
+        historyGrid.innerHTML = '';
         if (results.length === 0) {
-            historyTableBody.innerHTML = '<tr><td colspan="6">You have not attempted any quizzes yet.</td></tr>';
+            historyGrid.innerHTML = '<p class="no-data">You have not attempted any quizzes yet.</p>';
             return;
         }
-
         results.forEach(result => {
-            const row = document.createElement('tr');
-
-            // Format the date
-            const attemptedDate = new Date(result.completedAt).toLocaleDateString();
-
-            // Determine score and result tag
-            let scoreText = '--';
-            let resultTag = `<span class="result-tag pending">${result.status === 'pending' ? 'Pending' : result.status}</span>`;
-
-            if (result.status === 'completed') {
-                scoreText = `${result.score ?? 0} / ${result.totalQuestions ?? 0}`;
-                const pass = result.totalQuestions > 0 && ((result.score / result.totalQuestions) > 0.5);
-                resultTag = pass
-                    ? `<span class="result-tag pass">Pass</span>`
-                    : `<span class="result-tag fail">Fail</span>`;
-            } else if (result.status === 'failed_security') {
-                resultTag = `<span class="result-tag fail">Auto-Submitted</span>`;
-            }
-
-            row.innerHTML = `
-                <td>${result.quizId ? result.quizId.title : 'Quiz Deleted'}</td>
-                <td>${result.quizId ? result.quizId.category : 'N/A'}</td>
-                <td>${result.quizId ? result.quizId.quizType : 'N/A'}</td>
-                <td>${attemptedDate}</td>
-                <td>${scoreText}</td>
-                <td>${resultTag}</td>
+            const attemptedDate = result.completedAt ? new Date(result.completedAt).toLocaleString() : '--';
+            const totalQ = result.totalQuestions || 0;
+            const score = result.score || 0;
+            const pass = totalQ > 0 && (score / totalQ) > 0.5;
+            const statusText = result.status === 'completed' ? (pass ? 'Pass' : 'Fail') : (result.status || 'Pending');
+            const statusClass = pass ? 'pass' : (result.status === 'completed' ? 'fail' : 'pending');
+            const card = document.createElement('div');
+            card.className = 'quiz-card';
+            card.innerHTML = `
+                <div class="quiz-card-header">
+                    <h4>${result.quizId ? result.quizId.title : 'Quiz Deleted'}</h4>
+                    <span class="status-tag ${statusClass}">${statusText}</span>
+                </div>
+                <div class="quiz-card-body">
+                    <div class="quiz-info">
+                        <span class="category">${result.quizId ? result.quizId.category : 'N/A'}</span>
+                        <span class="type-tag">${result.quizId ? (result.quizId.quizType || 'Regular') : 'N/A'}</span>
+                    </div>
+                    <div class="quiz-details">
+                        <p><strong>Date:</strong> ${attemptedDate}</p>
+                        <p><strong>Score:</strong> ${score} / ${totalQ}</p>
+                        <p><strong>Percentage:</strong> ${totalQ > 0 ? Math.round((score/totalQ)*100) : 0}%</p>
+                    </div>
+                </div>
+                <div class="quiz-card-actions">
+                    <button class="btn-secondary" onclick="window.location.href='quiz-results.html?quizId=${result.quizId?._id || ''}'">View Details</button>
+                </div>
             `;
-            historyTableBody.appendChild(row);
+            historyGrid.appendChild(card);
         });
     }
 

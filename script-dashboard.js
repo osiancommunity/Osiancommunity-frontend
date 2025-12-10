@@ -197,13 +197,15 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             }
 
             const categories = data.categories || {};
-            const all = [
-                ...(categories.technical || []),
-                ...(categories.law || []),
-                ...(categories.engineering || []),
-                ...(categories.gk || []),
-                ...(categories.sports || [])
-            ];
+            const all = Array.isArray(data.quizzes) && data.quizzes.length > 0
+                ? data.quizzes
+                : [
+                    ...(categories.technical || []),
+                    ...(categories.law || []),
+                    ...(categories.engineering || []),
+                    ...(categories.gk || []),
+                    ...(categories.sports || [])
+                  ];
 
             const recommended = pickTop(all, 6);
             if (recommended.length === 0 && isLocal) {
@@ -234,7 +236,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         return `
             <div class="quiz-card">
-                <img src="${quiz.coverImage || 'https://via.placeholder.com/320x200?text=No+Image'}" alt="${quiz.title}" class="quiz-card-img">
+                <img src="${quiz.coverImage || 'https://via.placeholder.com/320x200?text=No+Image'}" alt="${quiz.title}" class="quiz-card-img" loading="lazy">
                 <div class="quiz-card-header">
                     <span class="quiz-tag ${isPaid ? 'paid' : 'live'}">${isPaid ? 'Paid' : 'Free'}</span>
                     <span class="quiz-category">${quiz.category}</span>
@@ -337,15 +339,13 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             const data = await res.json();
             const prefLocal = localStorage.getItem('fieldPreference');
             const pref = (user && user.profile && user.profile.fieldPreference) || prefLocal || 'General Knowledge';
-            const map = {
-                'Technical': data.categories?.technical || [],
-                'Law': data.categories?.law || [],
-                'Medical': data.categories?.medical || [],
-                'General Knowledge': data.categories?.gk || [],
-                'Social Studies': data.categories?.social || []
-            };
-            const base = map[pref] || [];
-            const rec = pickTop(base.length > 0 ? base : ([...(data.categories?.technical||[]),...(data.categories?.gk||[])]), 12);
+
+            const all = Array.isArray(data.quizzes) && data.quizzes.length > 0
+                ? data.quizzes
+                : ([...(data.categories?.technical||[]), ...(data.categories?.gk||[]), ...(data.categories?.law||[]), ...(data.categories?.engineering||[])]);
+
+            const base = all.filter(q => String(q.category||'').toLowerCase() === String(pref).toLowerCase());
+            const rec = pickTop(base.length > 0 ? base : all, 12);
             renderIntoGrid(rec, 'recommended-quizzes-container');
         } catch (e) { fetchQuizzes(); }
     }
