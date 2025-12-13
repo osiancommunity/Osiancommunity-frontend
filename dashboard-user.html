@@ -1,370 +1,375 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>OSIAN — Dashboard</title>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OSIAN — Dashboard</title>
 
-<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <script src="shared-init.js"></script>
 
-<style>
-/* ================= THEME VARIABLES ================= */
-:root{
-  --bg:#f4faff;
-  --card:#ffffff;
-  --primary:#4c8dff;
-  --accent:#6a5cd8;
-  --text:#0f172a;
-  --muted:#6b7380;
-  --shadow:0 12px 32px rgba(0,0,0,.08);
-}
+    <style>
+      :root {
+        --bg: #f4faff;
+        --card: #ffffff;
+        --primary: #4c8dff;
+        --accent: #6a5cd8;
+        --text: #0f172a;
+        --muted: #6b7380;
+        --shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+      }
+      [data-theme="dark"] {
+        --bg: #0b1220;
+        --card: #121a2f;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+      }
 
-[data-theme="dark"]{
-  --bg:#0b1220;
-  --card:#121a2f;
-  --text:#e5e7eb;
-  --muted:#9ca3af;
-  --shadow:0 12px 32px rgba(0,0,0,.35);
-}
+      * {
+        box-sizing: border-box;
+        font-family: Poppins, system-ui;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+      }
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
 
-*{box-sizing:border-box;font-family:Poppins,system-ui}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  transition:.3s;
-}
+      .sidebar {
+        width: 260px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+        padding: 20px;
+      }
+      .logo {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 30px;
+      }
+      .nav a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .nav a.active,
+      .nav a:hover {
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: #fff;
+      }
 
-.app{display:flex;min-height:100vh}
+      .main {
+        flex: 1;
+        padding: 30px;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 30px;
+      }
+      .header p {
+        margin: 6px 0 0;
+        color: var(--muted);
+      }
 
-/* ================= SIDEBAR (DESKTOP) ================= */
-.sidebar{
-  width:260px;
-  background:var(--card);
-  box-shadow:var(--shadow);
-  padding:20px;
-}
-.logo{
-  font-size:26px;
-  font-weight:800;
-  color:var(--primary);
-  margin-bottom:30px;
-}
-.nav a{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:12px;
-  border-radius:10px;
-  text-decoration:none;
-  color:var(--muted);
-  font-weight:600;
-  margin-bottom:6px;
-}
-.nav a.active,.nav a:hover{
-  background:linear-gradient(135deg,var(--primary),var(--accent));
-  color:#fff;
-}
+      .user-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        position: relative;
+      }
+      .user-box img {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #e5e7eb;
+      }
 
-/* ================= MAIN ================= */
-.main{
-  flex:1;
-  padding:30px;
-}
+      .settings {
+        position: absolute;
+        top: 54px;
+        right: 0;
+        background: var(--card);
+        box-shadow: var(--shadow);
+        border-radius: 12px;
+        padding: 8px;
+        display: none;
+        min-width: 200px;
+        z-index: 10;
+      }
+      .settings button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        background: none;
+        text-align: left;
+        cursor: pointer;
+        border-radius: 8px;
+        display: flex;
+        gap: 10px;
+        color: var(--text);
+      }
+      .settings button:hover {
+        background: var(--bg);
+      }
+      .divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 6px 0;
+      }
 
-/* ================= HEADER ================= */
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:30px;
-}
-.header h1{margin:0;font-size:30px}
-.header p{margin:6px 0 0;color:var(--muted)}
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 22px;
+      }
+      .card {
+        background: var(--card);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        cursor: pointer;
+        transition: 0.25s;
+      }
+      .card:hover {
+        transform: translateY(-6px);
+      }
+      .card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+      }
+      .card span {
+        display: block;
+        padding: 14px;
+        font-weight: 800;
+      }
+      .game-tag {
+        margin-left: 14px;
+        margin-bottom: 14px;
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+      }
 
-/* ================= USER MENU ================= */
-.user-box{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  cursor:pointer;
-  position:relative;
-}
-.user-box img{
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  object-fit:cover;
-}
-.settings{
-  position:absolute;
-  top:54px;
-  right:0;
-  background:var(--card);
-  box-shadow:var(--shadow);
-  border-radius:12px;
-  padding:8px;
-  display:none;
-  min-width:200px;
-}
-.settings button{
-  width:100%;
-  padding:10px;
-  border:none;
-  background:none;
-  text-align:left;
-  cursor:pointer;
-  border-radius:8px;
-  display:flex;
-  gap:10px;
-  color:var(--text);
-}
-.settings button:hover{background:var(--bg)}
-.divider{height:1px;background:#e5e7eb;margin:6px 0}
+      .bottom-nav {
+        display: none;
+      }
+      @media (max-width: 900px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 18px;
+          padding-bottom: 90px;
+        }
+        .bottom-nav {
+          display: flex;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          background: var(--card);
+          box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.2);
+          border-radius: 18px 18px 0 0;
+          z-index: 9999;
+        }
+        .bottom-nav a {
+          flex: 1;
+          text-align: center;
+          padding: 10px 0;
+          text-decoration: none;
+          color: var(--muted);
+          font-size: 12px;
+          font-weight: 600;
+        }
+        .bottom-nav a i {
+          display: block;
+          font-size: 22px;
+          margin-bottom: 4px;
+        }
+        .bottom-nav a.active {
+          color: var(--primary);
+        }
+      }
+    </style>
+  </head>
 
-/* ================= GRID ================= */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
-  gap:22px;
-}
-.card{
-  background:var(--card);
-  border-radius:16px;
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  cursor:pointer;
-  transition:.25s;
-}
-.card:hover{
-  transform:translateY(-6px);
-}
-.card img{
-  width:100%;
-  height:180px;
-  object-fit:cover;
-}
-.card span{
-  display:block;
-  padding:14px;
-  font-weight:800;
-}
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="logo">OSIAN</div>
+        <nav class="nav">
+          <a class="active"><i class="bx bxs-dashboard"></i> Dashboard</a>
+          <a href="quiz-progress.html"><i class="bx bx-file"></i> Quizzes</a>
+          <a href="leaderboard.html"
+            ><i class="bx bxs-trophy"></i> Leaderboard</a
+          >
+          <a href="notifications.html"
+            ><i class="bx bx-bell"></i> Notifications</a
+          >
+          <a href="profile.html"><i class="bx bxs-user"></i> Profile</a>
+        </nav>
+      </aside>
 
-/* ================= GAME TAG ================= */
-.game-tag{
-  margin-left:14px;
-  margin-bottom:14px;
-  display:inline-block;
-  padding:6px 12px;
-  border-radius:999px;
-  background:linear-gradient(135deg,var(--primary),var(--accent));
-  color:#fff;
-  font-size:12px;
-  font-weight:700;
-}
+      <main class="main">
+        <div class="header">
+          <div>
+            <h1 id="welcomeText">Welcome</h1>
+            <p>Select a category or play a game</p>
+          </div>
 
-/* ================= MOBILE BOTTOM NAV ================= */
-.bottom-nav{
-  display:none;
-}
+          <div class="user-box" id="userMenu">
+            <img id="userAvatar" alt="Profile" />
+            <i class="bx bx-chevron-down"></i>
 
-@media(max-width:900px){
+            <div class="settings" id="settingsMenu">
+              <button onclick="location.href='profile.html'">
+                <i class="bx bxs-user"></i> My Profile
+              </button>
+              <div class="divider"></div>
+              <button onclick="setTheme('light')">
+                <i class="bx bx-sun"></i> Light
+              </button>
+              <button onclick="setTheme('dark')">
+                <i class="bx bx-moon"></i> Dark
+              </button>
+              <div class="divider"></div>
+              <button onclick="logout()" style="color: #e11d48">
+                <i class="bx bx-log-out"></i> Logout
+              </button>
+            </div>
+          </div>
+        </div>
 
-  .sidebar{display:none;}
+        <!-- CONTENT SAME AS BEFORE -->
+        <!-- CATEGORIES -->
+        <h2>Categories</h2>
+        <div class="grid">
+          <div class="card" onclick="openCategory('Technical')">
+            <img src="https://i.ibb.co/vCktJR6N/IT-Sector.jpg" />
+            <span>Technical</span>
+          </div>
+          <div class="card" onclick="openCategory('Law')">
+            <img src="https://i.ibb.co/S4zrfB1z/image.jpg" />
+            <span>Law</span>
+          </div>
+          <div class="card" onclick="openCategory('Engineering')">
+            <img
+              src="https://i.ibb.co/V0synVwC/Wallpaper-4-K-Electronic-Gallery.jpg"
+            />
+            <span>Engineering</span>
+          </div>
+          <div class="card" onclick="openCategory('General Knowledge')">
+            <img src="https://i.ibb.co/k65BKMVn/dua-Libra.jpg" />
+            <span>General Knowledge</span>
+          </div>
+          <div class="card" onclick="openCategory('Sports')">
+            <img src="https://i.ibb.co/k65BKMVn/dua-Libra.jpg" />
+            <span>Sports</span>
+          </div>
+        </div>
 
-  .main{
-    padding:18px;
-    padding-bottom:90px;
-  }
+        <!-- 🎮 GAMES SECTION -->
+        <h2 style="margin-top: 30px">Games</h2>
+        <div class="grid">
+          <!-- QUIZ GAME -->
+          <div class="card" onclick="location.href='quiz-game.html'">
+            <img
+              src="https://images.unsplash.com/photo-1511512578047-dfb367046420"
+            />
+            <span>Quiz Game</span>
+            <span class="game-tag">10 Levels • Ranking</span>
+          </div>
 
-  .bottom-nav{
-    display:flex;
-    position:fixed;
-    bottom:0;
-    left:0;
-    width:100%;
-    background:var(--card);
-    box-shadow:0 -10px 25px rgba(0,0,0,.2);
-    border-radius:18px 18px 0 0;
-    z-index:9999;
-  }
-
-  .bottom-nav a{
-    flex:1;
-    text-align:center;
-    padding:10px 0;
-    text-decoration:none;
-    color:var(--muted);
-    font-size:12px;
-    font-weight:600;
-  }
-
-  .bottom-nav a i{
-    display:block;
-    font-size:22px;
-    margin-bottom:4px;
-  }
-
-  .bottom-nav a.active{
-    color:var(--primary);
-  }
-}
-</style>
-</head>
-
-<body>
-
-<div class="app">
-
-<!-- ========== SIDEBAR (DESKTOP) ========== -->
-<aside class="sidebar">
-  <div class="logo">OSIAN</div>
-  <nav class="nav">
-    <a class="active"><i class="bx bxs-dashboard"></i> Dashboard</a>
-    <a href="quiz-progress.html"><i class="bx bx-file"></i> Quizzes</a>
-    <a href="leaderboard.html"><i class="bx bxs-trophy"></i> Leaderboard</a>
-    <a href="notifications.html"><i class="bx bx-bell"></i> Notifications</a>
-    <a href="profile.html"><i class="bx bxs-user"></i> Profile</a>
-  </nav>
-</aside>
-
-<!-- ========== MAIN ========== -->
-<main class="main">
-
-<div class="header">
-  <div>
-    <h1 id="welcomeText">Welcome</h1>
-    <p>Select a category or play a game</p>
-  </div>
-
-  <div class="user-box" id="userMenu">
-    <img id="userAvatar">
-    <i class="bx bx-chevron-down"></i>
-
-    <div class="settings" id="settingsMenu">
-      <button onclick="setTheme('light')">
-        <i class="bx bx-sun"></i> Light Theme
-      </button>
-      <button onclick="setTheme('dark')">
-        <i class="bx bx-moon"></i> Dark Theme
-      </button>
-      <div class="divider"></div>
-      <button onclick="location.href='profile.html'">
-        <i class="bx bxs-user"></i> My Profile
-      </button>
-      <div class="divider"></div>
-      <button onclick="logout()" style="color:#e11d48">
-        <i class="bx bx-log-out"></i> Logout
-      </button>
+          <!-- PUZZLE GAME -->
+          <div class="card" onclick="location.href='puzzle-game.html'">
+            <img src="https://i.ibb.co/3ysLSSd6/Kunstwerk-Puzzle-kaufen.jpg" />
+            <span>Puzzle Game</span>
+            <span class="game-tag">Brain • Logic</span>
+          </div>
+        </div>
+      </main>
     </div>
-  </div>
-</div>
 
-<h2>Categories</h2>
-<div class="grid">
-  <div class="card" onclick="openCategory('Technical')">
-    <img src="https://i.ibb.co/vCktJR6N/IT-Sector.jpg">
-    <span>Technical</span>
-  </div>
-  <div class="card" onclick="openCategory('Law')">
-    <img src="https://i.ibb.co/S4zrfB1z/image.jpg">
-    <span>Law</span>
-  </div>
-  <div class="card" onclick="openCategory('Engineering')">
-    <img src="https://i.ibb.co/V0synVwC/Wallpaper-4-K-Electronic-Gallery.jpg">
-    <span>Engineering</span>
-  </div>
-  <div class="card" onclick="openCategory('General Knowledge')">
-    <img src="https://i.ibb.co/k65BKMVn/dua-Libra.jpg">
-    <span>General Knowledge</span>
-  </div>
-</div>
+    <nav class="bottom-nav">
+      <a class="active" href="dashboard.html"
+        ><i class="bx bxs-dashboard"></i>Home</a
+      >
+      <a href="quiz-progress.html"><i class="bx bx-file"></i>Quizzes</a>
+      <a href="leaderboard.html"><i class="bx bxs-trophy"></i>Rank</a>
+      <a href="notifications.html"><i class="bx bx-bell"></i>Alerts</a>
+      <a href="profile.html"><i class="bx bxs-user"></i>Profile</a>
+    </nav>
 
-<h2 style="margin-top:30px">Games</h2>
-<div class="grid">
-  <div class="card" onclick="location.href='quiz-game.html'">
-    <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420">
-    <span>Quiz Game</span>
-    <span class="game-tag">10 Levels</span>
-  </div>
+    <script>
+      /* ===== USER DATA FIX ===== */
+      let userData = {};
+      try {
+        userData = JSON.parse(localStorage.getItem("osianUserData")) || {};
+      } catch (e) {}
 
-  <div class="card" onclick="location.href='puzzle-game.html'">
-    <img src="https://i.ibb.co/3ysLSSd6/Kunstwerk-Puzzle-kaufen.jpg">
-    <span>Puzzle Game</span>
-    <span class="game-tag">Brain Logic</span>
-  </div>
-</div>
+      const fallbackUser = JSON.parse(localStorage.getItem("user")) || {};
+      const name = userData.name || fallbackUser.name || "Student";
+      const avatar =
+        userData.avatar ||
+        fallbackUser.avatar ||
+        "https://i.ibb.co/jP9JWBBy/diljj.png";
 
-</main>
-</div>
+      welcomeText.textContent = "Welcome back, " + name;
+      userAvatar.src = avatar;
 
-<!-- ========== MOBILE BOTTOM NAV ========== -->
-<nav class="bottom-nav">
-  <a href="dashboard.html" class="active">
-    <i class="bx bxs-dashboard"></i>
-    <span>Home</span>
-  </a>
-  <a href="quiz-progress.html">
-    <i class="bx bx-file"></i>
-    <span>Quizzes</span>
-  </a>
-  <a href="leaderboard.html">
-    <i class="bx bxs-trophy"></i>
-    <span>Rank</span>
-  </a>
-  <a href="notifications.html">
-    <i class="bx bx-bell"></i>
-    <span>Alerts</span>
-  </a>
-  <a href="profile.html">
-    <i class="bx bxs-user"></i>
-    <span>Profile</span>
-  </a>
-</nav>
+      function setTheme(t) {
+        document.documentElement.setAttribute("data-theme", t);
+        localStorage.setItem("theme", t);
+      }
+      setTheme(localStorage.getItem("theme") || "light");
 
-<script>
-/* ================= USER DATA ================= */
-const user = JSON.parse(localStorage.getItem("user")) || {
-  name:"Student",
-  avatar:"https://i.ibb.co/jP9JWBBy/diljj.png"
-};
-welcomeText.textContent = "Welcome back, " + user.name;
-userAvatar.src = user.avatar;
+      userMenu.onclick = (e) => {
+        e.stopPropagation();
+        settingsMenu.style.display =
+          settingsMenu.style.display === "block" ? "none" : "block";
+      };
+      function openCategory(category) {
+        if (!category) return;
 
-/* ================= THEME LOGIC ================= */
-function setTheme(theme){
-  document.documentElement.setAttribute("data-theme", theme);
-  localStorage.setItem("theme", theme);
-}
+        // Encode category safely
+        const encoded = encodeURIComponent(category);
 
-setTheme(localStorage.getItem("theme") || "light");
+        // Redirect to category page
+        window.location.href = "category.html?category=" + encoded;
+      }
 
-/* ================= USER MENU ================= */
-userMenu.onclick = e => {
-  e.stopPropagation();
-  settingsMenu.style.display =
-    settingsMenu.style.display === "block" ? "none" : "block";
-};
-document.onclick = () => settingsMenu.style.display = "none";
+      document.onclick = () => (settingsMenu.style.display = "none");
 
-/* ================= NAV & LOGOUT ================= */
-function openCategory(c){
-  location.href = "category.html?category=" + encodeURIComponent(c);
-}
-function logout(){
-  localStorage.clear();
-  location.href = "index.html";
-}
-
-/* ================= ACTIVE BOTTOM NAV ================= */
-document.querySelectorAll(".bottom-nav a").forEach(link=>{
-  if(link.href === location.href){
-    document.querySelectorAll(".bottom-nav a")
-      .forEach(a=>a.classList.remove("active"));
-    link.classList.add("active");
-  }
-});
-</script>
-
-</body>
+      function logout() {
+        localStorage.clear();
+        location.href = "index.html";
+      }
+    </script>
+  </body>
 </html>
