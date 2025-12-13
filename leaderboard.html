@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OSIAN — Leaderboard</title>
 
 <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-<script src="shared-init.js"></script>
 
 <style>
-/* ===== SAME VARIABLES AS DASHBOARD ===== */
+/* ===== THEME VARIABLES (SYNC WITH DASHBOARD) ===== */
 :root{
   --bg:#f7fbff;
   --card:#ffffff;
@@ -19,18 +18,21 @@
   --text:#0f172a;
   --shadow:0 12px 32px rgba(20,60,120,.08);
   --radius:14px;
-  font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto;
+  font-family:Poppins,system-ui;
 }
 
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
+[data-theme="dark"]{
+  --bg:#0b1220;
+  --card:#121a2f;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --shadow:0 15px 40px rgba(0,0,0,.6);
 }
 
+body{margin:0;background:var(--bg);color:var(--text)}
 .app{display:flex;min-height:100vh}
 
-/* ===== SIDEBAR (SAME AS DASHBOARD) ===== */
+/* ===== SIDEBAR ===== */
 .sidebar{
   width:260px;
   background:var(--card);
@@ -101,9 +103,8 @@ body{
   cursor:pointer;
   display:flex;
   gap:10px;
-  align-items:center;
 }
-.dropdown button:hover{background:#eef4ff}
+.dropdown button:hover{background:var(--bg)}
 
 /* ===== CONTROLS ===== */
 .controls{
@@ -155,7 +156,6 @@ body{
 }
 .name{font-weight:700}
 .score{font-size:26px;font-weight:800;color:var(--primary)}
-
 .badge{
   display:inline-block;
   margin-top:8px;
@@ -193,9 +193,36 @@ body{
 .row img{width:46px;height:46px;border-radius:50%}
 
 /* ===== MOBILE ===== */
+.bottom-nav{display:none}
 @media(max-width:980px){
   .sidebar{display:none}
+  .main{padding-bottom:90px}
   .top3{grid-template-columns:1fr}
+
+  .bottom-nav{
+    display:flex;
+    position:fixed;
+    bottom:0;left:0;width:100%;
+    background:var(--card);
+    box-shadow:0 -10px 25px rgba(0,0,0,.2);
+    border-radius:18px 18px 0 0;
+    z-index:9999;
+  }
+  .bottom-nav a{
+    flex:1;
+    text-align:center;
+    padding:10px 0;
+    text-decoration:none;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:600;
+  }
+  .bottom-nav a i{
+    display:block;
+    font-size:22px;
+    margin-bottom:4px;
+  }
+  .bottom-nav a.active{color:var(--primary)}
 }
 </style>
 </head>
@@ -217,7 +244,6 @@ body{
 
 <!-- MAIN -->
 <main class="main">
-
 <div class="header">
   <div>
     <h1>Top Users</h1>
@@ -246,33 +272,65 @@ body{
 
 <div class="top3" id="top3"></div>
 <div class="list" id="list"></div>
-
 </main>
 </div>
 
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="dashboard-user.html"><i class="bx bxs-dashboard"></i><span>Home</span></a>
+  <a href="quiz-progress.html"><i class="bx bx-file"></i><span>Quizzes</span></a>
+  <a class="active"><i class="bx bxs-trophy"></i><span>Rank</span></a>
+  <a href="notifications.html"><i class="bx bx-bell"></i><span>Alerts</span></a>
+  <a href="profile.html"><i class="bx bxs-user"></i><span>Profile</span></a>
+</nav>
+
 <script>
-const user=JSON.parse(localStorage.getItem("user"))||{
-  name:"Kudoz Kundan",
+/* ===== THEME SYNC ===== */
+document.documentElement.setAttribute(
+  "data-theme",
+  localStorage.getItem("theme") || "light"
+);
+
+/* ===== USER ===== */
+const user = JSON.parse(localStorage.getItem("user")) || {
+  name:"Student",
   avatar:"https://i.pravatar.cc/150?img=3"
 };
+document.getElementById("avatar").src = user.avatar || "";
 
-profileBtn.onclick=e=>{
+/* ===== DROPDOWN ===== */
+profileBtn.onclick = e=>{
   e.stopPropagation();
-  dropdown.style.display=dropdown.style.display==="block"?"none":"block";
+  dropdown.style.display = dropdown.style.display==="block"?"none":"block";
 };
-document.onclick=()=>dropdown.style.display="none";
+document.onclick = ()=>dropdown.style.display="none";
 
 function logout(){
   localStorage.clear();
   location.href="index.html";
 }
 
+/* ===== SAFE apiFetch ===== */
+const backendUrl =
+  location.hostname.endsWith("vercel.app")
+    ? "https://osiancommunity-backend.vercel.app/api"
+    : (location.hostname==="localhost"||location.hostname==="127.0.0.1")
+      ? "http://localhost:5000/api"
+      : "https://osiancommunity-backend.vercel.app/api";
+
+async function apiFetch(path){
+  const res = await fetch(backendUrl + path);
+  if(!res.ok) throw new Error("API Error");
+  return res.json();
+}
+
+/* ===== LOAD LEADERBOARD ===== */
 async function load(){
   let data=[];
   try{
-    const res = await apiFetch('/leaderboard');
-    if (res && Array.isArray(res.leaderboard)) data = res.leaderboard;
-  }catch(e){}
+    const res = await apiFetch("/leaderboard");
+    if (Array.isArray(res.leaderboard)) data = res.leaderboard;
+  }catch{}
 
   if(!data.length){
     data=[
@@ -305,7 +363,6 @@ async function load(){
     </div>
   `).join("");
 }
-
 load();
 </script>
 </body>
