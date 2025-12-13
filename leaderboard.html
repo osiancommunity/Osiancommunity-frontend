@@ -133,7 +133,9 @@ body{margin:0;background:var(--bg);color:var(--text)}
   box-shadow:var(--shadow);
   text-align:center;
   position:relative;
+  transition:transform .2s ease, box-shadow .2s ease;
 }
+.card:hover{ transform:translateY(-4px); box-shadow:0 18px 42px rgba(20,60,120,.12); }
 .medal{
   position:absolute;
   top:-14px;
@@ -153,6 +155,10 @@ body{margin:0;background:var(--bg);color:var(--text)}
 .avatar{
   width:90px;height:90px;border-radius:50%;object-fit:cover;
   margin:0 auto 10px;
+  box-shadow:0 12px 24px rgba(76,141,255,.25);
+  outline:4px solid transparent; outline-offset:0;
+  background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,var(--primary),var(--accent)) border-box;
+  border:4px solid transparent;
 }
 .name{font-weight:700}
 .score{font-size:26px;font-weight:800;color:var(--primary)}
@@ -161,7 +167,7 @@ body{margin:0;background:var(--bg);color:var(--text)}
   margin-top:8px;
   padding:6px 12px;
   border-radius:999px;
-  background:#eef4ff;
+  background:linear-gradient(135deg,#eef4ff,#f2f7ff);
   color:var(--primary);
   font-size:13px;
   font-weight:700;
@@ -181,7 +187,9 @@ body{margin:0;background:var(--bg);color:var(--text)}
   display:flex;
   gap:12px;
   align-items:center;
+  transition:transform .2s ease, box-shadow .2s ease;
 }
+.row:hover{ transform:translateY(-2px); box-shadow:0 12px 32px rgba(20,60,120,.10); }
 .rank{
   width:42px;height:42px;border-radius:12px;
   background:#eef4ff;
@@ -284,6 +292,7 @@ body{margin:0;background:var(--bg);color:var(--text)}
   <a href="profile.html"><i class="bx bxs-user"></i><span>Profile</span></a>
 </nav>
 
+<script src="shared-init.js"></script>
 <script>
 /* ===== THEME SYNC ===== */
 document.documentElement.setAttribute(
@@ -292,11 +301,8 @@ document.documentElement.setAttribute(
 );
 
 /* ===== USER ===== */
-const user = JSON.parse(localStorage.getItem("user")) || {
-  name:"Student",
-  avatar:"https://i.pravatar.cc/150?img=3"
-};
-document.getElementById("avatar").src = user.avatar || "";
+const user = JSON.parse(localStorage.getItem("user")||"{}")||{};
+document.getElementById("avatar").src = user.avatar || "https://i.pravatar.cc/150?img=3";
 
 /* ===== DROPDOWN ===== */
 profileBtn.onclick = e=>{
@@ -311,57 +317,75 @@ function logout(){
 }
 
 /* ===== SAFE apiFetch ===== */
-const backendUrl =
-  location.hostname.endsWith("vercel.app")
-    ? "https://osiancommunity-backend.vercel.app/api"
-    : (location.hostname==="localhost"||location.hostname==="127.0.0.1")
-      ? "http://localhost:5000/api"
-      : "https://osiancommunity-backend.vercel.app/api";
-
-async function apiFetch(path){
-  const res = await fetch(backendUrl + path);
-  if(!res.ok) throw new Error("API Error");
-  return res.json();
+async function safeFetchLeaderboard(params){
+  const query = new URLSearchParams(params).toString();
+  const res = await apiFetch('/leaderboard?'+query);
+  return Array.isArray(res.leaderboard) ? res.leaderboard : [];
 }
 
 /* ===== LOAD LEADERBOARD ===== */
-async function load(){
-  let data=[];
-  try{
-    const res = await apiFetch("/leaderboard");
-    if (Array.isArray(res.leaderboard)) data = res.leaderboard;
-  }catch{}
+function renderData(data){
+  const top = data.slice(0,3);
+  const rest = data.slice(3);
+  top3.innerHTML=top.map((u,i)=>{
+    const n = u.user?.name || u.name || 'User';
+    const a = u.user?.avatar || u.avatar || 'https://i.pravatar.cc/150?img=3';
+    const s = Math.round(u.compositeScore||u.score||0);
+    return `
+    <div class="card">
+      <div class="medal ${["gold","silver","bronze"][i]}">${i+1}</div>
+      <img class="avatar" src="${a}">
+      <div class="name">${n}</div>
+      <div class="score">${s}%</div>
+      <div class="badge">${["Gold","Silver","Bronze"][i]}</div>
+    </div>`;
+  }).join("");
+  list.innerHTML=rest.map((u,i)=>{
+    const n = u.user?.name || u.name || 'User';
+    const a = u.user?.avatar || u.avatar || 'https://i.pravatar.cc/150?img=3';
+    const r = (u.rank||i+4);
+    return `
+    <div class="row">
+      <div class="rank">${r}</div>
+      <img src="${a}">
+      <div>
+        <strong>${n}</strong>
+        <div class="badge">Top 10</div>
+      </div>
+    </div>`;
+  }).join("");
+}
 
+async function load(){
+  const urlParams = new URLSearchParams(location.search);
+  const quizId = urlParams.get('quizId');
+  let scope = 'global';
+  let period = 'all';
+  const params = quizId ? { scope:'quiz', period, quizId } : { scope, period };
+  let data = [];
+  try { data = await safeFetchLeaderboard(params); } catch {}
   if(!data.length){
     data=[
       {name:"Kudoz",score:92},
       {name:"Aman",score:88},
       {name:"Riya",score:85},
       {name:"Neha",score:80},
-      {name:"Arjun",score:78},
+      {name:"Arjun",score:78}
     ];
   }
+  renderData(data);
+  startRealtime(params);
+}
 
-  top3.innerHTML=data.slice(0,3).map((u,i)=>`
-    <div class="card">
-      <div class="medal ${["gold","silver","bronze"][i]}">${i+1}</div>
-      <img class="avatar" src="${u.avatar||user.avatar}">
-      <div class="name">${u.name}</div>
-      <div class="score">${u.score}%</div>
-      <div class="badge">${["Gold","Silver","Bronze"][i]}</div>
-    </div>
-  `).join("");
-
-  list.innerHTML=data.slice(3).map((u,i)=>`
-    <div class="row">
-      <div class="rank">${i+4}</div>
-      <img src="${u.avatar||user.avatar}">
-      <div>
-        <strong>${u.name}</strong>
-        <div class="badge">Top 10</div>
-      </div>
-    </div>
-  `).join("");
+let lbTimer=null;
+function startRealtime(params){
+  startPolling(params);
+}
+function startPolling(params){
+  if(lbTimer) clearInterval(lbTimer);
+  const tick = async()=>{ try{ const d = await safeFetchLeaderboard(params); renderData(d);}catch{} };
+  tick();
+  lbTimer = setInterval(tick,15000);
 }
 load();
 </script>
