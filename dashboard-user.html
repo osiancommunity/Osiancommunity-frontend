@@ -1,867 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>OSIAN — Dashboard (User)</title>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OSIAN — Dashboard</title>
 
-    <!-- Boxicons -->
-    <link
-      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
-      rel="stylesheet"
-    />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
+<script src="shared-init.js"></script>
 
-    <style>
-      :root {
-        --primary: #4c8dff;
-        --accent: #6a5cd8;
-        --bg: #f7fbff;
-        --muted: #6b7380;
-        --card: #fff;
-        --border: #e9eef2;
-        --shadow: 0 10px 30px rgba(40, 70, 140, 0.06);
-        --radius: 14px;
-        font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial;
-        color: #0f172a;
-      }
+<style>
+:root{
+  --bg:#f4faff;
+  --card:#ffffff;
+  --primary:#4c8dff;
+  --accent:#6a5cd8;
+  --text:#0f172a;
+  --muted:#6b7380;
+  --shadow:0 12px 32px rgba(0,0,0,.08);
+}
+[data-theme="dark"]{
+  --bg:#0b1220;
+  --card:#121a2f;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+}
 
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        background: radial-gradient(
-          1200px 600px at 0% 0%,
-          #f7fbff 0%,
-          #eaf4ff 100%
-        );
-      }
+*{box-sizing:border-box;font-family:Poppins,system-ui}
+body{margin:0;background:var(--bg);color:var(--text)}
 
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
+.app{display:flex;min-height:100vh}
 
-      .dashboard-container {
-        display: flex;
-        min-height: 100vh;
-      }
+/* SIDEBAR */
+.sidebar{
+  width:260px;
+  background:var(--card);
+  box-shadow:var(--shadow);
+  padding:20px;
+}
+.logo{
+  font-size:26px;
+  font-weight:800;
+  color:var(--primary);
+  margin-bottom:30px;
+}
+.nav a{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  border-radius:10px;
+  text-decoration:none;
+  color:var(--muted);
+  font-weight:600;
+  margin-bottom:6px;
+}
+.nav a.active,.nav a:hover{
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+}
 
-      /* ---------------- Sidebar ---------------- */
-      .sidebar {
-        width: 260px;
-        background: linear-gradient(180deg, #fff, #f6faff);
-        border-right: 1px solid var(--border);
-        position: fixed;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        overflow: auto;
-        border-radius: 0 18px 18px 0;
-        box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.06),
-          -8px -8px 24px rgba(255, 255, 255, 0.8);
-      }
-      .sidebar-header {
-        padding: 22px;
-        border-bottom: 1px solid var(--border);
-      }
-      .logo {
-        font-size: 28px;
-        font-weight: 700;
-        color: var(--primary);
-      }
-      .sidebar-menu {
-        padding: 16px;
-        flex: 1;
-      }
-      .sidebar-menu li {
-        list-style: none;
-        margin-bottom: 6px;
-      }
-      .sidebar-menu a {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 10px;
-        border-radius: 10px;
-        color: var(--muted);
-        font-weight: 600;
-      }
-      .sidebar-menu a i {
-        font-size: 20px;
-        color: var(--primary);
-        width: 28px;
-        text-align: center;
-      }
-      .sidebar-menu a.active {
-        background: linear-gradient(135deg, var(--primary), var(--accent));
-        color: #fff;
-        box-shadow: 0 6px 16px rgba(106, 92, 216, 0.18);
-      }
-      .sidebar-footer {
-        padding: 14px;
-        border-top: 1px solid var(--border);
-        font-size: 13px;
-        color: var(--muted);
-      }
+/* MAIN */
+.main{flex:1;padding:30px}
 
-      /* ---------------- Main content ---------------- */
-      .main-content {
-        margin-left: 260px;
-        flex: 1;
-        padding: 28px;
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-      }
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:30px;
+}
+.header h1{margin:0;font-size:30px}
+.header p{margin:6px 0 0;color:var(--muted)}
 
-      /* Header */
-      .main-header {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        position: relative;
-      }
-      .header-title {
-        flex: 1;
-        min-width: 0;
-      }
-      .header-title h1 {
-        margin: 0;
-        font-size: clamp(20px, 5.5vw, 34px);
-        line-height: 1.02;
-      }
-      .header-title p {
-        margin: 8px 0 0;
-        color: var(--muted);
-        font-size: 14px;
-      }
+/* USER MENU */
+.user-box{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  position:relative;
+}
+.user-box img{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  object-fit:cover;
+}
+.settings{
+  position:absolute;
+  top:54px;
+  right:0;
+  background:var(--card);
+  box-shadow:var(--shadow);
+  border-radius:12px;
+  padding:8px;
+  display:none;
+  min-width:200px;
+}
+.settings button{
+  width:100%;
+  padding:10px;
+  border:none;
+  background:none;
+  text-align:left;
+  cursor:pointer;
+  border-radius:8px;
+  display:flex;
+  gap:10px;
+}
+.settings button:hover{background:var(--bg)}
+.divider{height:1px;background:#e5e7eb;margin:6px 0}
 
-      /* Actions aligned right and do not wrap under title */
-      .header-actions {
-        flex: 0 0 auto;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-left: 12px;
-      }
-      .header-link {
-        padding: 8px 12px;
-        border-radius: 10px;
-        background: #fff;
-        border: 1px solid var(--border);
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .header-link img {
-        display: block;
-        border-radius: 50%;
-      }
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:22px;
+}
+.card{
+  background:var(--card);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  cursor:pointer;
+  transition:.25s;
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 18px 40px rgba(0,0,0,.12);
+}
+.card img{
+  width:100%;
+  height:180px;
+  object-fit:cover;
+}
+.card span{
+  display:block;
+  padding:14px;
+  font-weight:800;
+}
 
-      /* Hero */
-      .premium-hero {
-        background: linear-gradient(180deg, #fff, #f7faff);
-        border-radius: 12px;
-        padding: 16px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: var(--shadow);
-      }
+/* GAME BADGE */
+.game-tag{
+  margin-left:14px;
+  margin-bottom:14px;
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:999px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+}
+</style>
+</head>
 
-      /* Content card */
-      .content-card {
-        background: var(--card);
-        border-radius: 12px;
-        padding: 18px;
-        box-shadow: var(--shadow);
-      }
-      .content-card h2 {
-        font-size: 20px;
-        margin: 0 0 14px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
+<body>
+<div class="app">
 
-      /* CATEGORY GRID - large card style */
-      .category-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
-      }
-      .category-card {
-        background: var(--card);
-        border-radius: 12px;
-        padding: 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        cursor: pointer;
-        border: 1px solid #edf2f7;
-        transition: transform 0.15s, box-shadow 0.15s;
-        height: 100%;
-        /* help equal heights */
-        min-height: 100%;
-      }
-      .category-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
-        border-color: rgba(76, 141, 255, 0.12);
-      }
-      .category-media {
-        width: 100%;
-        height: 260px;
-        border-radius: 10px;
-        overflow: hidden;
-        background: #f0f6ff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 10px 30px rgba(76, 141, 255, 0.06);
-      }
-      .category-media img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
-      .category-label {
-        font-size: 18px;
-        font-weight: 700;
-        color: #0f172a;
-        text-align: left;
-      }
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">OSIAN</div>
+  <nav class="nav">
+    <a class="active"><i class="bx bxs-dashboard"></i> Dashboard</a>
+    <a href="quiz-progress.html"><i class="bx bx-file"></i> Quizzes</a>
+    <a href="leaderboard.html"><i class="bx bxs-trophy"></i> Leaderboard</a>
+    <a href="notifications.html"><i class="bx bx-bell"></i> Notifications</a>
+    <a href="profile.html"><i class="bx bxs-user"></i> Profile</a>
+  </nav>
+</aside>
 
-      /* Recommended list */
-      .quiz-list-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 16px;
-      }
-      .quiz-card {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        padding: 12px;
-        border-radius: 12px;
-        background: #fff;
-        box-shadow: var(--shadow);
-      }
-      .quiz-card img {
-        width: 160px;
-        height: 110px;
-        border-radius: 8px;
-        object-fit: cover;
-      }
-      .quiz-body {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-      .btn-primary {
-        background: var(--primary);
-        color: #fff;
-        padding: 8px 12px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-      }
+<!-- MAIN -->
+<main class="main">
 
-      /* Bottom nav (mobile) */
-      .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 72px;
-        background: var(--card);
-        border-top: 1px solid var(--border);
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        padding: 8px 0;
-        z-index: 9999;
-      }
-      .bottom-nav a {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        color: var(--muted);
-        font-size: 12px;
-      }
-      .bottom-nav a i {
-        font-size: 20px;
-      }
-      @media (min-width: 900px) {
-        .bottom-nav {
-          display: none;
-        }
-      }
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <h1 id="welcomeText">Welcome</h1>
+    <p>Select a category or play a game</p>
+  </div>
 
-      /* Responsive */
-      @media (max-width: 1024px) {
-        .sidebar {
-          width: 72px;
-        }
-        .sidebar .logo {
-          font-size: 18px;
-          text-align: center;
-        }
-        .sidebar-menu a span {
-          display: none;
-        }
-        .main-content {
-          margin-left: 72px;
-          padding: 18px;
-        }
-      }
-      @media (max-width: 768px) {
-        .sidebar {
-          display: none;
-        }
-        .main-content {
-          margin-left: 0;
-          padding: 14px 12px 110px;
-        }
-        .category-media {
-          height: 200px;
-        }
-      }
+  <div class="user-box" id="userMenu">
+    <img id="userAvatar">
+    <i class="bx bx-chevron-down"></i>
 
-      /* small helper for broken images replacement */
-      .img-placeholder {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f2f8ff;
-        color: var(--primary);
-        font-weight: 700;
-        border-radius: 8px;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="dashboard-container">
-      <!-- Sidebar -->
-      <aside class="sidebar" role="navigation" aria-label="Main sidebar">
-        <div class="sidebar-header">
-          <a class="logo" href="dashboard-user.html">OSIAN</a>
-        </div>
-
-        <ul class="sidebar-menu" role="menu" aria-label="Main menu">
-          <li>
-            <a id="side-dashboard" class="active" href="dashboard-user.html"
-              ><i class="bx bxs-dashboard"></i><span>Dashboard</span></a
-            >
-          </li>
-          <li>
-            <a id="side-quizzes" href="quiz-progress.html"
-              ><i class="bx bx-file-blank"></i><span>Quizzes</span></a
-            >
-          </li>
-          <li>
-            <a id="side-leaderboard" href="leaderboard.html"
-              ><i class="bx bxs-trophy"></i><span>Leaderboard</span></a
-            >
-          </li>
-          <li>
-            <a id="side-notifs" href="notifications.html"
-              ><i class="bx bx-bell"></i><span>Notifications</span></a
-            >
-          </li>
-          <li>
-            <a id="side-profile" href="profile.html"
-              ><i class="bx bxs-user"></i><span>My Profile</span></a
-            >
-          </li>
-        </ul>
-
-        <div class="sidebar-footer">
-          <a
-            id="logoutBtnSidebar"
-            class="header-link"
-            href="index.html"
-            style="display: inline-flex; align-items: center; gap: 10px"
-            ><i class="bx bx-log-out"></i><span>Log Out</span></a
-          >
-        </div>
-      </aside>
-
-      <!-- Main -->
-      <main class="main-content" role="main">
-        <!-- Header -->
-        <header class="main-header">
-          <div class="header-title">
-            <h1>Welcome Back, Kudoz Kundan!</h1>
-            <p>Let's find a quiz for you.</p>
-          </div>
-
-          <div class="header-actions" aria-label="User actions">
-            <a class="header-link" href="profile.html" title="Profile">
-                src="https://i.ibb.co/jP9JWBBy/diljj.png"
-                alt="Profile"
-                id="header-avatar"
-                style="width: 36px; height: 36px; border-radius: 50%"
-                loading="lazy"
-              />
-            </a>
-            <a
-              id="logoutBtnHeader"
-              class="header-link"
-              href="index.html"
-              title="Log out"
-              ><i class="bx bx-log-out"></i> Log Out</a
-            >
-          </div>
-        </header>
-
-        <!-- Categories -->
-        <section class="content-card" aria-labelledby="categories-heading">
-          <h2 id="categories-heading">
-            <i class="bx bx-category"></i> Categories
-          </h2>
-
-          <!-- Categories -->
-          <section class="category-grid" id="categoryGrid">
-            <div
-         <!-- Categories --> <section class="category-grid" id="categoryGrid"> <div class="category-card" role="button" tabindex="0" data-category="Technical" > <div class="category-media"> <img src="https://i.ibb.co/vCktJR6N/IT-Sector.jpg" alt="Technical" onerror="fallback(this)" /> </div> <div class="category-label">Technical</div> </div> <div class="category-card" role="button" tabindex="0" data-category="Law" > <div class="category-media"> <img src="https://i.ibb.co/S4zrfB1z/image.jpg" alt="Law" onerror="fallback(this)" /> </div> <div class="category-label">Law</div> </div> <div class="category-card" role="button" tabindex="0" data-category="Engineering" > <div class="category-media"> <img src="https://i.ibb.co/V0synVwC/Wallpaper-4-K-Electronic-Gallery.jpg" alt="Engineering" onerror="fallback(this)" /> </div> <div class="category-label">Engineering</div> </div> <div class="category-card" role="button" tabindex="0" data-category="General Knowledge" > <div class="category-media"> <img src="https://i.ibb.co/k65BKMVn/dua-Libra.jpg" alt="General Knowledge" onerror="fallback(this)" /> </div> <div class="category-label">General Knowledge</div> </div> <div class="category-card" role="button" tabindex="0" data-category="Sports" > <div class="category-media"> <img src="https://i.ibb.co/4R4ZtnRk/All-sports-elements-on-dark-background-Premium-AI-generated-image.jpg" alt="Sports" onerror="fallback(this)" /> </div> <div class="category-label">Sports</div> </div> </div> </section>
-              role="button"
-              tabindex="0"
-              data-category="Technical"
-            >
-              <div class="category-media">
-                <img
-                  src="https://i.ibb.co/vCktJR6N/IT-Sector.jpg"
-                  alt="Technical"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div class="category-label">Technical</div>
-            </div>
-
-            <div
-              class="category-card"
-              role="button"
-              tabindex="0"
-              data-category="Law"
-            >
-              <div class="category-media">
-                <img
-                  src="https://i.ibb.co/S4zrfB1z/image.jpg"
-                  alt="Law"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div class="category-label">Law</div>
-            </div>
-
-            <div
-              class="category-card"
-              role="button"
-              tabindex="0"
-              data-category="Engineering"
-            >
-              <div class="category-media">
-                <img
-                  src="https://i.ibb.co/V0synVwC/Wallpaper-4-K-Electronic-Gallery.jpg"
-                  alt="Engineering"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div class="category-label">Engineering</div>
-            </div>
-
-            <div
-              class="category-card"
-              role="button"
-              tabindex="0"
-              data-category="General Knowledge"
-            >
-              <div class="category-media">
-                <img
-                  src="https://i.ibb.co/k65BKMVn/dua-Libra.jpg"
-                  alt="General Knowledge"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div class="category-label">General Knowledge</div>
-            </div>
-
-            <div
-              class="category-card"
-              role="button"
-              tabindex="0"
-              data-category="Sports"
-            >
-              <div class="category-media">
-                <img
-                  src="https://i.ibb.co/4R4ZtnRk/All-sports-elements-on-dark-background-Premium-AI-generated-image.jpg"
-                  alt="Sports"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div class="category-label">Sports</div>
-            </div>
-          </section>
-        </section>
-
-        <!-- Recommended -->
-        <section class="content-card" aria-labelledby="recommended-heading">
-          <h2 id="recommended-heading">
-            <i class="bx bx-star"></i> Recommended For You
-          </h2>
-          <!-- This container will be populated by JS -->
-          <div class="quiz-list-grid" id="recommendedContainer">
-            <!-- Loading skeleton or message will be injected by JS while fetching -->
-            <div id="recommendedLoading" style="color: var(--muted)">
-              Loading recommendations…
-            </div>
-          </div>
-        </section>
-      </main>
+    <div class="settings" id="settingsMenu">
+      <button onclick="location.href='profile.html'">
+        <i class="bx bxs-user"></i> My Profile
+      </button>
+      <div class="divider"></div>
+      <button onclick="setTheme('light')"><i class="bx bx-sun"></i> Light</button>
+      <button onclick="setTheme('dark')"><i class="bx bx-moon"></i> Dark</button>
+      <div class="divider"></div>
+      <button onclick="logout()" style="color:#e11d48">
+        <i class="bx bx-log-out"></i> Logout
+      </button>
     </div>
+  </div>
+</div>
 
-    <!-- bottom nav (mobile) -->
-    <nav class="bottom-nav" role="navigation" aria-label="Mobile nav">
-      <a href="dashboard-user.html" id="nav-dashboard"
-        ><i class="bx bxs-dashboard"></i><span>Home</span></a
-      >
-      <a href="quiz-progress.html" id="nav-quizzes"
-        ><i class="bx bx-file-blank"></i><span>Quizzes</span></a
-      >
-      <a href="leaderboard.html" id="nav-leaderboard"
-        ><i class="bx bxs-trophy"></i><span>Leaderboard</span></a
-      >
-      <a href="notifications.html" id="nav-notifs"
-        ><i class="bx bx-bell"></i><span>Alerts</span></a
-      >
-      <a href="profile.html" id="nav-profile"
-        ><i class="bx bxs-user"></i><span>Profile</span></a
-      >
-    </nav>
+<!-- CATEGORIES -->
+<h2>Categories</h2>
+<div class="grid">
+  <div class="card" onclick="openCategory('Technical')">
+    <img src="https://i.ibb.co/vCktJR6N/IT-Sector.jpg">
+    <span>Technical</span>
+  </div>
+  <div class="card" onclick="openCategory('Law')">
+    <img src="https://i.ibb.co/S4zrfB1z/image.jpg">
+    <span>Law</span>
+  </div>
+  <div class="card" onclick="openCategory('Engineering')">
+    <img src="https://i.ibb.co/V0synVwC/Wallpaper-4-K-Electronic-Gallery.jpg">
+    <span>Engineering</span>
+  </div>
+  <div class="card" onclick="openCategory('General Knowledge')">
+    <img src="https://i.ibb.co/k65BKMVn/dua-Libra.jpg">
+    <span>General Knowledge</span>
+  </div>
+   <div class="card" onclick="openCategory('Sports')">
+    <img src="https://i.ibb.co/k65BKMVn/dua-Libra.jpg">
+    <span>Sports</span>
+  </div>
+</div>
 
-    <script>
-      (function () {
-        // ---------------- CONFIG: backend URL detection (same logic as your login script) ----------------
-        const backendUrl = location.hostname.endsWith("vercel.app")
-          ? "https://osiancommunity-backend.vercel.app/api"
-          : location.hostname === "localhost" ||
-            location.hostname === "127.0.0.1"
-          ? "http://localhost:5000/api"
-          : "https://osiancommunity-backend.vercel.app/api";
+<!-- 🎮 GAMES SECTION -->
+<h2 style="margin-top:30px">Games</h2>
+<div class="grid">
 
-        // Recommended API route (adjust if needed)
-        const RECOMMENDED_API = backendUrl + "/quizzes/recommended";
+  <!-- QUIZ GAME -->
+  <div class="card" onclick="location.href='quiz-game.html'">
+    <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420">
+    <span>Quiz Game</span>
+    <span class="game-tag">10 Levels • Ranking</span>
+  </div>
 
-        // ---------------- Utilities ----------------
-        function safeJSONParse(val) {
-          try {
-            return JSON.parse(val);
-          } catch (e) {
-            return null;
-          }
-        }
-        function createImgPlaceholder() {
-            if (!img || !img.parentNode) return;
-            const parent = img.parentNode;
-            if (
-              parent.querySelector &&
-              parent.querySelector(".img-placeholder")
-            )
-              return;
-            const placeholder = createImgPlaceholder();
-            parent.replaceChild(placeholder, img);
-          } catch (e) {
-            console.error(e);
-          }
-        }
+  <!-- PUZZLE GAME -->
+  <div class="card" onclick="location.href='puzzle-game.html'">
+    <img src="https://i.ibb.co/3ysLSSd6/Kunstwerk-Puzzle-kaufen.jpg">
+    <span>Puzzle Game</span>
+    <span class="game-tag">Brain • Logic</span>
+  </div>
 
-        // ---------------- Populate recommended quizzes ----------------
-        function buildQuizCard(q) {
-          const card = document.createElement("div");
-          card.className = "quiz-card";
+</div>
 
-          const img = document.createElement("img");
-          img.alt = q.title || "Quiz image";
-          img.loading = "lazy";
-          img.decoding = "async";
-          if (q.image) img.src = q.image;
+</main>
+</div>
 
-          img.addEventListener("error", () => imgFallback(img));
-          img.style.cursor = "zoom-in";
-          img.addEventListener("click", (e) => {
-            const cardParent = img.closest(".category-card, .quiz-card");
-            if (cardParent && cardParent.getAttribute("role") === "button")
-              return;
-            try {
-              window.open(q.image || img.src, "_blank", "noopener");
-            } catch (err) {
-              location.href = q.image || img.src;
-            }
-          });
+<script>
+const user = JSON.parse(localStorage.getItem("user")) || {
+  name:"Student",
+  avatar:"https://i.ibb.co/jP9JWBBy/diljj.png"
+};
+welcomeText.textContent="Welcome back, "+user.name;
+userAvatar.src=user.avatar;
 
-          const body = document.createElement("div");
-          body.className = "quiz-body";
+applyTheme(localStorage.getItem("theme")||"light");
 
-          const title = document.createElement("div");
-          title.style.fontWeight = "700";
-          title.textContent = q.title || "Untitled Quiz";
+userMenu.onclick=e=>{
+  e.stopPropagation();
+  settingsMenu.style.display=settingsMenu.style.display==="block"?"none":"block";
+};
+document.onclick=()=>settingsMenu.style.display="none";
 
-          const desc = document.createElement("div");
-          desc.style.color = "var(--muted)";
-          desc.textContent = q.description || "";
+function openCategory(c){
+  location.href="category.html?category="+encodeURIComponent(c);
+}
+function logout(){
+  localStorage.clear();
+  location.href="index.html";
+}
+</script>
 
-          const actions = document.createElement("div");
-          actions.style.marginTop = "8px";
-          const openBtn = document.createElement("button");
-          openBtn.className = "btn-primary";
-          openBtn.type = "button";
-          openBtn.textContent = "Open Quiz";
-          openBtn.addEventListener("click", () => {
-            const id = encodeURIComponent(q.quizId || q.id || "");
-            if (!id) {
-              alert("Quiz id missing.");
-              return;
-            }
-            location.href = `quiz-play.html?quizId=${id}`;
-          });
-
-          actions.appendChild(openBtn);
-          body.appendChild(title);
-          body.appendChild(desc);
-          body.appendChild(actions);
-
-          card.appendChild(img);
-          card.appendChild(body);
-
-          return card;
-        }
-
-        async function fetchRecommended() {
-          const container = document.getElementById("recommendedContainer");
-          const loadingEl = document.getElementById("recommendedLoading");
-          if (!container) return;
-          // show loading
-          container.innerHTML = "";
-          container.appendChild(loadingEl);
-          loadingEl.style.display = "block";
-
-          try {
-            const token = localStorage.getItem("token");
-            const headers = {};
-            if (token) headers["Authorization"] = "Bearer " + token;
-
-            const res = await fetch(RECOMMENDED_API, {
-              method: "GET",
-              credentials: "include",
-              headers,
-            });
-
-            if (res.status === 401) {
-              // not authenticated: show empty state
-              container.innerHTML =
-                '<div style="color:var(--muted)">Please log in to see recommendations.</div>';
-              return;
-            }
-            if (!res.ok) {
-              console.error("Failed to fetch recommended quizzes", res.status);
-              container.innerHTML =
-                '<div style="color:var(--muted)">Could not load recommendations.</div>';
-              return;
-            }
-            let data = null;
-            try {
-              data = await res.json();
-            } catch (e) {
-              data = null;
-            }
-            const arr = Array.isArray(data)
-              ? data
-              : data && data.quizzes
-              ? data.quizzes
-              : [];
-            // render
-            container.innerHTML = "";
-            if (!arr || arr.length === 0) {
-              container.innerHTML =
-                '<div style="color:var(--muted)">No recommended quizzes yet.</div>';
-              return;
-            }
-            arr.forEach((q) => {
-              container.appendChild(buildQuizCard(q));
-            });
-          } catch (err) {
-            console.error("Error fetching recommended quizzes", err);
-            container.innerHTML =
-              '<div style="color:var(--muted)">Could not load recommendations.</div>';
-          }
-        }
-
-        // ---------------- Category cards & general image handling ----------------
-        function wireCategoryCards() {
-          document.querySelectorAll(".category-card").forEach((card) => {
-            card.addEventListener("click", () => {
-              const cat =
-                card.dataset.category ||
-                card.querySelector(".category-label")?.textContent ||
-                "Category";
-              window.location.href =
-                "category.html?category=" + encodeURIComponent(cat);
-            });
-            card.addEventListener("keydown", (e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                card.click();
-              }
-            });
-          });
-        }
-
-        // ---------------- Logout handler ----------------
-        function clearCookie(name) {
-          try {
-            document.cookie = name + "=; Max-Age=0; path=/; SameSite=Lax";
-            document.cookie =
-              name + "=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
-          } catch (e) {}
-        }
-
-        async function doLogout() {
-          try {
-            // server call to clear session cookie if backend supports it
-            await fetch(backendUrl + "/auth/logout", {
-              method: "POST",
-              credentials: "include",
-              headers: { "Content-Type": "application/json" },
-            }).catch(() => {});
-
-            // Clear client storage keys used by login script
-            try {
-              localStorage.removeItem("token");
-            } catch (e) {}
-            try {
-              localStorage.removeItem("user");
-            } catch (e) {}
-
-            // legacy/alternate keys (backwards compatibility)
-            try {
-              localStorage.removeItem("osianAuthToken");
-            } catch (e) {}
-            try {
-              localStorage.removeItem("osianUserData");
-            } catch (e) {}
-
-            // Clear likely cookies (best-effort)
-            clearCookie("authToken");
-            clearCookie("osianAuth");
-
-            // Unregister service workers to avoid cached dashboard re-appearing
-            if ("serviceWorker" in navigator) {
-              navigator.serviceWorker
-                .getRegistrations()
-                .then((regs) => {
-                  regs.forEach((r) => {
-                    try {
-                      r.unregister();
-                    } catch (e) {}
-                  });
-                })
-                .catch(() => {});
-            }
-
-            // Redirect to index, replace history
-            window.location.replace("/index.html");
-          } catch (err) {
-            console.error("Logout error", err);
-            window.location.replace("/index.html");
-          }
-        }
-
-        // ---------------- Navigation active state ----------------
-        function setActiveNav() {
-          try {
-            const path = location.pathname.split("/").pop();
-            const navMap = {
-              "dashboard-user.html": ["#nav-dashboard", "#side-dashboard"],
-              "quiz-progress.html": ["#nav-quizzes", "#side-quizzes"],
-              "leaderboard.html": ["#nav-leaderboard", "#side-leaderboard"],
-              "notifications.html": ["#nav-notifs", "#side-notifs"],
-              "profile.html": ["#nav-profile", "#side-profile"],
-            };
-            const pair = navMap[path] || ["#nav-dashboard", "#side-dashboard"];
-            document
-              .querySelectorAll(".bottom-nav a, .sidebar-menu a")
-              .forEach((a) => a.classList.remove("active"));
-            const small = document.querySelector(pair[0]);
-            if (small) small.classList.add("active");
-            const side = document.querySelector(pair[1]);
-            if (side) side.classList.add("active");
-          } catch (e) {
-            /* ignore */
-          }
-        }
-
-        // ---------------- Header avatar from stored user ----------------
-        function setHeaderAvatar() {
-          try {
-            const data = safeJSONParse(localStorage.getItem("user")) || {};
-            const img = document.getElementById("header-avatar");
-            if (img && data.avatar) img.src = data.avatar;
-          } catch (_) {}
-        }
-
-        // ---------------- Bootstrapping ----------------
-        document.addEventListener("DOMContentLoaded", function () {
-          // Wire up logout buttons
-          const sidebarLogout = document.getElementById("logoutBtnSidebar");
-          const headerLogout = document.getElementById("logoutBtnHeader");
-          if (sidebarLogout)
-            sidebarLogout.addEventListener("click", (e) => {
-              e.preventDefault();
-              doLogout();
-            });
-          if (headerLogout)
-            headerLogout.addEventListener("click", (e) => {
-              e.preventDefault();
-              doLogout();
-            });
-
-          // wire category cards and images
-          wireCategoryCards();
-
-          // ensure images have only error handlers (do not preemptively replace)
-          document.querySelectorAll("img").forEach((img) => {
-            img.addEventListener("error", () => imgFallback(img));
-            // clicking image opens in new tab (unless inside clickable card)
-            img.style.cursor = "zoom-in";
-            img.addEventListener("click", (e) => {
-              const cardParent = img.closest(".category-card, .quiz-card");
-              if (cardParent && cardParent.getAttribute("role") === "button")
-                return;
-              try {
-                window.open(img.src, "_blank", "noopener");
-              } catch (err) {
-                location.href = img.src;
-              }
-            });
-          });
-
-          setActiveNav();
-          setHeaderAvatar();
-          fetchRecommended();
-        });
-      })();
-    </script>
-  </body>
+</body>
 </html>

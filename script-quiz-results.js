@@ -16,12 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
         notificationModal.classList.remove('active');
     }
 
-    // Define the location of your backend
-const backendUrl = (location.hostname.endsWith('vercel.app'))
-  ? 'https://osiancommunity-backend.vercel.app/api'
-  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-      ? 'http://localhost:5000/api'
-      : 'https://osiancommunity-backend.vercel.app/api');
+    // API base and helpers are provided by shared-init.js (apiFetch)
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -74,33 +69,10 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // --- Fetch Admin's Quizzes ---
     async function fetchMyQuizzes() {
         try {
-            const response = await fetch(`${backendUrl}/quizzes/admin`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                if (response.status === 403) {
-                    showToast('Access denied.', 'warning');
-                    return;
-                }
-                throw new Error('Failed to fetch quizzes');
-            }
-
-            const data = await response.json();
-            allQuizzes = data.quizzes || [];
-
-            // Populate quiz filter dropdown
+            const data = await apiFetch('/quizzes/admin', { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!data) throw new Error('Failed to fetch quizzes');
+            allQuizzes = Array.isArray(data.quizzes) ? data.quizzes : (Array.isArray(data) ? data : []);
             populateQuizFilter();
-
-            // Fetch results based on selected quiz or all results
             if (selectedQuizId) {
                 quizFilter.value = selectedQuizId;
                 fetchQuizResults(selectedQuizId);
@@ -127,30 +99,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // --- Fetch Results for All Quizzes ---
 async function fetchAllResults() {
     try {
-        const response = await fetch(`${backendUrl}/results/admin`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                localStorage.removeItem('user');
-                localStorage.removeItem('token');
-                window.location.href = 'login.html';
-                return;
-            }
-            if (response.status === 403) {
-                    showToast('Access denied.', 'warning');
-                    return;
-                }
-            const errorText = await response.text();
-            console.error('Failed response text:', errorText);
-            throw new Error(`Failed to fetch results: ${response.status}`);
-        }
-
-        const data = await response.json();
-        allResults = data.results || [];
+        const data = await apiFetch('/results/admin', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!data) throw new Error('Failed to fetch results');
+        allResults = Array.isArray(data.results) ? data.results : (Array.isArray(data) ? data : []);
         filteredResults = [...allResults];
         sortResults && sortResults();
         renderResults();
@@ -165,32 +116,13 @@ async function fetchAllResults() {
     // --- Fetch Results for Specific Quiz ---
     async function fetchQuizResults(quizId) {
         try {
-            const response = await fetch(`${backendUrl}/results/quiz/${quizId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                if (response.status === 403) {
-                    showToast('Access denied.', 'warning');
-                    return;
-                }
-                throw new Error('Failed to fetch quiz results');
-            }
-
-        const data = await response.json();
-        allResults = data.results || [];
-        filteredResults = [...allResults];
-        sortResults();
-        renderResults();
-        renderSummary();
+            const data = await apiFetch(`/results/quiz/${quizId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!data) throw new Error('Failed to fetch quiz results');
+            allResults = Array.isArray(data.results) ? data.results : (Array.isArray(data) ? data : []);
+            filteredResults = [...allResults];
+            sortResults();
+            renderResults();
+            renderSummary();
         } catch (error) {
             console.error('Error fetching quiz results:', error);
             resultsTableBody.innerHTML = '<tr><td colspan="7">Error loading quiz results. Please try again.</td></tr>';
@@ -213,10 +145,8 @@ async function fetchAllResults() {
         if (!userId) return null;
         if (userCache[userId]) return userCache[userId];
         try {
-            const res = await fetch(`${backendUrl}/users/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-            if (!res.ok) return null;
-            const data = await res.json();
-            const u = data.user || null;
+            const data = await apiFetch(`/users/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const u = (data && data.user) ? data.user : data || null;
             if (u) {
                 userCache[userId] = u;
                 try {
@@ -427,7 +357,7 @@ async function fetchAllResults() {
         const rawMessage = (messageInput && messageInput.value.trim()) || 'Your quiz results have been released for {{quizTitle}} on {{releaseDate}}.';
 
         try {
-            const response = await fetch(`${backendUrl}/results/release`, {
+            const resp = await apiFetch('/results/release', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -435,13 +365,7 @@ async function fetchAllResults() {
                 },
                 body: JSON.stringify({ resultIds })
             });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Failed to release results:', response.status, errorText);
-                throw new Error(`Failed to release results: ${response.status}`);
-            }
-
+            if (!resp) throw new Error('Failed to release results');
             showToast('Results released successfully!', 'success');
 
             // Auto-send notifications to selected users (optional)
@@ -462,7 +386,7 @@ async function fetchAllResults() {
                 }
                 const finalMessage = renderTemplate(rawMessage, { quizTitle, releaseDate: dateStr, adminName });
                 try {
-                    const notifyRes = await fetch(`${backendUrl}/notifications/send-result`, {
+                    const notifyRes = await apiFetch('/notifications/send-result', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -473,13 +397,12 @@ async function fetchAllResults() {
                             message: finalMessage
                         })
                     });
-                    if (!notifyRes.ok) {
-                        const errText = await notifyRes.text();
-                        console.warn('Notification send failed:', errText);
+                    if (!notifyRes) {
+                        console.warn('Notification send failed');
                     }
                 } catch (e) {
                     console.warn('Notification send error:', e);
-            }
+                }
     }
             // Refresh the results
             if (quizFilter.value === 'all') {
@@ -541,7 +464,7 @@ async function fetchAllResults() {
                     quizTitle = t || quizTitle;
                 }
                 const finalMessage = renderTemplate(notificationMessage, { quizTitle, releaseDate: dateStr, adminName });
-                const response = await fetch(`${backendUrl}/notifications/send-result`, {
+                const response = await apiFetch('/notifications/send-result', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -552,12 +475,7 @@ async function fetchAllResults() {
                         message: finalMessage
                     })
                 });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || 'Failed to send notification');
-                }
-
+                if (!response) throw new Error('Failed to send notification');
                 showToast('Notification sent successfully!', 'success');
             } catch (error) {
                 console.error('Error sending notification:', error);
@@ -607,14 +525,8 @@ async function fetchAllResults() {
         const closeBtn = document.getElementById('result-modal-close');
 
         try {
-            const response = await fetch(`${backendUrl}/results/${resultId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(errText || 'Failed to load result details');
-            }
-            const data = await response.json();
+            const data = await apiFetch(`/results/${resultId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!data) throw new Error('Failed to load result details');
             const r = data.result || data;
 
             const score = r.score ?? 0;

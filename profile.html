@@ -1,138 +1,668 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - OSIAN</title>
-    <link rel="stylesheet" href="style-profile.css">
-    <link rel="stylesheet" href="assets/boxicons-local.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OSIAN — My Profile</title>
 
-    <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <a href="dashboard-user.html" class="logo" id="sidebar-logo-link">OSIAN</a>
-            </div>
-            <ul class="sidebar-menu">
-                <li id="dashboard-link-li"><a href="dashboard-user.html" id="dashboard-link"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
-                <li id="my-quizzes-link-li"><a href="quiz-progress.html" id="my-quizzes-link"><i class='bx bx-file-blank'></i><span>My Quizzes</span></a></li>
-                <li id="mentorship-link-li"><a href="mentorship-user.html" id="mentorship-link"><i class='bx bx-video'></i><span>Mentorship</span></a></li>
-                <li id="notifications-link-li"><a href="notifications.html" id="notifications-link"><i class='bx bx-bell'></i><span>Notifications</span></a></li>
-               <li class="active"><a href="profile.html" class="active"><i class='bx bxs-user'></i><span>My Profile</span></a></li>
+    <!-- Icons -->
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <script src="shared-init.js"></script>
 
-            </ul>
-            <div class="sidebar-footer">
-                <a href="login.html" class="logout-btn">
-                    <i class='bx bx-log-out'></i><span>Log Out</span>
-                </a>
-            </div>
-        </aside>
+    <style>
+      :root {
+        --primary: #4c8dff;
+        --accent: #6a5cd8;
 
-        <main class="main-content">
-            <header class="main-header">
-                <div class="header-title">
-                    <h1>User Profile</h1>
-                    <p>Manage your account settings and view your statistics.</p>
-                </div>
-                <div class="header-profile">
-                    <button class="sidebar-toggle" id="sidebar-toggle"><i class='bx bx-menu'></i></button>
-                    <a href="profile.html"><img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="Profile Picture" id="header-avatar"></a>
-                </div>
-            </header>
+        /* LIGHT THEME (default) */
+        --bg: #f4faff;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #6b7380;
+        --border: #e5e7eb;
+        --shadow: 0 14px 36px rgba(0, 0, 0, 0.08);
+        --radius: 16px;
+      }
 
-            <div class="profile-grid">
-            <!-- 1. User Profile Card -->
-            <section class="profile-card">
-                <div class="profile-header">
-                    <label for="avatar-upload" class="avatar-label">
-                        <img src="https://i.ibb.co/jP9JWBBy/diljj.png" alt="User Avatar" id="profile-avatar">
-                        <div class="avatar-overlay"><i class='bx bx-camera'></i></div>
-                    </label>
-                    <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
-                    <h2 id="profile-name">OSIAN user</h2>
-                    <p id="profile-username">@osianuser</p>
-                    <button id="change-pic-btn" class="btn btn-secondary">Change Picture</button>
+      /* ===== DARK THEME ===== */
+      :root[data-theme="dark"] {
+        --bg: #0b1220;
+        --card: #0f172a;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --border: #1e293b;
+        --shadow: 0 18px 44px rgba(0, 0, 0, 0.6);
+      }
 
-                </div>
-                <div class="profile-bio">
-                    <p>Quiz enthusiast and lifelong learner. Ready to take on any challenge!</p>
-                </div>
-            </section>
-            <!-- 3. Account Settings -->
-            <section class="profile-settings">
-                <h3>Account Settings</h3>
-                <div class="profile-progress" id="profile-progress">
-                    <div class="progress-track"><div class="progress-bar" id="profile-progress-bar"></div></div>
-                    <div class="progress-text">Profile completion: <span id="profile-progress-percent">0%</span></div>
-                </div>
-                <form id="settings-form">
-                    <!-- Common Fields -->
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" readonly>
-                        <small>Email cannot be changed.</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="mobile">Mobile No</label>
-                        <input type="tel" id="mobile" name="mobile" placeholder="Enter your mobile number">
-                    </div>
-                    <div class="form-group">
-                        <label for="city">City</label>
-                        <input type="text" id="city" name="city" placeholder="Enter your city">
-                    </div>
+      * {
+        box-sizing: border-box;
+        font-family: Poppins, system-ui, sans-serif;
+      }
 
-                    <!-- User-Specific Fields -->
-                    <div id="user-fields" class="role-specific-fields">
-                        <div class="form-group"><label for="college">College/University</label><input type="text" id="college" name="college" placeholder="Enter your college"></div>
-                        <div class="form-group"><label for="branch">Branch</label><input type="text" id="branch" name="branch" placeholder="Enter your branch"></div>
-                        <div class="form-group"><label for="state">State</label><input type="text" id="state" name="state" placeholder="Enter your state"></div>
-                    </div>
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+      }
 
-                    <!-- Admin/Superadmin-Specific Fields -->
-                    <div id="admin-fields" class="role-specific-fields">
-                        <div class="form-group"><label for="organization">Organization</label><input type="text" id="organization" name="organization" placeholder="Enter your organization"></div>
-                    </div>
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
 
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </form>
-                <p id="form-status"></p>
-                <p id="profile-missing" style="text-align:center;font-size:13px;color:#888;"></p>
-            </section>
-            </div>
-        </main>
-    </div>
+      /* ===== SIDEBAR ===== */
+      .sidebar {
+        width: 260px;
+        background: var(--card);
+        padding: 22px;
+        box-shadow: var(--shadow);
+      }
 
-    <div class="bottom-nav">
-        <a href="dashboard-user.html" id="nav-dashboard"><i class='bx bxs-dashboard'></i><span>Home</span></a>
-        <a href="quiz-progress.html" id="nav-quizzes"><i class='bx bx-file-blank'></i><span>Quizzes</span></a>
-        <a href="mentorship-user.html" id="nav-mentorship"><i class='bx bx-video'></i><span>Mentor</span></a>
-        <a href="notifications.html" id="nav-notifs"><i class='bx bx-bell'></i><span>Alerts</span></a>
-        <a href="profile.html" id="nav-profile"><i class='bx bxs-user'></i><span>Profile</span></a>
-    </div>
+      .logo {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 30px;
+      }
 
-    <script src="script-toast-helper.js"></script>
-    <script src="script-profile.js"></script>
-    <script>
-    (function(){
-        var el = document.getElementById('nav-profile');
-        if (el) el.classList.add('active');
-    })();
-    </script>
-    <script>
-    (function(){
-        const toggle = document.getElementById('sidebar-toggle');
-        const sidebar = document.querySelector('.sidebar');
-        if (toggle && sidebar) {
-            toggle.addEventListener('click', function(){
-                sidebar.classList.toggle('open');
-            });
+      .nav a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      .nav a.active,
+      .nav a:hover {
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: #fff;
+      }
+
+      /* ===== MAIN ===== */
+      .main {
+        flex: 1;
+        padding: 30px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 30px;
+      }
+
+      .header p {
+        margin: 6px 0 0;
+        color: var(--muted);
+      }
+
+      .user-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .user-box img {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      /* ===== PROFILE GRID ===== */
+      .profile-grid {
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: 24px;
+      }
+
+      /* PROFILE CARD */
+      .profile-card {
+        background: var(--card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 24px;
+        text-align: center;
+      }
+
+      .avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 6px solid #fff;
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.15);
+      }
+
+      .profile-card h2 {
+        margin: 14px 0 4px;
+        font-size: 22px;
+      }
+
+      .profile-card p {
+        color: var(--muted);
+        margin-bottom: 18px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .stat {
+        background: #f7faff;
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .stat strong {
+        font-size: 18px;
+        display: block;
+      }
+
+      /* SETTINGS */
+      .settings {
+        background: var(--card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 26px;
+      }
+
+      .settings h3 {
+        margin-top: 0;
+        margin-bottom: 18px;
+        font-size: 22px;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #abadb2;
+        font-size: 14px;
+      }
+
+      .btn {
+        padding: 12px 18px;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: #fff;
+      }
+
+      @media (max-width: 900px) {
+        .profile-grid {
+          grid-template-columns: 1fr;
         }
-    })();
+        .sidebar {
+          display: none;
+        }
+      }
+
+      /* ===== MOBILE BOTTOM NAV ===== */
+      .bottom-nav {
+        display: none;
+      }
+
+      @media (max-width: 900px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 18px;
+          padding-bottom: 90px;
+        }
+
+        .bottom-nav {
+          display: flex;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          background: var(--card);
+          box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.2);
+          border-radius: 18px 18px 0 0;
+          z-index: 9999;
+        }
+        .bottom-nav a {
+          flex: 1;
+          text-align: center;
+          padding: 10px 0;
+          text-decoration: none;
+          color: var(--muted);
+          font-size: 12px;
+          font-weight: 600;
+        }
+        .bottom-nav a i {
+          display: block;
+          font-size: 22px;
+          margin-bottom: 4px;
+        }
+        .bottom-nav a.active {
+          color: var(--primary);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="logo">OSIAN</div>
+        <nav class="nav">
+          <a href="dashboard-user.html"
+            ><i class="bx bxs-dashboard"></i> Dashboard</a
+          >
+          <a href="quiz-progress.html"><i class="bx bx-file"></i>Quizzes</a>
+          <a href="leaderboard.html"
+            ><i class="bx bxs-trophy"></i> Leaderboard</a
+          >
+          <a href="notifications.html"
+            ><i class="bx bx-bell"></i> Notifications</a
+          >
+          <a class="active"><i class="bx bxs-user"></i> My Profile</a>
+        </nav>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="main">
+        <div class="header">
+          <div>
+            <h1>User Profile</h1>
+            <p>Manage your account and performance</p>
+          </div>
+          <div class="user-box">
+            <img id="headerAvatar" src="https://i.ibb.co/jP9JWBBy/diljj.png" />
+          </div>
+        </div>
+
+        <div class="profile-grid">
+          <!-- PROFILE CARD -->
+          <div class="profile-card">
+            <img
+              id="profileAvatar"
+              class="avatar"
+              src="https://i.ibb.co/jP9JWBBy/diljj.png"
+            />
+            <h2 id="profileName">OSIAN User</h2>
+            <p id="profileUsername">@osianuser</p>
+            <button id="changePicBtn" class="btn btn-primary" type="button">
+              Change Picture
+            </button>
+            <input
+              id="avatarUpload"
+              type="file"
+              accept="image/*"
+              style="display: none"
+            />
+
+            <div class="stats">
+              <div class="stat">
+                <strong id="statQuizzes">0</strong>
+                Quizzes
+              </div>
+              <div class="stat">
+                <strong id="statWin">0%</strong>
+                Win Rate
+              </div>
+              <div class="stat">
+                <strong id="statPoints">0</strong>
+                Points
+              </div>
+            </div>
+          </div>
+
+          <!-- SETTINGS -->
+          <div class="settings">
+            <h3>Account Settings</h3>
+
+            <form id="profileForm">
+              <div class="form-group">
+                <label>Name</label>
+                <input id="name" type="text" />
+              </div>
+
+              <div class="form-group">
+                <label>Email</label>
+                <input id="email" type="email" readonly />
+              </div>
+
+              <div class="form-group">
+                <label>Mobile</label>
+                <input id="mobile" type="tel" />
+              </div>
+
+              <div class="form-group">
+                <label>City</label>
+                <input id="city" type="text" />
+              </div>
+
+              <div class="form-group">
+                <label>College / Institute</label>
+                <input
+                  id="college"
+                  type="text"
+                  placeholder="Enter your college / institute"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Course</label>
+                <input
+                  id="course"
+                  type="text"
+                  placeholder="Enter your course"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Institute Roll Number (optional)</label>
+                <input
+                  id="roll"
+                  type="text"
+                  placeholder="Enter your roll number"
+                />
+              </div>
+
+              <button class="btn btn-primary" type="submit">
+                Save Changes
+              </button>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <a href="dashboard-user.html"
+        ><i class="bx bxs-dashboard"></i><span>Home</span></a
+      >
+      <a href="quiz-progress.html"
+        ><i class="bx bx-file"></i><span>Quizzes</span></a
+      >
+      <a href="leaderboard.html"
+        ><i class="bx bxs-trophy"></i><span>Rank</span></a
+      >
+      <a href="notifications.html" <a
+        ><i class="bx bx-bell"></i><span>Alerts</span></a
+      >
+      <a class="active" href="profile.html">
+        <i class="bx bxs-user"></i><span>Profile</span></a
+      >
+    </nav>
+
+    <script>
+      var token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "login.html";
+      }
+      function setText(id, v) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = v || "";
+      }
+      function setValue(id, v) {
+        var el = document.getElementById(id);
+        if (el) el.value = v || "";
+      }
+      function setSrc(id, v) {
+        var el = document.getElementById(id);
+        if (el && v) el.src = v;
+      }
+      async function loadProfile() {
+        try {
+          var data = await apiFetch("/users/profile", {
+            headers: { Authorization: "Bearer " + token },
+          });
+          if (!data) throw new Error("failed");
+          var u = data.user || {};
+          var p = u.profile || {};
+          setText("profileName", u.name);
+          setText(
+            "profileUsername",
+            "@" + (u.name || "user").replace(/\s+/g, "").toLowerCase()
+          );
+          setValue("name", u.name);
+          setValue("email", u.email);
+          setValue("mobile", p.phone);
+          setValue("city", p.city);
+          setValue("college", p.college);
+          setValue("course", p.course);
+          setValue("roll", p.roll || p.rollNumber);
+          var avatar = p.avatar || u.avatar;
+          setSrc("profileAvatar", avatar);
+          setSrc("headerAvatar", avatar);
+          var storedRaw = localStorage.getItem("osianUserData");
+          var stored = {};
+          try {
+            stored = storedRaw ? JSON.parse(storedRaw) : {};
+          } catch (e) {}
+          var merged = Object.assign({}, stored, {
+            name: u.name,
+            email: u.email,
+            college: p.college,
+            course: p.course,
+            roll: p.roll || p.rollNumber,
+            city: p.city,
+            state: p.state,
+            avatar: avatar,
+          });
+          localStorage.setItem("osianUserData", JSON.stringify(merged));
+        } catch (e) {}
+      }
+      function showCachedProfile() {
+        try {
+          var raw = localStorage.getItem("osianUserData");
+          if (!raw) return;
+          var c = JSON.parse(raw);
+          setText("profileName", c.name);
+          setText(
+            "profileUsername",
+            c.name
+              ? "@" + String(c.name).replace(/\s+/g, "").toLowerCase()
+              : "@user"
+          );
+          setValue("name", c.name);
+          setValue("email", c.email);
+          setValue("mobile", c.phone || c.mobile);
+          setValue("city", c.city);
+          setValue("college", c.college);
+          setValue("course", c.course);
+          setValue("roll", c.roll || c.rollNumber);
+          setSrc("profileAvatar", c.avatar);
+          setSrc("headerAvatar", c.avatar);
+        } catch (_) {}
+      }
+      document
+        .getElementById("profileForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          var body = {
+            name: document.getElementById("name").value || "",
+            profile: {
+              phone: document.getElementById("mobile").value || "",
+              city: document.getElementById("city").value || "",
+              college: document.getElementById("college").value || "",
+              course: document.getElementById("course").value || "",
+              roll: document.getElementById("roll").value || "",
+              rollNumber: document.getElementById("roll").value || "",
+            },
+          };
+          try {
+            var data = await apiFetch("/users/profile", {
+              method: "PUT",
+              headers: {
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(body),
+            });
+            if (!data) throw new Error("failed");
+            var u = data.user || {};
+            var p = u.profile || {};
+            var avatar = p.avatar || u.avatar;
+            var storedRaw = localStorage.getItem("osianUserData");
+            var stored = {};
+            try {
+              stored = storedRaw ? JSON.parse(storedRaw) : {};
+            } catch (e) {}
+            var merged = Object.assign({}, stored, {
+              name: u.name,
+              email: u.email,
+              college: p.college,
+              course: p.course,
+              roll: p.roll || p.rollNumber,
+              city: p.city,
+              state: p.state,
+              avatar: avatar,
+            });
+            localStorage.setItem("osianUserData", JSON.stringify(merged));
+            alert("Profile saved");
+          } catch (e) {
+            alert("Failed to save");
+          }
+        });
+      async function loadStats() {
+        try {
+          var userRaw = localStorage.getItem("user");
+          var userObj = userRaw ? JSON.parse(userRaw) : {};
+          var uid = userObj._id || userObj.id;
+          if (!uid) throw new Error("no user id");
+          var data = await apiFetch(
+            "/results/user/" + uid + "?page=1&limit=100",
+            { headers: { Authorization: "Bearer " + token } }
+          );
+          if (!data) throw new Error("failed");
+          var results = data.results || [];
+          var attempts = results.length;
+          var completed = results.filter(function (r) {
+            return r.status === "completed" && r.totalQuestions > 0;
+          });
+          var passes = completed.filter(function (r) {
+            return r.score / r.totalQuestions > 0.5;
+          }).length;
+          var avgScore = 0;
+          if (completed.length) {
+            var totalScore = completed.reduce(function (acc, r) {
+              return acc + r.score / r.totalQuestions;
+            }, 0);
+            avgScore = Math.round((totalScore / completed.length) * 100);
+          }
+          setText("statQuizzes", String(attempts));
+          setText(
+            "statWin",
+            String(Math.round((passes / Math.max(1, attempts)) * 100)) + "%"
+          );
+          setText("statPoints", String(avgScore));
+          try {
+            localStorage.setItem(
+              "osianUserStats",
+              JSON.stringify({
+                attempts: attempts,
+                winRate: Math.round(
+                  (passes / Math.max(1, completed.length)) * 100
+                ),
+                avgScore: avgScore,
+              })
+            );
+          } catch (_) {}
+        } catch (e) {
+          try {
+            var sRaw = localStorage.getItem("osianUserStats");
+            var s = sRaw ? JSON.parse(sRaw) : null;
+            if (s && typeof s === "object") {
+              if (typeof s.attempts === "number")
+                setText("statQuizzes", String(s.attempts));
+              if (typeof s.winRate === "number")
+                setText("statWin", String(s.winRate) + "%");
+              if (typeof s.avgScore === "number")
+                setText("statPoints", String(s.avgScore));
+            }
+          } catch (_) {}
+        }
+      }
+      (function wireAvatarUpload() {
+        var btn = document.getElementById("changePicBtn");
+        var fileInput = document.getElementById("avatarUpload");
+        if (!btn || !fileInput) return;
+        btn.addEventListener("click", function () {
+          fileInput.click();
+        });
+        fileInput.addEventListener("change", function () {
+          var f = fileInput.files && fileInput.files[0];
+          if (!f) return;
+          var reader = new FileReader();
+          reader.onload = async function () {
+            var base64 = reader.result;
+            try {
+              var data = await apiFetch("/users/profile", {
+                method: "PUT",
+                headers: {
+                  Authorization: "Bearer " + token,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ profilePicture: base64 }),
+              });
+              if (!data) throw new Error("failed");
+              var u = data.user || {};
+              var p = u.profile || {};
+              var avatar = p.avatar || u.avatar || base64;
+              setSrc("profileAvatar", avatar);
+              setSrc("headerAvatar", avatar);
+              var storedRaw = localStorage.getItem("osianUserData");
+              var stored = {};
+              try {
+                stored = storedRaw ? JSON.parse(storedRaw) : {};
+              } catch (e) {}
+              stored.avatar = avatar;
+              localStorage.setItem("osianUserData", JSON.stringify(stored));
+              alert("Profile picture updated");
+            } catch (e) {
+              alert("Failed to update picture");
+            }
+          };
+          reader.readAsDataURL(f);
+        });
+      })();
+      showCachedProfile();
+      Promise.all([loadProfile(), loadStats()])
+        .then(function () {
+          /* done */
+        })
+        .catch(function () {
+          /* ignore */
+        });
     </script>
-</body>
+  </body>
 </html>

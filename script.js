@@ -6,11 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const passwordInput = document.getElementById('password');
     const errorMessage = document.getElementById('error-message');
     
-const backendUrl = (location.hostname.endsWith('vercel.app'))
-  ? 'https://osiancommunity-backend.vercel.app/api'
-  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-      ? 'http://localhost:5000/api'
-      : 'https://osiancommunity-backend.vercel.app/api');
+// Use centralized API helper with automatic fallback
 
     // --- 1. Check if already logged in ---
     // If a user visits login.html but is already logged in, send them to their dashboard.
@@ -47,45 +43,12 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             submitButton.textContent = 'Logging in...';
 
             try {
-                const hostedUrl = 'https://osiancommunity-backend.vercel.app/api';
-                let response;
-                try {
-                    response = await fetch(`${backendUrl}/auth/login`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ email, password })
-                    });
-                } catch (networkErr) {
-                    if (backendUrl.startsWith('http://localhost')) {
-                        response = await fetch(`${hostedUrl}/auth/login`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ email, password })
-                        });
-                    } else {
-                        throw networkErr;
-                    }
-                }
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    // If response is not 200-299, it's an error (e.g., 401, 404)
-                    // For 500 errors, the response might not be JSON.
-                    if (response.status >= 500) {
-                        throw new Error('Server error. Please try again later.');
-                    }
-                    // For other errors (400, 401, 404), we expect a JSON message.
-                    if (data && data.message) {
-                        throw new Error(data.message);
-                    } else {
-                        throw new Error('Invalid email or password');
-                    }
-                }
+                const data = await apiFetch('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                if (!data) throw new Error('Unable to reach server. Please try again.');
 
                 // --- THIS IS THE CRITICAL FIX ---
                 // Check that the API returned BOTH token and user
