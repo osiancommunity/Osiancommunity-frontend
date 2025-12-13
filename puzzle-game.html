@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OSIAN — Puzzle Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+<script src="shared-init.js"></script>
+
+<style>
+:root{
+  --primary:#4c8dff;
+  --accent:#6a5cd8;
+  --bg:#f4faff;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#6b7380;
+  --shadow:0 16px 40px rgba(0,0,0,.1);
+}
+[data-theme="dark"]{
+  --bg:#0b1220;
+  --card:#0f172a;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --shadow:0 22px 60px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;font-family:Poppins,system-ui}
+body{margin:0;background:var(--bg);color:var(--text)}
+.container{max-width:900px;margin:auto;padding:28px}
+.card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:26px;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+.option{
+  padding:16px;
+  border-radius:14px;
+  background:#eef4ff;
+  cursor:pointer;
+  font-weight:700;
+  text-align:center;
+  transition:.25s;
+}
+.option:hover{transform:translateY(-4px);border:2px solid var(--primary)}
+.option.correct{background:#10b981;color:#fff}
+.option.wrong{background:#ef4444;color:#fff}
+.timer{font-weight:800;color:var(--primary)}
+.center{text-align:center}
+.btn{
+  padding:12px 20px;
+  border-radius:14px;
+  border:none;
+  font-weight:800;
+  cursor:pointer;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+}
+.badge{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:999px;
+  background:#eef4ff;
+  font-weight:700;
+  margin:4px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<!-- STEP 1 -->
+<div class="card" id="step1">
+  <h1>🧩 Puzzle Challenge</h1>
+  <p>Select Puzzle Category</p>
+  <div class="grid" id="categoryGrid"></div>
+</div>
+
+<!-- STEP 2 -->
+<div class="card" id="step2" style="display:none">
+  <h2>Select Level</h2>
+  <div class="grid" id="levelGrid"></div>
+</div>
+
+<!-- STEP 3 -->
+<div class="card" id="step3" style="display:none">
+  <div class="timer">⏱ Time: <span id="time">40</span>s</div>
+  <h3 id="question"></h3>
+  <div class="grid" id="options"></div>
+</div>
+
+<!-- RESULT -->
+<div class="card center" id="result" style="display:none">
+  <h2>🎉 Puzzle Result</h2>
+  <div id="finalScore" style="font-size:28px;font-weight:900"></div>
+  <div id="rank"></div>
+  <div style="margin-top:18px">
+    <button class="btn btn-primary" onclick="location.reload()">Play Again</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const API = window.API_BASE || '';
+const LEVELS = Array.from({length:10},(_,i)=>`Level${i+1}`);
+
+/* ================= FALLBACK PUZZLES ================= */
+const FALLBACK = [
+  {q:"2, 4, 8, ?", o:["10","12","16","18"], a:2},
+  {q:"Which is different?", o:["Apple","Banana","Car","Mango"], a:2},
+  {q:"5 + 3 × 2 = ?", o:["16","11","13","10"], a:1},
+  {q:"Odd one out", o:["Triangle","Square","Circle","Cube"], a:3},
+  {q:"If CAT = 3 letters, DOG = ?", o:["2","3","4","5"], a:1}
+];
+
+/* ================= STATE ================= */
+let category=null, level=null;
+let puzzles=[], index=0, score=0;
+let timer, time=40;
+
+/* ================= ELEMENTS ================= */
+const catGrid = document.getElementById("categoryGrid");
+const levelGrid = document.getElementById("levelGrid");
+
+/* ================= INIT ================= */
+["Logic","Math","Patterns","Word"].forEach(c=>{
+  const d=document.createElement("div");
+  d.className="option";
+  d.textContent=c;
+  d.onclick=()=>{category=c; showStep(2); loadLevels();};
+  catGrid.appendChild(d);
+});
+
+/* ================= LEVELS ================= */
+function loadLevels(){
+  levelGrid.innerHTML='';
+  LEVELS.forEach(l=>{
+    const d=document.createElement("div");
+    d.className="option";
+    d.textContent=l;
+    d.onclick=()=>{level=l; startPuzzle();};
+    levelGrid.appendChild(d);
+  });
+}
+
+/* ================= LOAD PUZZLES ================= */
+async function startPuzzle(){
+  showStep(3);
+  index=0; score=0;
+  try{
+    const res = await apiFetch(
+      `/game/puzzles?category=${encodeURIComponent(category)}&level=${encodeURIComponent(level)}`
+    );
+    puzzles = res.puzzles || [];
+  }catch{
+    puzzles = FALLBACK;
+  }
+  startTimer();
+  showPuzzle();
+}
+
+/* ================= GAME FLOW ================= */
+function showPuzzle(){
+  if(index>=puzzles.length){endGame();return;}
+  const p = puzzles[index];
+  question.textContent = p.q;
+  options.innerHTML='';
+  p.o.forEach((opt,i)=>{
+    const b=document.createElement("div");
+    b.className="option";
+    b.textContent=opt;
+    b.onclick=()=>{
+      if(i===p.a){score++; b.classList.add("correct")}
+      else b.classList.add("wrong");
+      setTimeout(()=>{index++; showPuzzle()},600);
+    };
+    options.appendChild(b);
+  });
+}
+
+/* ================= TIMER ================= */
+function startTimer(){
+  clearInterval(timer);
+  time=40;
+  document.getElementById("time").textContent=time;
+  timer=setInterval(()=>{
+    time--;
+    document.getElementById("time").textContent=time;
+    if(time<=0) endGame();
+  },1000);
+}
+
+/* ================= RESULT ================= */
+function endGame(){
+  clearInterval(timer);
+  showStep("result");
+  finalScore.textContent = `Score: ${score}/${puzzles.length}`;
+  const pct=(score/puzzles.length)*100;
+  rank.innerHTML =
+    pct>=80?'<span class="badge">🏆 Master</span>':
+    pct>=50?'<span class="badge">🥈 Thinker</span>':
+            '<span class="badge">🥉 Beginner</span>';
+}
+
+/* ================= UTILS ================= */
+function showStep(n){
+  ["step1","step2","step3","result"].forEach(id=>{
+    document.getElementById(id).style.display="none";
+  });
+  document.getElementById(n==="result"?"result":"step"+n).style.display="block";
+}
+</script>
+</body>
+</html>
