@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OSIAN — Quiz Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#4c8dff;
+  --accent:#6a5cd8;
+  --bg:#f4faff;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#6b7380;
+  --shadow:0 14px 36px rgba(0,0,0,.08);
+}
+[data-theme="dark"]{
+  --bg:#0b1220;
+  --card:#0f172a;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --shadow:0 20px 50px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;font-family:Poppins,system-ui}
+body{margin:0;background:var(--bg);color:var(--text)}
+.container{max-width:900px;margin:auto;padding:30px}
+
+.card{
+  background:var(--card);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  padding:26px;
+  margin-bottom:24px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;
+}
+
+.option{
+  padding:18px;
+  border-radius:16px;
+  background:#eef4ff;
+  cursor:pointer;
+  text-align:center;
+  font-weight:800;
+  transition:.2s;
+}
+.option:hover{
+  transform:translateY(-4px);
+  box-shadow:0 10px 24px rgba(0,0,0,.1);
+}
+.option.locked{pointer-events:none}
+
+.quiz-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+}
+.timer{
+  font-weight:800;
+  color:var(--primary);
+  font-size:18px;
+}
+
+.answers{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-top:20px;
+}
+.answers button{
+  padding:16px;
+  border-radius:14px;
+  border:none;
+  font-weight:700;
+  cursor:pointer;
+  background:#eef4ff;
+}
+.answers button.correct{background:#10b981;color:#fff}
+.answers button.wrong{background:#ef4444;color:#fff}
+
+.btn{
+  padding:12px 20px;
+  border-radius:14px;
+  border:none;
+  font-weight:800;
+  cursor:pointer;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+}
+.center{text-align:center}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<!-- STEP 1 -->
+<div class="card" id="step1">
+  <h1>🎮 Quiz Game</h1>
+  <p>Select Category</p>
+  <div class="grid" id="categoryGrid"></div>
+</div>
+
+<!-- STEP 2 -->
+<div class="card" id="step2" style="display:none">
+  <h2>Select Field</h2>
+  <div class="grid" id="fieldGrid"></div>
+</div>
+
+<!-- STEP 3 -->
+<div class="card" id="step3" style="display:none">
+  <h2>Select Level</h2>
+  <div class="grid" id="levelGrid"></div>
+</div>
+
+<!-- STEP 4 -->
+<div class="card" id="step4" style="display:none">
+  <div class="quiz-header">
+    <div class="timer">⏱ <span id="time">30</span>s</div>
+    <div id="progress"></div>
+  </div>
+  <h3 id="question"></h3>
+  <div class="answers" id="answers"></div>
+</div>
+
+<!-- RESULT -->
+<div class="card center" id="result" style="display:none">
+  <h2>🎉 Result</h2>
+  <div id="finalScore" style="font-size:28px;font-weight:900"></div>
+  <div id="rank" style="margin:10px 0;font-size:20px"></div>
+  <button class="btn btn-primary" onclick="location.reload()">Play Again</button>
+</div>
+
+</div>
+
+<script>
+/* ================= QUESTIONS DATA ================= */
+const Q = {
+Technical:{
+ Python:{L1:[
+  {q:"Python is ?",o:["Compiler","Interpreter","OS","Browser"],a:1},
+  {q:"File extension?",o:[".java",".py",".c",".js"],a:1},
+  {q:"Mutable?",o:["Tuple","List","String","Int"],a:1},
+  {q:"Index starts?",o:["0","1","-1","None"],a:0},
+  {q:"Keyword?",o:["Print","print","echo","cout"],a:1},
+  {q:"Loop?",o:["if","for","def","class"],a:1},
+  {q:"Data type?",o:["int","float","str","all"],a:3},
+  {q:"Comment?",o:["//","#","<!--","**"],a:1},
+  {q:"Boolean?",o:["1/0","Yes/No","True/False","On"],a:2},
+  {q:"Output?",o:["input","print","len","type"],a:1}
+ ]},
+ Java:{L1:[{q:"Java runs on?",o:["OS","JVM","Browser","CPU"],a:1}]},
+ DBMS:{L1:[{q:"SQL stands for?",o:["Simple Query","Structured Query","Sequential","None"],a:1}]},
+ "Computer Networks":{L1:[{q:"TCP is?",o:["Protocol","Language","OS","Cable"],a:0}]},
+ "C++":{L1:[{q:"C++ is?",o:["Procedural","OOP","Scripting","None"],a:1}]}
+},
+Law:{
+ Constitution:{L1:[{q:"Indian constitution year?",o:["1947","1950","1952","1960"],a:1}]},
+ Criminal:{L1:[{q:"IPC related to?",o:["Civil","Criminal","Tax","Trade"],a:1}]}
+},
+"General Knowledge":{
+ History:{L1:[{q:"Taj Mahal built by?",o:["Akbar","Shah Jahan","Babur","Aurangzeb"],a:1}]},
+ Geography:{L1:[{q:"Highest mountain?",o:["K2","Everest","Kangchenjunga","Makalu"],a:1}]}
+},
+Sports:{
+ Cricket:{L1:[{q:"Cricket team players?",o:["9","10","11","12"],a:2}]},
+ Football:{L1:[{q:"Football team players?",o:["9","10","11","12"],a:2}]}
+}
+};
+
+/* ================= LOGIC ================= */
+let category,field,level;
+let list=[],i=0,score=0,time=30,timer;
+
+const cg=categoryGrid,fg=fieldGrid,lg=levelGrid;
+
+Object.keys(Q).forEach(c=>{
+ let d=document.createElement("div");
+ d.className="option"; d.textContent=c;
+ d.onclick=()=>{category=c;show(2);loadFields()};
+ cg.appendChild(d);
+});
+
+function loadFields(){
+ fg.innerHTML="";
+ Object.keys(Q[category]).forEach(f=>{
+  let d=document.createElement("div");
+  d.className="option"; d.textContent=f;
+  d.onclick=()=>{field=f;show(3);loadLevels()};
+  fg.appendChild(d);
+ });
+}
+
+function loadLevels(){
+ lg.innerHTML="";
+ for(let i=1;i<=10;i++){
+  let d=document.createElement("div");
+  d.className="option";
+  d.textContent="Level "+i;
+  d.onclick=()=>{level="L1";startQuiz()}; // demo uses L1
+  lg.appendChild(d);
+ }
+}
+
+function startQuiz(){
+ list=Q[category][field][level];
+ i=0;score=0;show(4);next();
+}
+
+function next(){
+ if(i>=list.length){end();return;}
+ time=30;updateTimer();
+ const q=list[i];
+ question.textContent=q.q;
+ progress.textContent=`Q ${i+1}/${list.length}`;
+ answers.innerHTML="";
+ q.o.forEach((op,idx)=>{
+  let b=document.createElement("button");
+  b.textContent=op;
+  b.onclick=()=>{
+   document.querySelectorAll(".answers button").forEach(x=>x.disabled=true);
+   if(idx===q.a){score++;b.classList.add("correct")}
+   else b.classList.add("wrong");
+   setTimeout(()=>{i++;next()},800);
+  };
+  answers.appendChild(b);
+ });
+ clearInterval(timer);
+ timer=setInterval(()=>{time--;updateTimer();if(time<=0){clearInterval(timer);i++;next()}},1000);
+}
+
+function updateTimer(){timeEl.textContent=time}
+
+function end(){
+ clearInterval(timer);
+ show("result");
+ finalScore.textContent=`Score: ${score}/${list.length}`;
+ let p=score/list.length*100;
+ rank.textContent=p>80?"🏆 Gold":p>50?"🥈 Silver":"🥉 Bronze";
+}
+
+function show(s){
+ ["step1","step2","step3","step4","result"].forEach(id=>document.getElementById(id).style.display="none");
+ document.getElementById(s==="result"?"result":"step"+s).style.display="block";
+}
+</script>
+</body>
+</html>
