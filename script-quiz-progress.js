@@ -11,11 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Define the location of your backend
-const backendUrl = (location.hostname.endsWith('vercel.app'))
-  ? 'https://osiancommunity-backend.vercel.app/api'
-  : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-      ? 'http://localhost:5000/api'
-      : 'https://osiancommunity-backend.vercel.app/api');
+const backendUrl = window.API_BASE;
 
     // --- User & Logout Logic ---
     const user = JSON.parse(localStorage.getItem('user'));
@@ -73,30 +69,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             }
 
             // --- BACKEND CALL ---
-            const response = await fetch(`${backendUrl}/results/user/${userId}?page=${page}&limit=${historyPageSize}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}` // Send the user's token
-                }
-            });
-
-            if (!response.ok) {
-                try {
-                    const data = await response.json();
-                    if (response.status === 403) {
-                        showToast(data && data.message ? data.message : 'Access denied or not available yet.', 'warning');
-                        return;
-                    }
-                    if (response.status === 401) {
-                        showToast(data && data.message ? data.message : 'Unable to load your registered quizzes right now.', 'warning');
-                        return;
-                    }
-                    throw new Error(data.message || 'Failed to fetch registered quizzes');
-                } catch (e) {
-                    throw e;
-                }
-            }
-
-            const data = await response.json();
+            const data = await apiFetch(`/results/user/${userId}?page=${page}&limit=${historyPageSize}`);
             const results = data.results || [];
             const pagination = data.pagination || { currentPage: page, totalPages: 1, totalResults: results.length };
             historyCurrentPage = pagination.currentPage || page;
@@ -121,26 +94,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
     async function fetchMyRegisteredQuizzes() {
         try {
-            const response = await fetch(`${backendUrl}/quizzes/user/registered`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    showToast('Unable to load your registered quizzes right now.', 'warning');
-                    return;
-                }
-                if (response.status === 403) {
-                    showToast('Access denied or not available yet.', 'warning');
-                    return;
-                }
-                const data = await response.json();
-                throw new Error(data.message);
-            }
-
-            const data = await response.json();
+            const data = await apiFetch('/user/registered-quizzes');
             registeredAll = data.quizzes || [];
             try { localStorage.setItem('osianRegisteredQuizzes', JSON.stringify(registeredAll)); } catch (_) {}
             regTotalPages = Math.max(1, Math.ceil(registeredAll.length / regPageSize));
@@ -368,15 +322,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     async function fetchLeaderboardREST(scope, period) {
         try {
             const query = new URLSearchParams({ scope, period }).toString();
-            const res = await fetch(`${backendUrl}/leaderboard?${query}`, { headers: { 'Authorization': `Bearer ${token}` } });
-            if (!res.ok) {
+            const res = await apiFetch(`/leaderboard?${query}`);
+            if (!res || !Array.isArray(res.leaderboard)) {
                 // Fallback message
                 const tbody = document.querySelector('#leaderboard-table tbody');
                 if (tbody) tbody.innerHTML = '<tr><td colspan="4">Leaderboard not available</td></tr>';
                 return;
             }
-            const data = await res.json();
-            renderLeaderboard(data.leaderboard || []);
+            renderLeaderboard(res.leaderboard || []);
         } catch (_) {}
     }
     function renderLeaderboard(list) {

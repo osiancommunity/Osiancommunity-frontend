@@ -8,11 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(el._hideTimer);
         el._hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 5000);
     }
-    const backendUrl = (location.hostname.endsWith('vercel.app'))
-      ? 'https://osiancommunity-backend.vercel.app/api'
-      : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-          ? 'http://localhost:5000/api'
-          : 'https://osiancommunity-backend.vercel.app/api');
+    const backendUrl = window.API_BASE;
 
     const settingsForm = document.getElementById('settings-form');
     const formStatus = document.getElementById('form-status');
@@ -122,25 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`${backendUrl}/users/profile`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                const errorText = await response.text();
-                console.error('Failed response text:', errorText);
-                throw new Error('Failed to fetch profile');
-            }
-
-            const data = await response.json();
+            const data = await apiFetch('/users/profile');
             const user = data.user;
             let existingLocal = {};
             try { existingLocal = JSON.parse(localStorage.getItem('osianUserData')) || {}; } catch(e) { existingLocal = {}; }
@@ -344,21 +322,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`${backendUrl}/users/profile`, {
+            await apiFetch('/users/profile', {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Content-Type':'application/json' },
                 body: JSON.stringify(updatedProfileData)
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to save changes');
-            }
-
-            // On successful save, reload data from the backend to ensure UI is in sync
-            await loadUserData(role); 
+            await loadUserData(role);
 
             formStatus.textContent = 'Changes saved successfully!';
             formStatus.style.color = 'green';
@@ -413,20 +382,11 @@ avatarUpload.addEventListener('change', async (e) => {
             }
 
             try {
-                const response = await fetch(`${backendUrl}/users/profile`, {
+                await apiFetch('/users/profile', {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        profilePicture: avatarDataUrl
-                    })
+                    headers: { 'Content-Type':'application/json' },
+                    body: JSON.stringify({ profilePicture: avatarDataUrl })
                 });
-
-                if (!response.ok) {
-                    throw new Error('Failed to update avatar');
-                }
 
                 // Update localStorage
                 const currentData = JSON.parse(localStorage.getItem('osianUserData')) || defaultData;

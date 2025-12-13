@@ -12,25 +12,44 @@
     var rel = path.startsWith('/') ? path : ('/'+path);
     var prim = w.API_BASE + rel;
     var fall = 'https://osiancommunity-backend.vercel.app/api' + rel;
-    var o = Object.assign({ credentials: 'include' }, opts||{});
+    var o = Object.assign({ credentials: 'omit' }, opts||{});
     o.headers = Object.assign({}, o.headers||{});
+    if (!('Content-Type' in o.headers) && o.body) o.headers['Content-Type'] = 'application/json';
     var t = getToken();
     if (t && !('Authorization' in o.headers)) o.headers['Authorization'] = 'Bearer ' + t;
+
+    async function handleResponse(res){
+      var ct = (res.headers.get('content-type')||'');
+      var isJson = ct.includes('application/json');
+      var body = null;
+      try { body = isJson ? await res.json() : await res.text(); } catch(_) {}
+      if (res.ok) return body;
+      if (res.status === 401){
+        try { localStorage.removeItem('token'); localStorage.removeItem('user'); } catch(_){ }
+        if (!location.pathname.endsWith('login.html')) location.href = 'login.html';
+        throw new Error((body && body.message) ? body.message : 'Unauthorized');
+      }
+      if (res.status === 403){
+        throw new Error((body && body.message) ? body.message : 'Forbidden');
+      }
+      if (res.status >= 500){
+        throw new Error((body && body.message) ? body.message : ('Server error '+res.status));
+      }
+      throw new Error((body && body.message) ? body.message : ('HTTP '+res.status));
+    }
+
     async function tryOne(url){
       var res = await fetch(url, o);
-      if (!res.ok) throw new Error('HTTP '+res.status);
-      var ct = (res.headers.get('content-type')||'');
-      if (ct.includes('application/json')) return await res.json();
-      return await res.text();
+      return handleResponse(res);
     }
+
     try {
       return await tryOne(prim);
     } catch (e) {
       if (isLocal) {
-        try { return await tryOne(fall); } catch (e2) { console.error('[API]', prim, e); console.error('[API-fallback]', fall, e2); return null; }
-      } else {
-        console.error('[API]', prim, e); return null;
+        return await tryOne(fall);
       }
+      throw e;
     }
   }
   w.apiFetch = apiFetch;
