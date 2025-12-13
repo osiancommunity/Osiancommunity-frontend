@@ -1,309 +1,360 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>OSIAN — Notifications</title>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OSIAN — Notifications</title>
 
-  <!-- Boxicons -->
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
-  <script src="shared-init.js"></script>
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
 
-  <style>
-    :root {
-      --bg: #f4faff;
-      --card: #ffffff;
-      --primary: #4c8dff;
-      --accent: #6a5cd8;
-      --text: #0f172a;
-      --muted: #6b7380;
-      --shadow: 0 12px 32px rgba(0,0,0,.08);
-    }
+    <style>
+      /* ===== THEME VARIABLES (SYNC WITH DASHBOARD) ===== */
+      :root {
+        --bg: #f4faff;
+        --card: #ffffff;
+        --primary: #4c8dff;
+        --accent: #6a5cd8;
+        --text: #0f172a;
+        --muted: #6b7380;
+        --shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+      }
+      [data-theme="dark"] {
+        --bg: #0b1220;
+        --card: #121a2f;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+      }
 
-    [data-theme="dark"] {
-      --bg: #0b1220;
-      --card: #121a2f;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-    }
+      * {
+        box-sizing: border-box;
+        font-family: Poppins, system-ui;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+      }
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
 
-    * {
-      box-sizing: border-box;
-      font-family: "Poppins", system-ui, sans-serif;
-    }
+      /* ===== SIDEBAR ===== */
+      .sidebar {
+        width: 260px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+        padding: 20px;
+      }
+      .logo {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 30px;
+      }
+      .nav a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .nav a.active,
+      .nav a:hover {
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: #fff;
+      }
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-    }
+      /* ===== MAIN ===== */
+      .main {
+        flex: 1;
+        padding: 30px;
+      }
 
-    .app {
-      display: flex;
-      min-height: 100vh;
-    }
+      /* HEADER */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 30px;
+      }
+      .header p {
+        margin: 6px 0 0;
+        color: var(--muted);
+      }
 
-    /* ===== SIDEBAR ===== */
-    .sidebar {
-      width: 260px;
-      background: var(--card);
-      box-shadow: var(--shadow);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-    }
+      /* USER MENU */
+      .user-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        position: relative;
+      }
+      .user-box img {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .settings {
+        position: absolute;
+        top: 54px;
+        right: 0;
+        background: var(--card);
+        box-shadow: var(--shadow);
+        border-radius: 12px;
+        padding: 8px;
+        display: none;
+        min-width: 200px;
+        z-index: 100;
+      }
+      .settings button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        background: none;
+        text-align: left;
+        cursor: pointer;
+        border-radius: 8px;
+        display: flex;
+        gap: 10px;
+        color: var(--text);
+      }
+      .settings button:hover {
+        background: var(--bg);
+      }
+      .divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 6px 0;
+      }
 
-    .logo {
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 30px;
-    }
+      /* ===== NOTIFICATIONS ===== */
+      .notification {
+        background: var(--card);
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+        box-shadow: var(--shadow);
+        border-left: 4px solid var(--primary);
+      }
+      .notification h4 {
+        margin: 0 0 6px;
+        font-size: 16px;
+      }
+      .notification p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .notification .time {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #9ca3af;
+      }
 
-    .nav a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px;
-      border-radius: 10px;
-      text-decoration: none;
-      color: var(--muted);
-      font-weight: 600;
-      margin-bottom: 6px;
-      transition: 0.2s;
-    }
+      .empty {
+        text-align: center;
+        margin-top: 60px;
+        color: var(--muted);
+      }
+      .empty i {
+        font-size: 48px;
+        opacity: 0.4;
+      }
 
-    .nav a.active,
-    .nav a:hover {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: #fff;
-    }
+      /* ===== MOBILE BOTTOM NAV ===== */
+      .bottom-nav {
+        display: none;
+      }
 
-    /* ===== MAIN ===== */
-    .main {
-      flex: 1;
-      padding: 30px;
-    }
+      @media (max-width: 900px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 18px;
+          padding-bottom: 90px;
+        }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
+        .bottom-nav {
+          display: flex;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          background: var(--card);
+          box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.2);
+          border-radius: 18px 18px 0 0;
+          z-index: 9999;
+        }
+        .bottom-nav a {
+          flex: 1;
+          text-align: center;
+          padding: 10px 0;
+          text-decoration: none;
+          color: var(--muted);
+          font-size: 12px;
+          font-weight: 600;
+        }
+        .bottom-nav a i {
+          display: block;
+          font-size: 22px;
+          margin-bottom: 4px;
+        }
+        .bottom-nav a.active {
+          color: var(--primary);
+        }
+      }
+    </style>
+  </head>
 
-    .header h1 {
-      margin: 0;
-      font-size: 30px;
-    }
+  <body>
+    <div class="app">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="logo">OSIAN</div>
+        <nav class="nav">
+          <a href="dashboard-user.html"
+            ><i class="bx bxs-dashboard"></i> Dashboard</a
+          >
+          <a href="quiz-progress.html"><i class="bx bx-file"></i> Quizzes</a>
+          <a href="leaderboard.html"
+            ><i class="bx bxs-trophy"></i> Leaderboard</a
+          >
+          <a class="active"><i class="bx bx-bell"></i> Notifications</a>
+          <a href="profile.html"><i class="bx bxs-user"></i> Profile</a>
+        </nav>
+      </aside>
 
-    .header p {
-      margin: 6px 0 0;
-      color: var(--muted);
-    }
+      <!-- MAIN -->
+      <main class="main">
+        <div class="header">
+          <div>
+            <h1>Notifications</h1>
+            <p>Stay updated with system messages & announcements</p>
+          </div>
 
-    /* ===== USER MENU ===== */
-    .user-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      position: relative;
-    }
+          <div class="user-box" id="userMenu">
+            <img id="userAvatar" />
+            <i class="bx bx-chevron-down"></i>
 
-    .user-box img {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .settings {
-      position: absolute;
-      top: 54px;
-      right: 0;
-      background: var(--card);
-      box-shadow: var(--shadow);
-      border-radius: 12px;
-      padding: 8px;
-      display: none;
-      min-width: 200px;
-      z-index: 100;
-    }
-
-    .settings button {
-      width: 100%;
-      padding: 10px 12px;
-      border: none;
-      background: none;
-      color: var(--text);
-      text-align: left;
-      cursor: pointer;
-      border-radius: 8px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .settings button:hover {
-      background: var(--bg);
-    }
-
-    .divider {
-      height: 1px;
-      background: #e5e7eb;
-      margin: 6px 0;
-    }
-
-    /* ===== NOTIFICATIONS ===== */
-    .notification {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 16px 18px;
-      margin-bottom: 14px;
-      box-shadow: var(--shadow);
-      border-left: 4px solid var(--primary);
-    }
-
-    .notification h4 {
-      margin: 0 0 6px;
-      font-size: 16px;
-    }
-
-    .notification p {
-      margin: 0;
-      font-size: 14px;
-      color: var(--muted);
-    }
-
-    .notification .time {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #9ca3af;
-    }
-
-    .empty {
-      text-align: center;
-      margin-top: 60px;
-      color: var(--muted);
-    }
-
-    .empty i {
-      font-size: 48px;
-      opacity: .4;
-    }
-  </style>
-</head>
-
-<body data-theme="light">
-
-<div class="app">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="logo">OSIAN</div>
-    <nav class="nav">
-      <a href="dashboard-user.html"><i class="bx bxs-dashboard"></i> Dashboard</a>
-      <a href="quiz-progress.html"><i class="bx bx-file"></i> Quizzes</a>
-      <a href="leaderboard.html"><i class="bx bxs-trophy"></i> Leaderboard</a>
-      <a class="active"><i class="bx bx-bell"></i> Notifications</a>
-      <a href="profile.html"><i class="bx bxs-user"></i> Profile</a>
-    </nav>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-
-    <div class="header">
-      <div>
-        <h1>Notifications</h1>
-        <p>Stay updated with system messages & announcements</p>
-      </div>
-
-      <div class="user-box" id="userMenu">
-        <img id="userAvatar" src="" />
-        <i class="bx bx-chevron-down"></i>
-
-        <div class="settings" id="settingsMenu">
-          <button onclick="goProfile()"><i class="bx bxs-user"></i> My Profile</button>
-          <div class="divider"></div>
-          <button onclick="setTheme('light')"><i class="bx bx-sun"></i> Light Theme</button>
-          <button onclick="setTheme('dark')"><i class="bx bx-moon"></i> Dark Theme</button>
-          <div class="divider"></div>
-          <button onclick="logout()" style="color:#e11d48">
-            <i class="bx bx-log-out"></i> Logout
-          </button>
+            <div class="settings" id="settingsMenu">
+              <button onclick="setTheme('light')">
+                <i class="bx bx-sun"></i> Light Theme
+              </button>
+              <button onclick="setTheme('dark')">
+                <i class="bx bx-moon"></i> Dark Theme
+              </button>
+              <div class="divider"></div>
+              <button onclick="location.href='profile.html'">
+                <i class="bx bxs-user"></i> My Profile
+              </button>
+              <div class="divider"></div>
+              <button onclick="logout()" style="color: #e11d48">
+                <i class="bx bx-log-out"></i> Logout
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+
+        <div id="notificationList"></div>
+        <div id="emptyState" class="empty" style="display: none">
+          <i class="bx bx-bell-off"></i>
+          <p>No notifications available</p>
+        </div>
+      </main>
     </div>
 
-    <div id="notificationList"></div>
-    <div id="emptyState" class="empty" style="display:none">
-      <i class="bx bx-bell-off"></i>
-      <p>No notifications available</p>
-    </div>
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <a href="dashboard-user.html"
+        ><i class="bx bxs-dashboard"></i><span>Home</span></a
+      >
+      <a href="quiz-progress.html"
+        ><i class="bx bx-file"></i><span>Quizzes</span></a
+      >
+      <a href="leaderboard.html"
+        ><i class="bx bxs-trophy"></i><span>Rank</span></a
+      >
+      <a class="active"><i class="bx bx-bell"></i><span>Alerts</span></a>
+      <a href="profile.html"><i class="bx bxs-user"></i><span>Profile</span></a>
+    </nav>
 
-  </main>
-</div>
+    <script>
+      /* ===== THEME SYNC ===== */
+      function setTheme(t) {
+        document.documentElement.setAttribute("data-theme", t);
+        localStorage.setItem("theme", t);
+      }
+      setTheme(localStorage.getItem("theme") || "light");
 
-<script>
+      /* ===== USER ===== */
+      const user = JSON.parse(localStorage.getItem("user")) || {
+        avatar: "https://i.ibb.co/jP9JWBBy/diljj.png",
+      };
+      document.getElementById("userAvatar").src = user.avatar || "";
 
-  const user = JSON.parse(localStorage.getItem("user")) || {
-    name: "Student",
-    avatar: "https://i.ibb.co/jP9JWBBy/diljj.png"
-  };
+      /* ===== USER MENU ===== */
+      userMenu.onclick = (e) => {
+        e.stopPropagation();
+        settingsMenu.style.display =
+          settingsMenu.style.display === "block" ? "none" : "block";
+      };
+      document.onclick = () => (settingsMenu.style.display = "none");
 
-  document.getElementById("userAvatar").src = user.avatar;
+      function logout() {
+        localStorage.clear();
+        location.href = "index.html";
+      }
 
-  applyTheme(localStorage.getItem('theme')||'light');
+      /* ===== SAFE apiFetch ===== */
+      const backendUrl = location.hostname.endsWith("vercel.app")
+        ? "https://osiancommunity-backend.vercel.app/api"
+        : location.hostname === "localhost" || location.hostname === "127.0.0.1"
+        ? "http://localhost:5000/api"
+        : "https://osiancommunity-backend.vercel.app/api";
 
-  const userMenu = document.getElementById("userMenu");
-  const settingsMenu = document.getElementById("settingsMenu");
+      async function apiFetch(path) {
+        const res = await fetch(backendUrl + path);
+        if (!res.ok) throw new Error("API Error");
+        return res.json();
+      }
 
-  userMenu.onclick = e => {
-    e.stopPropagation();
-    settingsMenu.style.display =
-      settingsMenu.style.display === "block" ? "none" : "block";
-  };
-
-  document.onclick = () => settingsMenu.style.display = "none";
-
-  function goProfile() {
-    window.location.href = "profile.html";
-  }
-
-  function logout() {
-    localStorage.clear();
-    window.location.href = "index.html";
-  }
-
-  async function loadNotifications() {
-    const list = document.getElementById("notificationList");
-    const empty = document.getElementById("emptyState");
-
-    try {
-      const data = await apiFetch('/notifications');
-      if (!data || !data.length) throw new Error();
-
-      data.forEach(n => {
-        const div = document.createElement("div");
-        div.className = "notification";
-        div.innerHTML = `
-          <h4>${n.title || "Notification"}</h4>
-          <p>${n.message || ""}</p>
-          <div class="time">${new Date(n.createdAt).toLocaleString()}</div>
-        `;
-        list.appendChild(div);
-      });
-
-    } catch {
-      empty.style.display = "block";
-    }
-  }
-
-  loadNotifications();
-</script>
-
-</body>
+      /* ===== LOAD NOTIFICATIONS ===== */
+      async function loadNotifications() {
+        const list = document.getElementById("notificationList");
+        const empty = document.getElementById("emptyState");
+        try {
+          const data = await apiFetch("/notifications");
+          if (!Array.isArray(data) || !data.length) throw 0;
+          data.forEach((n) => {
+            const div = document.createElement("div");
+            div.className = "notification";
+            div.innerHTML = `
+        <h4>${n.title || "Notification"}</h4>
+        <p>${n.message || ""}</p>
+        <div class="time">${new Date(n.createdAt).toLocaleString()}</div>
+      `;
+            list.appendChild(div);
+          });
+        } catch {
+          empty.style.display = "block";
+        }
+      }
+      loadNotifications();
+    </script>
+  </body>
 </html>
