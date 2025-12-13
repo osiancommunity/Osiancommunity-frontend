@@ -1,199 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>OSIAN — Notifications</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OSIAN — Notifications</title>
 
-  <!-- Boxicons -->
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
-  <script src="shared-init.js"></script>
+    <!-- Boxicons -->
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <script src="shared-init.js"></script>
 
-  <style>
-    :root {
-      --bg: #f4faff;
-      --card: #ffffff;
-      --primary: #4c8dff;
-      --accent: #6a5cd8;
-      --text: #0f172a;
-      --muted: #6b7380;
-      --shadow: 0 12px 32px rgba(0,0,0,.08);
-    }
+    <style>
+      :root {
+        --bg: #f4faff;
+        --card: #ffffff;
+        --primary: #4c8dff;
+        --accent: #6a5cd8;
+        --text: #0f172a;
+        --muted: #6b7380;
+        --shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+      }
 
-    [data-theme="dark"] {
-      --bg: #0b1220;
-      --card: #121a2f;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-    }
+      [data-theme="dark"] {
+        --bg: #0b1220;
+        --card: #121a2f;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+      }
 
-    * {
-      box-sizing: border-box;
-      font-family: "Poppins", system-ui, sans-serif;
-    }
+      * {
+        box-sizing: border-box;
+        font-family: "Poppins", system-ui, sans-serif;
+      }
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-    }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+      }
 
-    .app {
-      display: flex;
-      min-height: 100vh;
-    }
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
 
-    /* ===== SIDEBAR ===== */
-    .sidebar {
-      width: 260px;
-      background: var(--card);
-      box-shadow: var(--shadow);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-    }
+      /* ===== SIDEBAR ===== */
+      .sidebar {
+        width: 260px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+      }
 
-    .logo {
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 30px;
-    }
+      .logo {
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 30px;
+      }
 
-    .nav a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px;
-      border-radius: 10px;
-      text-decoration: none;
-      color: var(--muted);
-      font-weight: 600;
-      margin-bottom: 6px;
-      transition: 0.2s;
-    }
+      .nav a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 6px;
+        transition: 0.2s;
+      }
 
-    .nav a.active,
-    .nav a:hover {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: #fff;
-    }
+      .nav a.active,
+      .nav a:hover {
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: #fff;
+      }
 
-    /* ===== MAIN ===== */
-    .main {
-      flex: 1;
-      padding: 30px;
-    }
+      /* ===== MAIN ===== */
+      .main {
+        flex: 1;
+        padding: 30px;
+      }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
 
-    .header h1 {
-      margin: 0;
-      font-size: 30px;
-    }
+      .header h1 {
+        margin: 0;
+        font-size: 30px;
+      }
 
-    .header p {
-      margin: 6px 0 0;
-      color: var(--muted);
-    }
+      .header p {
+        margin: 6px 0 0;
+        color: var(--muted);
+      }
 
-    /* ===== USER MENU ===== */
-    .user-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      position: relative;
-    }
+      /* ===== USER MENU ===== */
+      .user-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        position: relative;
+      }
 
-    .user-box img {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
+      .user-box img {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
 
-    .settings {
-      position: absolute;
-      top: 54px;
-      right: 0;
-      background: var(--card);
-      box-shadow: var(--shadow);
-      border-radius: 12px;
-      padding: 8px;
-      display: none;
-      min-width: 200px;
-      z-index: 100;
-    }
+      .settings {
+        position: absolute;
+        top: 54px;
+        right: 0;
+        background: var(--card);
+        box-shadow: var(--shadow);
+        border-radius: 12px;
+        padding: 8px;
+        display: none;
+        min-width: 200px;
+        z-index: 100;
+      }
 
-    .settings button {
-      width: 100%;
-      padding: 10px 12px;
-      border: none;
-      background: none;
-      color: var(--text);
-      text-align: left;
-      cursor: pointer;
-      border-radius: 8px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+      .settings button {
+        width: 100%;
+        padding: 10px 12px;
+        border: none;
+        background: none;
+        color: var(--text);
+        text-align: left;
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
 
-    .settings button:hover {
-      background: var(--bg);
-    }
+      .settings button:hover {
+        background: var(--bg);
+      }
 
-    .divider {
-      height: 1px;
-      background: #e5e7eb;
-      margin: 6px 0;
-    }
+      .divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 6px 0;
+      }
 
-    /* ===== NOTIFICATIONS ===== */
-    .notification {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 16px 18px;
-      margin-bottom: 14px;
-      box-shadow: var(--shadow);
-      border-left: 4px solid var(--primary);
-    }
+      /* ===== NOTIFICATIONS ===== */
+      .notification {
+        background: var(--card);
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+        box-shadow: var(--shadow);
+        border-left: 4px solid var(--primary);
+      }
 
-    .notification h4 {
-      margin: 0 0 6px;
-      font-size: 16px;
-    }
+      .notification h4 {
+        margin: 0 0 6px;
+        font-size: 16px;
+      }
 
-    .notification p {
-      margin: 0;
-      font-size: 14px;
-      color: var(--muted);
-    }
+      .notification p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
 
-    .notification .time {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #9ca3af;
-    }
+      .notification .time {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #9ca3af;
+      }
 
-    .empty {
-      text-align: center;
-      margin-top: 60px;
-      color: var(--muted);
-    }
+      .empty {
+        text-align: center;
+        margin-top: 60px;
+        color: var(--muted);
+      }
 
-    .empty i {
-      font-size: 48px;
-      opacity: .4;
-    }
-     .bottom-nav {
+      .empty i {
+        font-size: 48px;
+        opacity: 0.4;
+      }
+      .bottom-nav {
+        display: none;
+      }
+      @media (max-width: 900px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 18px;
+          padding-bottom: 90px;
+        }
+        .bottom-nav {
           display: flex;
           position: fixed;
           bottom: 0;
@@ -222,60 +236,66 @@
           color: var(--primary);
         }
       }
-  </style>
-</head>
+    </style>
+  </head>
 
-<body data-theme="light">
+  <body data-theme="light">
+    <div class="app">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="logo">OSIAN</div>
+        <nav class="nav">
+          <a href="dashboard-user.html"
+            ><i class="bx bxs-dashboard"></i> Dashboard</a
+          >
+          <a href="quiz-progress.html"><i class="bx bx-file"></i> Quizzes</a>
+          <a href="leaderboard.html"
+            ><i class="bx bxs-trophy"></i> Leaderboard</a
+          >
+          <a class="active"><i class="bx bx-bell"></i> Notifications</a>
+          <a href="profile.html"><i class="bx bxs-user"></i> Profile</a>
+        </nav>
+      </aside>
 
-<div class="app">
+      <!-- MAIN -->
+      <main class="main">
+        <div class="header">
+          <div>
+            <h1>Notifications</h1>
+            <p>Stay updated with system messages & announcements</p>
+          </div>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="logo">OSIAN</div>
-    <nav class="nav">
-      <a href="dashboard-user.html"><i class="bx bxs-dashboard"></i> Dashboard</a>
-      <a href="quiz-progress.html"><i class="bx bx-file"></i> Quizzes</a>
-      <a href="leaderboard.html"><i class="bx bxs-trophy"></i> Leaderboard</a>
-      <a class="active"><i class="bx bx-bell"></i> Notifications</a>
-      <a href="profile.html"><i class="bx bxs-user"></i> Profile</a>
-    </nav>
-  </aside>
+          <div class="user-box" id="userMenu">
+            <img id="userAvatar" src="" />
+            <i class="bx bx-chevron-down"></i>
 
-  <!-- MAIN -->
-  <main class="main">
-
-    <div class="header">
-      <div>
-        <h1>Notifications</h1>
-        <p>Stay updated with system messages & announcements</p>
-      </div>
-
-      <div class="user-box" id="userMenu">
-        <img id="userAvatar" src="" />
-        <i class="bx bx-chevron-down"></i>
-
-        <div class="settings" id="settingsMenu">
-          <button onclick="goProfile()"><i class="bx bxs-user"></i> My Profile</button>
-          <div class="divider"></div>
-          <button onclick="setTheme('light')"><i class="bx bx-sun"></i> Light Theme</button>
-          <button onclick="setTheme('dark')"><i class="bx bx-moon"></i> Dark Theme</button>
-          <div class="divider"></div>
-          <button onclick="logout()" style="color:#e11d48">
-            <i class="bx bx-log-out"></i> Logout
-          </button>
+            <div class="settings" id="settingsMenu">
+              <button onclick="goProfile()">
+                <i class="bx bxs-user"></i> My Profile
+              </button>
+              <div class="divider"></div>
+              <button onclick="setTheme('light')">
+                <i class="bx bx-sun"></i> Light Theme
+              </button>
+              <button onclick="setTheme('dark')">
+                <i class="bx bx-moon"></i> Dark Theme
+              </button>
+              <div class="divider"></div>
+              <button onclick="logout()" style="color: #e11d48">
+                <i class="bx bx-log-out"></i> Logout
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <div id="notificationList"></div>
-    <div id="emptyState" class="empty" style="display:none">
-      <i class="bx bx-bell-off"></i>
-      <p>No notifications available</p>
+        <div id="notificationList"></div>
+        <div id="emptyState" class="empty" style="display: none">
+          <i class="bx bx-bell-off"></i>
+          <p>No notifications available</p>
+        </div>
+      </main>
     </div>
-
-  </main>
-</div>
-  <nav class="bottom-nav">
+    <nav class="bottom-nav">
       <a class="active" href="dashboard.html"
         ><i class="bx bxs-dashboard"></i>Home</a
       >
@@ -285,65 +305,65 @@
       <a href="profile.html"><i class="bx bxs-user"></i>Profile</a>
     </nav>
 
+    <script>
+      const user = JSON.parse(localStorage.getItem("user")) || {
+        name: "Student",
+        avatar: "https://i.ibb.co/jP9JWBBy/diljj.png",
+      };
 
-<script>
+      document.getElementById("userAvatar").src = user.avatar;
 
-  const user = JSON.parse(localStorage.getItem("user")) || {
-    name: "Student",
-    avatar: "https://i.ibb.co/jP9JWBBy/diljj.png"
-  };
+      applyTheme(localStorage.getItem("theme") || "light");
 
-  document.getElementById("userAvatar").src = user.avatar;
+      const userMenu = document.getElementById("userMenu");
+      const settingsMenu = document.getElementById("settingsMenu");
 
-  applyTheme(localStorage.getItem('theme')||'light');
+      function setTheme(t) {
+        document.documentElement.setAttribute("data-theme", t);
+        localStorage.setItem("theme", t);
+      }
+      setTheme(localStorage.getItem("theme") || "light");
 
-  const userMenu = document.getElementById("userMenu");
-  const settingsMenu = document.getElementById("settingsMenu");
+      userMenu.onclick = (e) => {
+        e.stopPropagation();
+        settingsMenu.style.display =
+          settingsMenu.style.display === "block" ? "none" : "block";
+      };
+      document.onclick = () => (settingsMenu.style.display = "none");
 
-  userMenu.onclick = e => {
-    e.stopPropagation();
-    settingsMenu.style.display =
-      settingsMenu.style.display === "block" ? "none" : "block";
-  };
+      function goProfile() {
+        window.location.href = "profile.html";
+      }
 
-  document.onclick = () => settingsMenu.style.display = "none";
+      function logout() {
+        localStorage.clear();
+        window.location.href = "index.html";
+      }
 
-  function goProfile() {
-    window.location.href = "profile.html";
-  }
+      async function loadNotifications() {
+        const list = document.getElementById("notificationList");
+        const empty = document.getElementById("emptyState");
 
-  function logout() {
-    localStorage.clear();
-    window.location.href = "index.html";
-  }
+        try {
+          const data = await apiFetch("/notifications");
+          if (!data || !data.length) throw new Error();
 
-  async function loadNotifications() {
-    const list = document.getElementById("notificationList");
-    const empty = document.getElementById("emptyState");
-
-    try {
-      const data = await apiFetch('/notifications');
-      if (!data || !data.length) throw new Error();
-
-      data.forEach(n => {
-        const div = document.createElement("div");
-        div.className = "notification";
-        div.innerHTML = `
+          data.forEach((n) => {
+            const div = document.createElement("div");
+            div.className = "notification";
+            div.innerHTML = `
           <h4>${n.title || "Notification"}</h4>
           <p>${n.message || ""}</p>
           <div class="time">${new Date(n.createdAt).toLocaleString()}</div>
         `;
-        list.appendChild(div);
-      });
+            list.appendChild(div);
+          });
+        } catch {
+          empty.style.display = "block";
+        }
+      }
 
-    } catch {
-      empty.style.display = "block";
-    }
-  }
-
-  loadNotifications();
-</script>
-
-</body>
+      loadNotifications();
+    </script>
+  </body>
 </html>
-
