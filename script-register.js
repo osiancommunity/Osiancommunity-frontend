@@ -1,38 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-    const backendPrimary = (location.hostname.endsWith('vercel.app'))
-      ? 'https://osiancommunity-backend.vercel.app/api'
-      : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-          ? 'http://localhost:5000/api'
-          : 'https://osiancommunity-backend.vercel.app/api');
-    const backendFallback = 'https://osiancommunity-backend.vercel.app/api';
-
-    async function postWithFallback(path, payload) {
-        const endpoints = backendPrimary === backendFallback
-          ? [backendPrimary]
-          : [backendPrimary, backendFallback];
-        for (let i = 0; i < endpoints.length; i++) {
-            const base = endpoints[i];
-            try {
-                const response = await fetch(`${base}${path}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) {
-                    if (response.status === 404 && i < endpoints.length - 1) continue;
-                    const dataErr = await response.json().catch(() => ({}));
-                    throw new Error(dataErr.message || 'Request failed');
-                }
-                const data = await response.json();
-                return data;
-            } catch (e) {
-                if (i === endpoints.length - 1) throw e;
-                continue;
-            }
-        }
-    }
-
     const registerForm = document.getElementById("register-form");
     const registerBtn = document.getElementById("register-btn");
     const otpSection = document.getElementById("otp-section");
@@ -64,10 +31,14 @@ document.addEventListener("DOMContentLoaded", function() {
         registerBtn.textContent = "Registering...";
 
         try {
-            const data = await postWithFallback('/auth/register', {
-                name: fullName,
-                email: email,
-                password: password
+            const data = await apiFetch('/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: fullName,
+                    email: email,
+                    password: password
+                })
             });
             currentUserId = data.userId;
             registerForm.style.display = 'none';
@@ -96,9 +67,13 @@ document.addEventListener("DOMContentLoaded", function() {
         this.textContent = 'Verifying...';
 
         try {
-            const data = await postWithFallback('/auth/verify-otp', {
-                email: document.getElementById("email").value,
-                otp: otp
+            const data = await apiFetch('/auth/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: document.getElementById("email").value,
+                    otp: otp
+                })
             });
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
@@ -125,8 +100,12 @@ document.addEventListener("DOMContentLoaded", function() {
         this.textContent = 'Sending...';
 
         try {
-            const data = await postWithFallback('/auth/resend-otp', {
-                userId: currentUserId
+            const data = await apiFetch('/auth/resend-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: currentUserId
+                })
             });
             alert('OTP sent successfully! Check your email.');
             document.getElementById('otp-input').value = '';

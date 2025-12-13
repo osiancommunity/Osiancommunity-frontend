@@ -54,26 +54,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // --- Fetch Admin's Quizzes ---
     async function fetchMyQuizzes() {
         try {
-            const response = await fetch(`${backendUrl}/quizzes/admin`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                const text = await response.text();
-                console.error(`Fetch failed with status ${response.status}: ${text}`);
-                throw new Error(`Failed to fetch quizzes: ${response.status}`);
-            }
-
-            const data = await response.json();
-            allQuizzes = data.quizzes || [];
+            const data = await apiFetch('/quizzes/admin', { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!data) throw new Error('Failed to fetch quizzes');
+            allQuizzes = Array.isArray(data.quizzes) ? data.quizzes : (Array.isArray(data) ? data : []);
             filteredQuizzes = [...allQuizzes];
             renderQuizzes();
         } catch (error) {

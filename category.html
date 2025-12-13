@@ -1,969 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>OSIAN — Category</title>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>OSIAN — Category</title>
 
-    <!-- Boxicons (icons) -->
-    <link
-      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
-      rel="stylesheet"
-    />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
+<script src="shared-init.js"></script>
 
-    <style>
-      :root {
-        --bg: #f4faff;
-        --card: #fff;
-        --accent: #4c8dff;
-        --accent-2: #6a5cd8;
-        --muted: #6b7380;
-        --shadow: 0 12px 32px rgba(20, 60, 120, 0.06);
-        --radius: 12px;
-        font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial;
-        color: #0f172a;
-      }
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        background: radial-gradient(
-          900px 400px at 0% 0%,
-          #f7fbff 0%,
-          #eaf4ff 100%
-        );
-      }
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
+<style>
+:root{
+  --bg:#f4faff;
+  --card:#fff;
+  --primary:#4c8dff;
+  --accent:#6a5cd8;
+  --muted:#6b7380;
+  --shadow:0 12px 32px rgba(20,60,120,.06);
+  --radius:14px;
+  font-family:Poppins,system-ui;
+  color:#0f172a;
+}
+body{margin:0;background:radial-gradient(900px 400px at 0% 0%,#f7fbff,#eaf4ff)}
+.container{max-width:1200px;margin:auto;padding:20px;padding-bottom:120px}
 
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-        padding-bottom: 120px;
-      }
+.header{display:flex;justify-content:space-between;align-items:center}
+.header h1{margin:0;font-size:28px}
+.muted{color:var(--muted)}
 
-      /* Header */
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-        gap: 12px;
-      }
-      .header h1 {
-        margin: 0;
-        font-size: 28px;
-      }
-      .header p {
-        margin: 6px 0 0;
-        color: var(--muted);
-      }
+.hero{
+  background:linear-gradient(180deg,#fff,#f7faff);
+  border-radius:14px;
+  padding:16px;
+  margin:14px 0;
+  box-shadow:var(--shadow);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-      /* hero */
-      .hero {
-        background: linear-gradient(180deg, #fff, #f7faff);
-        padding: 14px;
-        border-radius: 14px;
-        box-shadow: var(--shadow);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-      }
+.layout{display:grid;grid-template-columns:1fr 360px;gap:18px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
 
-      /* layout */
-      .layout {
-        display: grid;
-        grid-template-columns: 1fr 360px;
-        gap: 18px;
-      }
-      @media (max-width: 900px) {
-        .layout {
-          grid-template-columns: 1fr;
-        }
-      }
+.card{
+  background:var(--card);
+  border-radius:14px;
+  padding:14px;
+  box-shadow:var(--shadow);
+}
 
-      .card {
-        background: var(--card);
-        border-radius: 14px;
-        padding: 14px;
-        box-shadow: var(--shadow);
-      }
+.section-title{font-size:18px;margin-bottom:12px}
 
-      .section-title {
-        font-size: 18px;
-        margin: 0 0 12px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
+/* TOPICS */
+.topics-grid{
+  display:grid;
+  gap:14px;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr))
+}
+.topic-card{
+  border-radius:12px;
+  overflow:hidden;
+  cursor:pointer;
+  border:2px solid transparent;
+  transition:.2s;
+}
+.topic-card.selected{
+  border-color:#4c8dff;
+  box-shadow:0 12px 28px rgba(76,141,255,.25);
+}
+.topic-media{height:140px;background:#eef4ff}
+.topic-media img{width:100%;height:100%;object-fit:cover}
+.topic-title{font-weight:700;padding:10px}
+.topic-desc{padding:0 10px 12px;font-size:13px;color:var(--muted)}
 
-      /* topics grid */
-      .topics-grid {
-        display: grid;
-        gap: 12px;
-        grid-template-columns: repeat(1, 1fr);
-      }
-      @media (min-width: 720px) {
-        .topics-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-      @media (min-width: 1100px) {
-        .topics-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-      }
+/* LEVELS */
+.level-card{
+  padding:12px;
+  border-radius:10px;
+  border:2px solid #eef4ff;
+  cursor:pointer;
+  margin-bottom:10px;
+  opacity:.5;
+  pointer-events:none;
+  transition:.2s;
+}
+.level-card.enabled{
+  opacity:1;
+  pointer-events:auto;
+}
+.level-card.selected{
+  border-color:#6a5cd8;
+  background:#f3f0ff;
+}
 
-      .topic-card {
-        border-radius: 12px;
-        padding: 8px;
-        text-align: center;
-        cursor: pointer;
-        transition: transform 0.18s ease, box-shadow 0.18s;
-        border: 2px solid transparent;
-      }
-      .topic-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.06);
-      }
-      .topic-card.selected {
-        border-color: rgba(76, 141, 255, 0.18);
-        box-shadow: 0 22px 44px rgba(76, 141, 255, 0.06);
-        transform: translateY(-8px);
-      }
+/* QUIZZES */
+.quiz-card{
+  display:flex;
+  gap:12px;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #eef4ff;
+}
+.quiz-thumb{width:120px;height:80px;border-radius:8px;overflow:hidden;background:#eef4ff}
+.quiz-thumb img{width:100%;height:100%;object-fit:cover}
+.quiz-actions{margin-left:auto;display:flex;flex-direction:column;gap:8px}
 
-      .topic-media {
-        width: 100%;
-        height: 220px;
-        border-radius: 10px;
-        overflow: hidden;
-        background: #f0f6ff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .topic-media img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
-      .topic-title {
-        font-weight: 700;
-        margin-top: 10px;
-      }
-      .topic-desc {
-        color: var(--muted);
-        font-size: 14px;
-        margin-top: 6px;
-      }
+.btn{
+  padding:8px 12px;
+  border-radius:8px;
+  border:none;
+  background:var(--accent);
+  color:#fff;
+  cursor:pointer;
+}
+.btn.secondary{
+  background:#fff;
+  color:var(--accent);
+  border:1px solid #dbe9ff;
+}
+</style>
+</head>
 
-      /* levels */
-      .levels-block {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-      .level-card {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px;
-        border-radius: 10px;
-        background: var(--card);
-        border: 1px solid #eef4ff;
-        cursor: pointer;
-        transition: transform 0.15s;
-      }
-      .level-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
-      }
-      .level-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 10px;
-        background: #f6f9ff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--accent);
-        font-size: 20px;
-      }
-      .selected-badge {
-        display: none;
-        margin-left: 8px;
-        background: #e8f1ff;
-        color: var(--accent);
-        padding: 6px 10px;
-        border-radius: 999px;
-        font-weight: 600;
-      }
+<body>
+<div class="container">
 
-      /* quizzes list */
-      .quizzes-list {
-        display: grid;
-        gap: 12px;
-        margin-top: 10px;
-      }
-      .quiz-card {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        padding: 12px;
-        border-radius: 10px;
-        background: var(--card);
-        border: 1px solid #eef4ff;
-      }
-      .quiz-thumb {
-        width: 140px;
-        height: 90px;
-        border-radius: 8px;
-        overflow: hidden;
-        flex-shrink: 0;
-      }
-      .quiz-thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      .quiz-info h4 {
-        margin: 0;
-        font-size: 16px;
-      }
-      .quiz-info p {
-        margin: 6px 0 0;
-        color: var(--muted);
-        font-size: 13px;
-      }
-      .quiz-actions {
-        margin-left: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        align-items: flex-end;
-      }
-      .btn {
-        padding: 8px 12px;
-        border-radius: 8px;
-        border: none;
-        background: var(--accent-2);
-        color: #fff;
-        cursor: pointer;
-      }
-      .btn.secondary {
-        background: #fff;
-        color: var(--accent-2);
-        border: 1px solid #dbe9ff;
-      }
+<div class="header">
+  <div>
+    <h1 id="pageTitle">Category</h1>
+    <p class="muted">Select topic → then level</p>
+  </div>
+  <button onclick="history.back()" class="btn secondary">← Back</button>
+</div>
 
-      /* recommended */
-      .recommended-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-top: 12px;
-      }
-      @media (max-width: 720px) {
-        .recommended-grid {
-          grid-template-columns: 1fr;
-        }
-      }
+<div class="hero">
+  <div>
+    <h2 id="heroTitle">Explore quizzes</h2>
+    <div class="muted">Choose a topic and level</div>
+  </div>
+  <i class="bx bx-category" style="font-size:32px;color:var(--primary)"></i>
+</div>
 
-      /* bottom nav (mobile) */
-      .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 72px;
-        background: #fff;
-        border-top: 1px solid #e8f0fb;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 9999;
-      }
-      .bottom-nav a {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-decoration: none;
-        color: #7a7a7a;
-        font-size: 12px;
-      }
-      .bottom-nav a i {
-        font-size: 20px;
-        margin-bottom: 4px;
-      }
-      @media (min-width: 900px) {
-        .bottom-nav {
-          display: none;
-        }
-      }
+<div class="layout">
 
-      /* placeholder */
-      .img-placeholder {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f2f7ff;
-        color: var(--accent);
-        font-weight: 700;
-      }
+<!-- TOPICS -->
+<div class="card">
+  <h3 class="section-title">Topics</h3>
+  <div id="topicsGrid" class="topics-grid"></div>
+</div>
 
-      /* small helper */
-      .muted {
-        color: var(--muted);
-      }
-      .note {
-        font-size: 13px;
-        color: var(--muted);
-        margin-top: 8px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <!-- Header -->
-      <div class="header">
-        <div>
-          <h1 id="pageTitle">Category</h1>
-          <p id="pageSub" class="muted">
-            Explore topics and levels for this category
-          </p>
-        </div>
-        <div>
-          <!-- Back button: uses history.back() when possible, otherwise goes to dashboard -->
-          <button
-            id="backBtn"
-            style="
-              padding: 8px 12px;
-              border-radius: 10px;
-              border: 1px solid #e7f0ff;
-              background: #fff;
-              cursor: pointer;
-            "
-          >
-            <i class="bx bx-left-arrow-alt"></i> Back
-          </button>
-        </div>
-      </div>
+<!-- LEVELS + QUIZZES -->
+<div class="card">
+  <h3 class="section-title">Levels</h3>
+  <div id="levelsBlock"></div>
 
-      <!-- Hero -->
-      <div class="hero">
-        <div>
-          <h2 style="margin: 0 0 6px" id="heroTitle">Explore quizzes</h2>
-          <div id="heroSub" class="muted">
-            Select a topic and then choose a level to find matching quizzes.
-          </div>
-        </div>
-        <div
-          style="
-            width: 64px;
-            height: 64px;
-            border-radius: 12px;
-            background: #eef6ff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          "
-        >
-          <i
-            id="heroIcon"
-            class="bx bx-category"
-            style="font-size: 28px; color: var(--accent)"
-          ></i>
-        </div>
-      </div>
-
-      <!-- Layout -->
-      <div class="layout">
-        <!-- LEFT: topics + recommended -->
-        <div class="card">
-          <h3 class="section-title">Topics</h3>
-
-          <div id="topicsGrid" class="topics-grid" role="list">
-            <!-- topics will be injected here by JS -->
-          </div>
-
-          <!-- Recommended -->
-          <div style="margin-top: 12px" class="card">
-            <h3 class="section-title">Recommended</h3>
-            <div class="recommended-grid" id="recommendedGrid">
-              <!-- optional recommended items -->
-            </div>
-          </div>
-        </div>
-
-        <!-- RIGHT: levels + matched quizzes -->
-        <div class="card levels-card" id="levelsCard">
-          <h3 class="section-title">
-            Levels
-            <span
-              id="chosenBadge"
-              class="selected-badge"
-              aria-live="polite"
-            ></span>
-          </h3>
-
-          <div class="levels-block" id="levelsBlock">
-            <div
-              class="level-card"
-              data-level="Basic"
-              tabindex="0"
-              role="button"
-              aria-pressed="false"
-            >
-              <div class="level-icon">📊</div>
-              <div>
-                <strong>Basic</strong>
-                <div class="muted">Warm-up</div>
-              </div>
-            </div>
-
-            <div
-              class="level-card"
-              data-level="Medium"
-              tabindex="0"
-              role="button"
-              aria-pressed="false"
-            >
-              <div class="level-icon">📈</div>
-              <div>
-                <strong>Medium</strong>
-                <div class="muted">Moderate</div>
-              </div>
-            </div>
-
-            <div
-              class="level-card"
-              data-level="Hard"
-              tabindex="0"
-              role="button"
-              aria-pressed="false"
-            >
-              <div class="level-icon">🏆</div>
-              <div>
-                <strong>Hard</strong>
-                <div class="muted">Challenging</div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            id="quizzesResultSection"
-            style="margin-top: 12px; display: none"
-          >
-            <h4 style="margin: 0 0 10px">Matched Quizzes</h4>
-            <div class="quizzes-list" id="quizzesList"></div>
-            <div id="noQuizzesNote" class="note" style="display: none">
-              No quizzes found for the selected field & level. Upload quizzes
-              via admin panel.
-            </div>
-          </div>
-
-          <div class="note">
-            Tip: select a topic first, then tap a level. Matching quizzes will
-            appear above.
-          </div>
-        </div>
-      </div>
+  <div id="quizzesResultSection" style="margin-top:16px;display:none">
+    <h4>Matched Quizzes</h4>
+    <div id="quizzesList"></div>
+    <div id="noQuizzesNote" class="muted" style="display:none">
+      No quizzes found.
     </div>
+  </div>
+</div>
 
-    <!-- Mobile bottom nav -->
-    <div class="bottom-nav" role="navigation" aria-label="Mobile nav">
-      <a href="dashboard-user.html" id="nav-dashboard"
-        ><i class="bx bxs-dashboard"></i><span>Home</span></a
-      >
-      <a href="quiz-progress.html" id="nav-quizzes"
-        ><i class="bx bx-file-blank"></i><span>Quizzes</span></a
-      >
-      <a href="leaderboard.html" id="nav-leaderboard"
-        ><i class="bx bxs-trophy"></i><span>Leaderboard</span></a
-      >
-      <a href="notifications.html" id="nav-notifs"
-        ><i class="bx bx-bell"></i><span>Alerts</span></a
-      >
-      <a href="profile.html" id="nav-profile"
-        ><i class="bx bxs-user"></i><span>Profile</span></a
-      >
-    </div>
+</div>
+</div>
 
-    <script>
-      /**********************
-       * Category page script
-       *
-       * - Reads ?category=... from URL (defaults to "Technical")
-       * - Populates topics per category (images are chosen from Unsplash / reliable patterns)
-       * - Allows selecting a topic and a level
-       * - Matches quizzes from SAMPLE_QUIZZES (demo). Integrate with backend by replacing SAMPLE_QUIZZES or calling an API
-       * - Back button: uses history.back() where available; falls back to dashboard page
-       **********************/
+<script>
+const CATEGORY = new URLSearchParams(location.search).get("category") || "Technical";
 
-      // Helper: read query param
-      function getQueryParam(name, fallback) {
-        const url = new URL(window.location.href);
-        return url.searchParams.get(name) || fallback;
-      }
+const TOPICS = {
+  Technical:[
+    {name:"Python",img:"https://images.unsplash.com/photo-1515879218367-8466d910aaa4"},
+    {name:"Java",img:"https://i.ibb.co/HTgvw4dS/download-1.jpg"},
+    {name:"C++",img:"https://images.unsplash.com/photo-1555066931-4365d14bab8c"},
+    {name:"DBMS",img:"https://i.ibb.co/HTYhLtXc/download-2.jpg"},
+    {name:"Computer Networks",img:"https://i.ibb.co/ynMph0P8/Exploring-Cable-Free-Computer-Networks-Types-and-Uses.jpg"}
+  ]
+};
 
-      const CATEGORY = getQueryParam("category", "Technical");
+const LEVELS=["Basic","Medium","Hard"];
+let ALL_QUIZZES=[];
+let selectedTopic=null;
+let selectedLevel=null;
 
-      // Mapping of categories -> topics (each topic has title, description and image)
-      const CATEGORY_TOPICS = {
-        Technical: [
-          {
-            field: "Python",
-            title: "Python",
-            desc: "Interpreted, versatile language",
-            img: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1200&q=80",
-          },
-          {
-            field: "Java",
-            title: "Java",
-            desc: "Object-oriented, JVM ecosystem",
-            img: "https://i.ibb.co/HTgvw4dS/download-1.jpg",
-          },
-          {
-            field: "C++",
-            title: "C++",
-            desc: "Systems & performance",
-            img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
-          },
-          {
-            field: "DBMS",
-            title: "DBMS",
-            desc: "SQL, normalization, transactions",
-            img: "https://i.ibb.co/HTYhLtXc/download-2.jpg",
-          },
-          {
-            field: "Computer Networks",
-            title: "Computer Networks",
-            desc: "Routing, switching, protocols",
-            img: "https://i.ibb.co/ynMph0P8/Exploring-Cable-Free-Computer-Networks-Types-and-Uses.jpg",
-          },
-        ],
-        Law: [
-          {
-            field: "Constitution",
-            title: "Constitution",
-            desc: "Fundamental rights & structure",
-            img: "https://images.unsplash.com/photo-1555448248-5e8f6b2e8b77?auto=format&fit=crop&w=1200&q=80",
-          },
-          {
-            field: "Criminal Law",
-            title: "Criminal Law",
-            desc: "Penal codes & procedure",
-            img: "https://images.unsplash.com/photo-1555371363-64d3f0b4c2b0?auto=format&fit=crop&w=1200&q=80",
-          },
-          {
-            field: "Corporate Law",
-            title: "Corporate Law",
-            desc: "Companies & compliance",
-            img: "https://images.unsplash.com/photo-1559589689-5774cb3f5b44?auto=format&fit=crop&w=1200&q=80",
-          },
-        ],
-        Engineering: [
-          {
-            field: "Mechanical",
-            title: "Mechanical",
-            desc: "Thermodynamics, machines",
-            img: "https://images.unsplash.com/photo-1581090465123-8d7f1f9dc4f9?auto=format&fit=crop&w=1200&q=80",
-          },
-          {
-            field: "Civil",
-            title: "Civil",
-            desc: "Structures, geotech, design",
-            img: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=1200&q=80",
-          },
-          {
-            field: "Electrical",
-            title: "Electrical",
-            desc: "Circuits, power, electronics",
-            img: "https://images.unsplash.com/photo-1505842465776-3f1a79d6a1b1?auto=format&fit=crop&w=1200&q=80",
-          },
-        ],
-        "General Knowledge": [
-          {
-            field: "History",
-            title: "History",
-            desc: "Important events & timelines",
-            img: "https://images.unsplash.com/photo-1508253578933-c6d31f8a2e5f?auto=format&fit=crop&w=1200&q=80",
-          },
-          {
-            field: "Geography",
-            title: "Geography",
-            desc: "Maps, physical & human geography",
-            img: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-          },
-          {
-            field: "Current Affairs",
-            title: "Current Affairs",
-            desc: "Recent news & developments",
-            img: "https://images.unsplash.com/photo-1541532713592-79a0317b6b77?auto=format&fit=crop&w=1200&q=80",
-          },
-        ],
-        Sports: [
-          {
-            field: "Cricket",
-            title: "Cricket",
-            desc: "Rules, records & players",
-            img: "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=80",
-          },
-          {
-            field: "Football",
-            title: "Football",
-            desc: "Tactics, leagues & players",
-            img: "https://images.unsplash.com/photo-1502772066659-2a39b9a0a1a9?auto=format&fit=crop&w=1200&q=80",
-          },
-          {
-            field: "Athletics",
-            title: "Athletics",
-            desc: "Track & field events",
-            img: "https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf?auto=format&fit=crop&w=1200&q=80",
-          },
-        ],
-      };
+async function loadQuizzes(){
+  const res=await apiFetch("/quizzes?category="+encodeURIComponent(CATEGORY));
+  ALL_QUIZZES = res?.quizzes || res?.data || [];
+}
 
-  
+function renderTopics(){
+  const grid=document.getElementById("topicsGrid");
+  grid.innerHTML="";
+  TOPICS[CATEGORY].forEach(t=>{
+    const d=document.createElement("div");
+    d.className="topic-card";
+    d.innerHTML=`
+      <div class="topic-media"><img src="${t.img}"></div>
+      <div class="topic-title">${t.name}</div>
+      <div class="topic-desc">Click to select</div>`;
+    d.onclick=()=>{
+      document.querySelectorAll(".topic-card").forEach(x=>x.classList.remove("selected"));
+      d.classList.add("selected");
+      selectedTopic=t.name;
+      selectedLevel=null;
+      enableLevels();
+      clearLevelSelection();
+      filterQuizzes();
+    };
+    grid.appendChild(d);
+  });
+}
 
-      // UI element refs
-      const pageTitle = document.getElementById("pageTitle");
-      const pageSub = document.getElementById("pageSub");
-      const heroTitle = document.getElementById("heroTitle");
-      const heroSub = document.getElementById("heroSub");
-      const heroIcon = document.getElementById("heroIcon");
-      const topicsGrid = document.getElementById("topicsGrid");
-      const recommendedGrid = document.getElementById("recommendedGrid");
-      const levelsBlock = document.getElementById("levelsBlock");
-      const chosenBadge = document.getElementById("chosenBadge");
-      const quizzesResultSection = document.getElementById(
-        "quizzesResultSection"
-      );
-      const quizzesList = document.getElementById("quizzesList");
-      const noQuizzesNote = document.getElementById("noQuizzesNote");
-      const backBtn = document.getElementById("backBtn");
+function renderLevels(){
+  const lb=document.getElementById("levelsBlock");
+  lb.innerHTML="";
+  LEVELS.forEach(l=>{
+    const d=document.createElement("div");
+    d.className="level-card";
+    d.textContent=l;
+    d.onclick=()=>{
+      if(!d.classList.contains("enabled")) return;
+      document.querySelectorAll(".level-card").forEach(x=>x.classList.remove("selected"));
+      d.classList.add("selected");
+      selectedLevel=l;
+      filterQuizzes();
+    };
+    lb.appendChild(d);
+  });
+}
 
-      let selectedField = null;
+function enableLevels(){
+  document.querySelectorAll(".level-card").forEach(l=>{
+    l.classList.add("enabled");
+  });
+}
 
-      // Populate page header according to CATEGORY
-      function setupHeader() {
-        pageTitle.textContent = CATEGORY;
-        heroTitle.textContent = `Explore ${CATEGORY} quizzes`;
-        pageSub.textContent = `Explore topics and levels for the "${CATEGORY}" category`;
-        // change icon per category (simple mapping)
-        const iconMap = {
-          Technical: "bx bx-chip",
-          Law: "bx bx-gavel",
-          Engineering: "bx bx-cog",
-          "General Knowledge": "bx bx-brain",
-          Sports: "bx bx-football",
-        };
-        heroIcon.className = iconMap[CATEGORY] || "bx bx-category";
-      }
+function clearLevelSelection(){
+  document.querySelectorAll(".level-card").forEach(l=>{
+    l.classList.remove("selected");
+  });
+}
 
-      // Build topics view from mapping
-      function renderTopics() {
-        topicsGrid.innerHTML = "";
-        const topics = CATEGORY_TOPICS[CATEGORY] || [];
-        topics.forEach((topic) => {
-          const card = document.createElement("div");
-          card.className = "topic-card";
-          card.setAttribute("tabindex", "0");
-          card.setAttribute("role", "listitem");
-          card.dataset.field = topic.field;
+function filterQuizzes(){
+  const list=document.getElementById("quizzesList");
+  const wrap=document.getElementById("quizzesResultSection");
+  const note=document.getElementById("noQuizzesNote");
+  list.innerHTML="";
+  wrap.style.display="block";
 
-          card.innerHTML = `
-          <div class="topic-media">
-            <img src="${topic.img}" alt="${topic.title}" loading="lazy" />
-          </div>
-          <div class="topic-title">${topic.title}</div>
-          <div class="topic-desc">${topic.desc}</div>
-        `;
+  const matched=ALL_QUIZZES.filter(q=>{
+    return (!selectedTopic || q.field===selectedTopic || q.topic===selectedTopic)
+        && (!selectedLevel || q.level===selectedLevel || q.difficulty===selectedLevel);
+  });
 
-          // Image error fallback
-          const img = card.querySelector("img");
-          img.addEventListener("error", () => {
-            const parent = img.parentNode;
-            img.remove();
-            const ph = document.createElement("div");
-            ph.className = "img-placeholder";
-            ph.textContent = "Image";
-            parent.appendChild(ph);
-          });
+  if(!matched.length){note.style.display="block";return;}
+  note.style.display="none";
 
-          // click/keyboard handlers
-          card.addEventListener("click", () => activateTopic(card));
-          card.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") activateTopic(card);
-          });
+  matched.forEach(q=>{
+    const d=document.createElement("div");
+    d.className="quiz-card";
+    d.innerHTML=`
+      <div class="quiz-thumb">${q.coverImage?`<img src="${q.coverImage}">`:""}</div>
+      <div><strong>${q.title}</strong><div class="muted">${q.level}</div></div>
+      <div class="quiz-actions">
+        <button class="btn secondary" onclick="location.href='quiz-details.html?quizId=${q._id}'">View</button>
+        <button class="btn" onclick="location.href='quiz-play.html?quizId=${q._id}'">Start</button>
+      </div>`;
+    list.appendChild(d);
+  });
+}
 
-          topicsGrid.appendChild(card);
-        });
+(async()=>{
+  document.getElementById("pageTitle").textContent=CATEGORY;
+  document.getElementById("heroTitle").textContent="Explore "+CATEGORY+" quizzes";
+  await loadQuizzes();
+  renderTopics();
+  renderLevels();
+})();
+</script>
 
-        // If no topics (shouldn't happen), show message
-        if (topics.length === 0) {
-          topicsGrid.innerHTML =
-            '<div class="muted">No topics available for this category.</div>';
-        }
-      }
-
-      // Recommended demo items (simple static)
-      function renderRecommended() {
-        recommendedGrid.innerHTML = "";
-        // show up to 2 recommended items from SAMPLE_QUIZZES that match category
-        const rec = SAMPLE_QUIZZES.filter((q) => q.category === CATEGORY).slice(
-          0,
-          2
-        );
-        if (rec.length === 0) {
-          recommendedGrid.innerHTML =
-            '<div class="muted">No recommended items for this category.</div>';
-          return;
-        }
-        rec.forEach((item) => {
-          const block = document.createElement("div");
-          block.style.display = "flex";
-          block.style.gap = "12px";
-          block.style.alignItems = "center";
-          block.innerHTML = `
-          <div style="width:120px;height:80px;border-radius:8px;overflow:hidden">
-            <img src="${item.image}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover" loading="lazy" />
-          </div>
-          <div>
-            <div style="font-weight:700">${item.title}</div>
-            <div class="muted" style="font-size:13px">${item.description}</div>
-          </div>
-        `;
-          // fallback for img
-          const img = block.querySelector("img");
-          img.addEventListener("error", () => {
-            const parent = img.parentNode;
-            img.remove();
-            const ph = document.createElement("div");
-            ph.className = "img-placeholder";
-            ph.style.height = "80px";
-            ph.textContent = "Image";
-            parent.appendChild(ph);
-          });
-
-          recommendedGrid.appendChild(block);
-        });
-      }
-
-      // Activate / select a topic
-      function activateTopic(card) {
-        document
-          .querySelectorAll(".topic-card")
-          .forEach((c) => c.classList.remove("selected"));
-        card.classList.add("selected");
-        selectedField = card.dataset.field;
-        chosenBadge.style.display = "inline-block";
-        chosenBadge.textContent = selectedField;
-
-        // scroll to levels (works on desktop + mobile)
-        const levelsEl = document.getElementById("levelsCard");
-        if (levelsEl) {
-          levelsEl.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-        // clear previous results
-        quizzesResultSection.style.display = "none";
-        quizzesList.innerHTML = "";
-      }
-
-      // When a level is clicked, query quizzes and render matches
-      function onLevelSelect(levelEl) {
-        const level = levelEl.dataset.level;
-        if (!selectedField) {
-          // scroll to topics and optionally flash selection
-          document
-            .getElementById("topicsGrid")
-            .scrollIntoView({ behavior: "smooth", block: "center" });
-          // briefly highlight first topic if exists
-          const first = document.querySelector(".topic-card");
-          if (first) {
-            first.classList.add("selected");
-            setTimeout(() => first.classList.remove("selected"), 900);
-          }
-          return;
-        }
-
-        // Query sample data (replace with your backend call)
-        const matches = SAMPLE_QUIZZES.filter(
-          (q) =>
-            q.category === CATEGORY &&
-            q.field === selectedField &&
-            q.level === level
-        );
-        renderQuizzes(matches);
-      }
-
-      // Render quizzes results
-      function renderQuizzes(quizzes) {
-        quizzesList.innerHTML = "";
-        if (!quizzes || quizzes.length === 0) {
-          quizzesResultSection.style.display = "block";
-          noQuizzesNote.style.display = "block";
-          quizzesList.style.display = "none";
-          return;
-        }
-        noQuizzesNote.style.display = "none";
-        quizzesResultSection.style.display = "block";
-        quizzesList.style.display = "grid";
-
-        quizzes.forEach((q) => {
-          const el = document.createElement("div");
-          el.className = "quiz-card";
-          el.innerHTML = `
-          <div class="quiz-thumb"><img src="${q.image}" alt="${q.title}" loading="lazy" /></div>
-          <div class="quiz-info"><h4>${q.title}</h4><p>${q.description}</p></div>
-        `;
-          const img = el.querySelector("img");
-          img.addEventListener("error", () => {
-            const parent = img.parentNode;
-            img.remove();
-            const ph = document.createElement("div");
-            ph.className = "img-placeholder";
-            ph.textContent = "Image";
-            ph.style.height = "90px";
-            parent.appendChild(ph);
-          });
-
-          const actions = document.createElement("div");
-          actions.className = "quiz-actions";
-          const viewBtn = document.createElement("button");
-          viewBtn.className = "btn secondary";
-          viewBtn.textContent = "View";
-          viewBtn.addEventListener(
-            "click",
-            () =>
-              (window.location.href = `quiz-details.html?quizId=${encodeURIComponent(
-                q.id
-              )}`)
-          );
-
-          const startBtn = document.createElement("button");
-          startBtn.className = "btn";
-          startBtn.textContent = "Start Quiz";
-          startBtn.addEventListener("click", () => {
-            // Navigate to quiz-play page with parameters
-            const url = `quiz-play.html?category=${encodeURIComponent(
-              q.category
-            )}&field=${encodeURIComponent(q.field)}&level=${encodeURIComponent(
-              q.level
-            )}&quizId=${encodeURIComponent(q.id)}`;
-            window.location.href = url;
-          });
-
-          actions.appendChild(viewBtn);
-          actions.appendChild(startBtn);
-
-          el.appendChild(actions);
-          quizzesList.appendChild(el);
-        });
-      }
-
-      // Wire up level handlers
-      function wireLevels() {
-        document.querySelectorAll(".level-card").forEach((lc) => {
-          lc.addEventListener("click", () => onLevelSelect(lc));
-          lc.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") onLevelSelect(lc);
-          });
-        });
-      }
-
-      // Back button behavior (history.back with fallback)
-      backBtn.addEventListener("click", () => {
-        if (window.history.length > 1) {
-          window.history.back();
-          // In some platforms history.back might not navigate; set a small fallback
-          setTimeout(() => {
-            if (
-              location.pathname.endsWith("category.html") ||
-              location.pathname.endsWith("")
-            ) {
-              location.href = "dashboard-user.html";
-            }
-          }, 600);
-        } else {
-          location.href = "dashboard-user.html";
-        }
-      });
-
-      // Ensure images that failed to load are replaced by placeholder
-      function installGlobalImgFallback() {
-        window.addEventListener("load", () => {
-          document.querySelectorAll("img").forEach((img) => {
-            if (!img.complete || img.naturalWidth === 0) {
-              replaceWithPlaceholder(img);
-            }
-            img.addEventListener("error", () => replaceWithPlaceholder(img));
-          });
-        });
-      }
-      function replaceWithPlaceholder(img) {
-        try {
-          const parent = img.parentNode;
-          if (!parent) return;
-          img.remove();
-          const ph = document.createElement("div");
-          ph.className = "img-placeholder";
-          ph.textContent = "Image";
-          parent.appendChild(ph);
-        } catch (e) {
-          console.warn(e);
-        }
-      }
-
-      // Init
-      (function init() {
-        setupHeader();
-        renderTopics();
-        renderRecommended();
-        wireLevels();
-        installGlobalImgFallback();
-
-        // set active bottom nav highlight
-        try {
-          document.getElementById("nav-dashboard").classList.remove("active");
-          // No strict active highlight required here; keep default neutral
-        } catch (e) {}
-      })();
-
-      // Expose a global function to allow external code to refresh topics for a category (useful if you navigate programmatically)
-      window.loadCategory = function (cat) {
-        if (!cat) return;
-        const normalized = String(cat);
-        if (!CATEGORY_TOPICS[normalized]) {
-          console.warn("Unknown category", normalized);
-          return;
-        }
-        // change URL without reload
-        const u = new URL(window.location.href);
-        u.searchParams.set("category", normalized);
-        window.history.replaceState({}, "", u.toString());
-        // update page state
-        document.getElementById("pageTitle").textContent = normalized;
-        document.getElementById(
-          "heroTitle"
-        ).textContent = `Explore ${normalized} quizzes`;
-        // re-render topics/recommended
-        renderTopics();
-        renderRecommended();
-        // clear selection / results
-        selectedField = null;
-        chosenBadge.style.display = "none";
-        quizzesResultSection.style.display = "none";
-        quizzesList.innerHTML = "";
-      };
-    </script>
-  </body>
+</body>
 </html>

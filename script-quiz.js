@@ -114,23 +114,21 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
         startQuizBtn.textContent = 'Loading Quiz...';
 
         try {
-            const response = await fetch(`${backendUrl}/quizzes/${quizId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await apiFetch(`/quizzes/${quizId}`, { headers: { 'Authorization': `Bearer ${token}` } });
 
-            if (!response.ok) {
+            if (!response || response.error) {
                 try {
-                    const data = await response.json();
+                    const data = response;
                     const startsAtRaw = data.startsAt || data.scheduleTime || (data.quiz && data.quiz.scheduleTime);
                     const startsAt = startsAtRaw ? new Date(startsAtRaw) : null;
-                    if ((response.status === 403 || response.status === 401) && (startsAt || (data && (data.code === 'SCHEDULED_NOT_STARTED')))) {
+                    if (data && (data.code === 'SCHEDULED_NOT_STARTED')) {
                         startQuizBtn.disabled = true;
                         startQuizBtn.textContent = startsAt ? `Starts at ${startsAt.toLocaleString()}` : (data.message || 'Scheduled to start later');
                         if (data && data.message) showToast(data.message, 'info');
                         isLoading = false;
                         return;
                     }
-                    if (response.status === 401) {
+                    if (data && (data.code === 'UNAUTHORIZED')) {
                         startQuizBtn.disabled = true;
                         startQuizBtn.textContent = 'Please login again to start';
                         showToast(data && data.message ? data.message : 'Your session has expired or is invalid. Please login again.', 'warning');
@@ -143,7 +141,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 }
             }
 
-            currentQuizData = await response.json();
+            currentQuizData = response;
 
             // Set up the quiz page
             document.querySelector('.quiz-info h3').textContent = currentQuizData.title;
@@ -507,7 +505,7 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
         try {
             // --- BACKEND CALL ---
-            const response = await fetch(`${backendUrl}/results/submit`, {
+            const data = await apiFetch('/results/submit', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -533,29 +531,15 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                     violationCount: violationCount
                 })
             });
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    showToast('Your session has expired or is invalid. Please login again before submitting.', 'warning');
-                    return;
-                }
-                try {
-                    const data = await response.json();
-                    const msg = data && data.message ? data.message : 'Failed to submit quiz.';
-                    throw new Error(msg);
-                } catch(e) {
-                    throw new Error('Failed to submit quiz.');
-                }
-            }
-
-            const data = await response.json();
+            if (!data) throw new Error('Failed to submit quiz.');
 
             // Update the modal with the correct message
             finalSubmitModal.querySelector('h2').textContent = "Quiz Submitted!";
-            if (data.result.status === 'pending') {
+            if (data.result && data.result.status === 'pending') {
                 finalSubmitModal.querySelector('p').textContent = "Your responses are saved. Results will be declared in 8-10 hours.";
             } else {
-                finalSubmitModal.querySelector('p').textContent = `Your score: ${data.result.score} / ${data.result.totalQuestions}`;
+                const r = data.result || data;
+                finalSubmitModal.querySelector('p').textContent = `Your score: ${r.score} / ${r.totalQuestions}`;
             }
 
         } catch (error) {

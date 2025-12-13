@@ -387,37 +387,17 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             // --- BACKEND CALL ---
             const method = isEditing ? 'PUT' : 'POST';
-            const url = isEditing ? `${backendUrl}/quizzes/${editQuizId}` : `${backendUrl}/quizzes`;
-
-            const response = await fetch(url, {
+            const data = await apiFetch(isEditing ? `/quizzes/${editQuizId}` : '/quizzes', {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Send the admin's token
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(quizData)
             });
-
-            if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
-                    showToast('Access denied. Please log in again.', 'warning');
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                // Handle non-JSON error responses gracefully
-                const errorText = await response.text();
-                try {
-                    const data = JSON.parse(errorText);
-                    throw new Error(data.message || 'Failed to save quiz.');
-                } catch (e) {
-                    // If parsing fails, the response was not JSON (likely HTML)
-                    throw new Error(errorText || 'An unknown server error occurred.');
-                }
+            if (!data) {
+                throw new Error('Failed to save quiz. Please try again.');
             }
-
-            const data = await response.json();
             showToast(`Quiz ${isEditing ? 'updated' : 'created'} successfully!`, 'success');
             window.location.href = 'my-quizzes.html'; // Redirect to quiz management list
 
@@ -432,28 +412,8 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     // --- Load Quiz for Editing ---
     async function loadQuizForEditing(quizId) {
         try {
-            const response = await fetch(`${backendUrl}/quizzes/${quizId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    showToast('Session expired. Please log in again.', 'warning');
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                if (response.status === 403) {
-                    showToast('Access denied.', 'warning');
-                    return;
-                }
-                throw new Error('Failed to load quiz for editing.');
-            }
-
-            const quiz = await response.json();
+            const quiz = await apiFetch(`/quizzes/${quizId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!quiz) throw new Error('Failed to load quiz for editing.');
 
             // Populate form fields
             document.getElementById('quiz-title').value = quiz.title;
