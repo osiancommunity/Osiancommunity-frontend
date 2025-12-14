@@ -212,6 +212,44 @@
         font-size: 13px;
       }
 
+      /* === Design Overrides for Premium UI === */
+      :root {
+        --bg: #f6f8fc;
+        --shadow: 0 12px 32px rgba(20, 60, 120, 0.08);
+        --radius: 16px;
+      }
+      .main { background: var(--bg); }
+      .sidebar { box-shadow: var(--shadow); border-radius: 0 16px 16px 0; }
+      .nav a.active, .nav a:hover { background:#eef4ff; color: var(--primary); }
+      .nav a.active::before{ content:""; position:absolute; left:0; top:8px; bottom:8px; width:4px; border-radius:8px; background:linear-gradient(180deg,var(--primary),var(--accent)); }
+      .hero { border-radius: var(--radius); }
+      .hero img { outline:4px solid transparent; outline-offset:0; background: linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,var(--primary),var(--accent)) border-box; border:4px solid transparent; }
+      .kpi { border-radius: var(--radius); }
+      .kpi .value { font-size:28px; }
+      .quiz-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+      .quiz { border-radius: var(--radius); min-height:140px; }
+      .quiz .body { padding:16px; }
+
+      /* Status pills */
+      .status-pill{ display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; }
+      .status-pill.pass{ background:#e8f7ee; color:#15803d; }
+      .status-pill.fail{ background:#fee2e2; color:#b91c1c; }
+      .status-pill .icon{ font-size:14px; }
+
+      /* Deleted card */
+      .quiz.deleted{ background:#f3f4f6; }
+      .quiz.deleted .body h4{ color:#6b7280; }
+
+      /* Empty state */
+      .empty-state{ display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; padding:22px; border:2px dashed #e6efff; border-radius:var(--radius); background:#fafcff; color:#6b7380; min-height:140px; }
+      .empty-state .icon{ font-size:22px; color:#9aa7ff; }
+
+      /* Pager */
+      .pager{ display:flex; align-items:center; gap:10px; margin-top:12px; }
+      .pager button{ padding:8px 12px; border-radius:10px; border:1px solid #e6efff; background:#fff; color:#0f172a; cursor:pointer; }
+      .pager button:disabled{ opacity:.5; cursor:not-allowed; }
+      .pager #reg-page-info, .pager #hist-page-info{ color:var(--muted); font-weight:600; }
+
       /* ================= MOBILE BOTTOM NAV ================= */
       .bottom-nav {
         display: none;
@@ -324,6 +362,21 @@
         <div class="section">
           <h3>My Registered Quizzes</h3>
           <div class="quiz-grid" id="quizGrid"></div>
+          <div class="pager" style="display:flex;align-items:center;gap:10px;margin-top:12px">
+            <button id="reg-prev">Prev</button>
+            <div id="reg-page-info">Page 1 of 1</div>
+            <button id="reg-next">Next</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>My Quiz History</h3>
+          <div class="quiz-grid" id="historyGrid"></div>
+          <div class="pager" style="display:flex;align-items:center;gap:10px;margin-top:12px">
+            <button id="hist-prev">Prev</button>
+            <div id="hist-page-info">Page 1 of 1</div>
+            <button id="hist-next">Next</button>
+          </div>
         </div>
       </main>
     </div>
@@ -362,7 +415,8 @@
       welcome.textContent = "Welcome back, " + user.name;
       heroName.textContent = user.name;
       heroRole.textContent = user.role;
-      topAvatar.src = heroAvatar.src = user.avatar;
+      const _safeAvatar = (user.avatar && user.avatar !== 'undefined') ? user.avatar : 'https://i.pravatar.cc/150?img=3';
+      topAvatar.src = heroAvatar.src = _safeAvatar;
 
       /* ================= API ================= */
       async function loadStats() {
@@ -396,31 +450,107 @@
         }
       }
 
-      async function loadQuizzes() {
-        try {
-          const res = await apiFetch("/user/registered-quizzes");
-          const quizzes = Array.isArray(res?.quizzes) ? res.quizzes : [];
-          quizGrid.innerHTML = quizzes.length
-            ? quizzes
-                .map(
-                  (q) => `
+      let registeredAll = []
+      let regCurrentPage = 1
+      let regTotalPages = 1
+      const regPageSize = 8
+      const regPrevBtn = document.getElementById('reg-prev')
+      const regNextBtn = document.getElementById('reg-next')
+      const regPageInfo = document.getElementById('reg-page-info')
+      function renderRegisteredPage(){
+        if(!quizGrid) return
+        if(!registeredAll.length){
+          quizGrid.innerHTML = `<div class="empty-state"><div class="icon">📘</div><div>You have not registered for any quiz yet</div></div>`
+          if (regPageInfo) regPageInfo.textContent = `Page 1 of 1`
+          if (regPrevBtn) regPrevBtn.disabled = true
+          if (regNextBtn) regNextBtn.disabled = true
+          return
+        }
+        const start = (regCurrentPage-1)*regPageSize
+        const pageItems = registeredAll.slice(start, start+regPageSize)
+        quizGrid.innerHTML = pageItems.map(q=>`
         <div class="quiz">
           ${q.image ? `<img src="${q.image}">` : ``}
           <div class="body">
             <h4>${q.title}</h4>
-            <p>${q.category || ""} • ${q.level || ""}</p>
+            <p>${q.category || ''} • ${q.level || ''}</p>
           </div>
-        </div>`
-                )
-                .join("")
-            : `<div class="quiz" style="padding:18px">No registered quizzes</div>`;
+        </div>`).join('')
+        if (regPageInfo) regPageInfo.textContent = `Page ${regCurrentPage} of ${regTotalPages}`
+        if (regPrevBtn) regPrevBtn.disabled = regCurrentPage === 1
+        if (regNextBtn) regNextBtn.disabled = regCurrentPage === regTotalPages
+      }
+      async function loadQuizzes() {
+        try {
+          const res = await apiFetch("/quizzes/user/registered");
+          registeredAll = Array.isArray(res?.quizzes) ? res.quizzes : []
+          regTotalPages = Math.max(1, Math.ceil(registeredAll.length / regPageSize))
+          regCurrentPage = 1
+          renderRegisteredPage()
         } catch (e) {
-          quizGrid.innerHTML = `<div class="quiz" style="padding:18px">Unable to load quizzes</div>`;
+          const msg = /Unauthorized|Forbidden/i.test(String(e && e.message || '')) ? 'Not authorized' : 'Unable to load quizzes'
+          quizGrid.innerHTML = `<div class="quiz" style="padding:18px">${msg}</div>`
         }
       }
+      if (regPrevBtn) regPrevBtn.onclick = ()=>{ if (regCurrentPage>1){ regCurrentPage--; renderRegisteredPage() } }
+      if (regNextBtn) regNextBtn.onclick = ()=>{ if (regCurrentPage<regTotalPages){ regCurrentPage++; renderRegisteredPage() } }
+
+      const historyGrid = document.getElementById('historyGrid')
+      let historyCurrentPage = 1
+      let historyTotalPages = 1
+      const historyPageSize = 10
+      const histPrevBtn = document.getElementById('hist-prev')
+      const histNextBtn = document.getElementById('hist-next')
+      const histPageInfo = document.getElementById('hist-page-info')
+      function renderHistoryCards(results){
+        if (!historyGrid) return
+        if (!results.length){
+          historyGrid.innerHTML = '<div class="empty-state"><div class="icon">📝</div><div>You have not attempted any quizzes yet</div></div>'
+        } else {
+          historyGrid.innerHTML = results.map(result => {
+            const attemptedDate = result.completedAt ? new Date(result.completedAt).toLocaleString() : '--'
+            const totalQ = result.totalQuestions || 0
+            const score = result.score || 0
+            const pass = totalQ > 0 && (score / totalQ) > 0.5
+            const statusText = pass ? 'Pass' : 'Fail'
+            const pillClass = pass ? 'pass' : 'fail'
+            const deleted = result.quizId ? '' : ' deleted'
+            return `
+            <div class="quiz${deleted}">
+              <div class="body">
+                <h4>${result.quizId ? result.quizId.title : 'Quiz Deleted'}</h4>
+                <p>${attemptedDate}</p>
+                <p>${score} / ${totalQ} • ${totalQ>0?Math.round((score/totalQ)*100):0}%</p>
+                <span class="status-pill ${pillClass}"><span class="icon">${pass?'✓':'✕'}</span>${statusText}</span>
+              </div>
+            </div>`
+          }).join('')
+        }
+        if (histPageInfo) histPageInfo.textContent = `Page ${historyCurrentPage} of ${historyTotalPages}`
+        if (histPrevBtn) histPrevBtn.disabled = historyCurrentPage === 1
+        if (histNextBtn) histNextBtn.disabled = historyCurrentPage === historyTotalPages
+      }
+      async function loadHistory(page=1){
+        try {
+          const data = await apiFetch(`/results/user/${user._id}?page=${page}&limit=${historyPageSize}`)
+          const results = Array.isArray(data?.results) ? data.results : []
+          const pagination = data.pagination || { currentPage: page, totalPages: 1 }
+          historyCurrentPage = pagination.currentPage || page
+          historyTotalPages = pagination.totalPages || 1
+          renderHistoryCards(results)
+        } catch (e) {
+          const msg = /Unauthorized|Forbidden/i.test(String(e && e.message || '')) ? 'Not authorized' : 'Unable to load history'
+          historyGrid.innerHTML = `<div class="quiz" style="padding:18px">${msg}</div>`
+        }
+      }
+      if (histPrevBtn) histPrevBtn.onclick = ()=>{ if (historyCurrentPage>1){ loadHistory(historyCurrentPage-1) } }
+      if (histNextBtn) histNextBtn.onclick = ()=>{ if (historyCurrentPage<historyTotalPages){ loadHistory(historyCurrentPage+1) } }
 
       loadStats();
       loadQuizzes();
+      loadHistory();
+      setInterval(loadQuizzes,15000)
+      setInterval(()=>loadHistory(historyCurrentPage),15000)
     </script>
   </body>
 </html>
