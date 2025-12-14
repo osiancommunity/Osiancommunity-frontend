@@ -3,14 +3,35 @@
   var host = location.hostname || '';
   var isLocal = (host === 'localhost' || host === '127.0.0.1');
   var base = isLocal ? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api';
+  var activeBase = base;
   w.API_BASE = base;
 
   function getToken(){ try { return localStorage.getItem('token') || ''; } catch(_) { return ''; } }
   w.getToken = getToken;
 
+  async function resolveAPIBase(){
+    try {
+      var ctrl = new AbortController();
+      var t = setTimeout(function(){ try{ctrl.abort();}catch(_){} }, 2500);
+      var res = await fetch(base.replace(/\/$/,'') + '/health', { method: 'GET', credentials: 'omit', signal: ctrl.signal });
+      clearTimeout(t);
+      if (res && res.ok) { activeBase = base; w.API_BASE = activeBase; return activeBase; }
+    } catch(_) {}
+    try {
+      var ctrl2 = new AbortController();
+      var t2 = setTimeout(function(){ try{ctrl2.abort();}catch(_){} }, 2500);
+      var res2 = await fetch('https://osiancommunity-backend.vercel.app/api/health', { method: 'GET', credentials: 'omit', signal: ctrl2.signal });
+      clearTimeout(t2);
+      if (res2 && res2.ok) { activeBase = 'https://osiancommunity-backend.vercel.app/api'; w.API_BASE = activeBase; return activeBase; }
+    } catch(_) {}
+    activeBase = base; w.API_BASE = activeBase; return activeBase;
+  }
+  w.resolveAPIBase = resolveAPIBase;
+
   async function apiFetch(path, opts){
     var rel = path.startsWith('/') ? path : ('/'+path);
-    var prim = w.API_BASE + rel;
+    await resolveAPIBase();
+    var prim = (activeBase || w.API_BASE) + rel;
     var fall = 'https://osiancommunity-backend.vercel.app/api' + rel;
     var o = Object.assign({ credentials: 'omit' }, opts||{});
     o.headers = Object.assign({}, o.headers||{});
@@ -46,8 +67,8 @@
     try {
       return await tryOne(prim);
     } catch (e) {
-      if (isLocal) {
-        return await tryOne(fall);
+      if (fall !== prim) {
+        try { return await tryOne(fall); } catch(_) {}
       }
       throw e;
     }

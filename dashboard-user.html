@@ -240,7 +240,7 @@
         <div class="header">
           <div>
             <h1 id="welcomeText">Welcome</h1>
-            <p>Let's find a quiz for you</p>
+            <p>Select a category or play a game</p>
           </div>
 
           <div class="user-box" id="userMenu">
@@ -265,6 +265,8 @@
             </div>
           </div>
         </div>
+
+        <!-- CONTENT SAME AS BEFORE -->
         <!-- CATEGORIES -->
         <h2>Categories</h2>
         <div class="grid">
@@ -287,7 +289,7 @@
             <span>General Knowledge</span>
           </div>
           <div class="card" onclick="openCategory('Sports')">
-            <img src="https://i.ibb.co/VctLj5Zn/All-sports-elements-on-dark-background-Premium-AI-generated-image.jpg" />
+            <img src="https://i.ibb.co/k65BKMVn/dua-Libra.jpg" />
             <span>Sports</span>
           </div>
         </div>
@@ -315,7 +317,7 @@
     </div>
 
     <nav class="bottom-nav">
-      <a class="active" href="dashboard.html"
+      <a class="active" href="dashboard-user.html"
         ><i class="bx bxs-dashboard"></i>Home</a
       >
       <a href="quiz-progress.html"><i class="bx bx-file"></i>Quizzes</a>
@@ -352,16 +354,6 @@
         settingsMenu.style.display =
           settingsMenu.style.display === "block" ? "none" : "block";
       };
-      function openCategory(category) {
-        if (!category) return;
-
-        // Encode category safely
-        const encoded = encodeURIComponent(category);
-
-        // Redirect to category page
-        window.location.href = "category.html?category=" + encoded;
-      }
-
       document.onclick = () => (settingsMenu.style.display = "none");
 
       function logout() {
@@ -369,8 +361,10 @@
         location.href = "index.html";
       }
     </script>
+    <script>
+      function openCategory(cat){
+        location.href = 'category.html?category=' + encodeURIComponent(cat||'');
+      }
+    </script>
   </body>
 </html>
-
-
-

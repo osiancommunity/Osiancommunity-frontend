@@ -326,6 +326,8 @@
               accept="image/*"
               style="display: none"
             />
+
+        
           </div>
 
           <!-- SETTINGS -->
@@ -444,23 +446,27 @@
           setValue("city", p.city);
           setValue("college", p.college);
           setValue("course", p.course);
-          setValue("roll", p.roll || p.rollNumber);
+          var storedRaw = localStorage.getItem("osianUserData");
+          var stored = {};
+          try { stored = storedRaw ? JSON.parse(storedRaw) : {}; } catch (e) {}
+          var incomingRoll = p.roll || p.rollNumber;
+          setValue("roll", (incomingRoll && incomingRoll !== 'undefined') ? incomingRoll : (stored.roll || stored.rollNumber || ''));
           var avatar = p.avatar || u.avatar;
           setSrc("profileAvatar", avatar);
           setSrc("headerAvatar", avatar);
-          var storedRaw = localStorage.getItem("osianUserData");
-          var stored = {};
-          try {
-            stored = storedRaw ? JSON.parse(storedRaw) : {};
-          } catch (e) {}
-          var merged = Object.assign({}, stored, {
+          var storedRaw2 = localStorage.getItem("osianUserData");
+          var stored2 = {};
+          try { stored2 = storedRaw2 ? JSON.parse(storedRaw2) : {}; } catch (e) {}
+          var merged = Object.assign({}, stored2, {
             name: u.name,
             email: u.email,
             college: p.college,
             course: p.course,
-            roll: p.roll || p.rollNumber,
+            roll: (incomingRoll && incomingRoll !== 'undefined') ? incomingRoll : (stored2.roll || stored2.rollNumber || ''),
             city: p.city,
             state: p.state,
+            mobile: p.phone,
+            phone: p.phone,
             avatar: avatar,
           });
           localStorage.setItem("osianUserData", JSON.stringify(merged));
@@ -517,22 +523,39 @@
             var u = data.user || {};
             var p = u.profile || {};
             var avatar = p.avatar || u.avatar;
-            var storedRaw = localStorage.getItem("osianUserData");
-            var stored = {};
-            try {
-              stored = storedRaw ? JSON.parse(storedRaw) : {};
-            } catch (e) {}
-            var merged = Object.assign({}, stored, {
+            var storedRaw3 = localStorage.getItem("osianUserData");
+            var stored3 = {};
+            try { stored3 = storedRaw3 ? JSON.parse(storedRaw3) : {}; } catch (e) {}
+            var savedRoll = document.getElementById("roll").value || "";
+            var merged = Object.assign({}, stored3, {
               name: u.name,
               email: u.email,
               college: p.college,
               course: p.course,
-              roll: p.roll || p.rollNumber,
+              roll: (p.roll || p.rollNumber || savedRoll),
               city: p.city,
               state: p.state,
+              mobile: body.profile.phone || p.phone || stored3.mobile,
+              phone: body.profile.phone || p.phone || stored3.phone,
               avatar: avatar,
             });
             localStorage.setItem("osianUserData", JSON.stringify(merged));
+            // Inline completion compute & flag for quiz start
+            try {
+              var phoneDigits = String(merged.phone || merged.mobile || body.profile.phone || '').replace(/\D/g,'');
+              var fields = [
+                !!(merged.name && String(merged.name).trim()),
+                phoneDigits.length >= 10,
+                !!(merged.city && String(merged.city).trim()),
+                !!(merged.college && String(merged.college).trim()),
+                !!(merged.course && String(merged.course).trim()),
+                !!(merged.state && String(merged.state).trim())
+              ];
+              var done = fields.filter(Boolean).length;
+              var percent = Math.round((done / fields.length) * 100);
+              localStorage.setItem('profileCompletion', JSON.stringify({ percent: percent, missing: [] }));
+              localStorage.setItem('profileComplete', percent === 100 ? 'true' : 'false');
+            } catch(_) {}
             alert("Profile saved");
           } catch (e) {
             alert("Failed to save");
@@ -651,4 +674,3 @@
     </script>
   </body>
 </html>
-

@@ -39,6 +39,8 @@
                 </div>
                 <div class="header-profile">
                     <a href="create-quiz.html" class="btn-create"><i class='bx bx-plus'></i> Create New Quiz</a>
+                    <button class="btn-create" id="btn-upload-csv"><i class='bx bx-upload'></i> Upload CSV</button>
+                    <input type="file" id="csv-file" accept=".csv" style="display:none" />
                     <img src="https://via.placeholder.com/40" alt="Admin Profile Picture">
                     <span>Admin User</span>
                 </div>
@@ -148,5 +150,51 @@
     </div>
 
     <script src="script-admin.js"></script>
-</body>
+    <script>
+      (function(){
+        var fileInput=document.getElementById('csv-file');
+        var btn=document.getElementById('btn-upload-csv');
+        function getBase(){ var host=location.hostname; return (host==='localhost'||host==='127.0.0.1')? 'http://localhost:5000/api' : 'https://osiancommunity-backend.vercel.app/api'; }
+        function getToken(){ try{ return localStorage.getItem('token')||''; }catch(_){ return ''; } }
+        async function apiPost(path, body){
+          var url=getBase()+ (path.startsWith('/')?path:('/'+path));
+          var headers={ 'Content-Type':'application/json' }; var t=getToken(); if(t) headers['Authorization']='Bearer '+t;
+          var res=await fetch(url,{ method:'POST', headers, body: JSON.stringify(body||{}) });
+          if(!res.ok) throw new Error('HTTP '+res.status);
+          try{ return await res.json(); }catch(_){ return {}; }
+        }
+        function parseCSV(text){
+          var lines=text.split(/\r?\n/).filter(Boolean);
+          if(!lines.length) return [];
+          var header=lines[0].split(',').map(function(h){return h.trim();});
+          var rows=lines.slice(1);
+          return rows.map(function(line){
+            var cols=line.split(','); var obj={};
+            for(var i=0;i<header.length;i++){ obj[header[i]]=(cols[i]||'').trim(); }
+            obj.duration = obj.duration? Number(obj.duration): undefined;
+            obj.price = obj.price? Number(obj.price): undefined;
+            return {
+              title: obj.title||obj.name||'',
+              category: obj.category||'Technical',
+              quizType: (obj.quizType||obj.type||'free').toLowerCase()==='paid'?'paid':'free',
+              level: obj.level||'Basic',
+              duration: obj.duration||30,
+              price: obj.price||0,
+              description: obj.description||'',
+              coverImage: obj.coverImage||obj.image||''
+            };
+          }).filter(function(q){ return q.title; });
+        }
+        async function uploadQuizzes(quizzes){
+          try{ await apiPost('/quizzes/bulk',{ quizzes }); alert('CSV uploaded successfully'); }
+          catch(e){
+            for(var i=0;i<quizzes.length;i++){ try{ await apiPost('/quizzes', quizzes[i]); }catch(_){} }
+            alert('CSV processed. Some items may have failed.');
+          }
+        }
+        if(btn) btn.onclick=function(){ if(fileInput) fileInput.click(); };
+        if(fileInput) fileInput.onchange=function(){ var f=fileInput.files&&fileInput.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(){ var text=String(r.result||''); var items=parseCSV(text); if(!items.length){ alert('No valid rows found'); return; } uploadQuizzes(items); }; r.readAsText(f); };
+      })();
+    </script>
+  </body>
 </html>

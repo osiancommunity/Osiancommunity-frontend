@@ -313,3 +313,79 @@ a, button { transition: background-color 0.3s ease, color 0.3s ease, box-shadow 
 .option:hover { transform: translateY(-1px); }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
 .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
+/* BACK BUTTON (QUIZ PAGE) */
+.quiz-back-btn{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 12px;
+  border-radius:8px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  cursor:pointer;
+  font-weight:600;
+  transition:.2s;
+}
+.quiz-back-btn:hover{
+  background:#f3f4f6;
+}
+
+/* CONFIRM SUBMIT MODAL */
+.confirm-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.45);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+}
+
+.confirm-box{
+  background:#fff;
+  width:90%;
+  max-width:380px;
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 20px 50px rgba(0,0,0,.25);
+  text-align:center;
+}
+
+.confirm-box h3{
+  margin:0 0 8px;
+  font-size:18px;
+}
+
+.confirm-box p{
+  margin:0 0 16px;
+  color:#6b7280;
+  font-size:14px;
+}
+
+.confirm-actions{
+  display:flex;
+  gap:12px;
+  justify-content:flex-end;
+}
+
+.confirm-actions button{
+  padding:8px 16px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.confirm-actions .cancel{
+  background:#f3f4f6;
+  color:#111827;
+}
+
+.confirm-actions .submit{
+  background:#ef4444;
+  color:#fff;
+}
+
+.confirm-actions .submit:hover{
+  background:#dc2626;
+}

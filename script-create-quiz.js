@@ -6,6 +6,18 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
   : ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
       ? 'http://localhost:5000/api'
       : 'https://osiancommunity-backend.vercel.app/api');
+let activeBackendUrl = backendUrl;
+async function resolveBackendUrl() {
+  const url = backendUrl;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 2500);
+    const res = await fetch(url.replace(/\/$/, '') + '/health', { method: 'GET', credentials: 'include', signal: ctrl.signal });
+    clearTimeout(t);
+    if (res && res.ok) { activeBackendUrl = url; return; }
+  } catch (_) {}
+  activeBackendUrl = 'https://osiancommunity-backend.vercel.app/api';
+}
 
     // --- Authentication & Authorization ---
     let user = null;
@@ -56,6 +68,8 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
     const quizDifficultySelect = document.getElementById('quiz-difficulty');
     let questionCount = 1;
     let coverImageBase64 = null;
+    let parsedCSVQuestions = null;
+    let csvErrors = [];
 
     function createOptionRow(text, imageBase64, isCorrect){
         const row = document.createElement('div');
@@ -346,6 +360,9 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 questions.push(questionData);
             }
 
+            if (parsedCSVQuestions && parsedCSVQuestions.length) {
+                parsedCSVQuestions.forEach(function(q){ questions.push(q); });
+            }
             if (questions.length === 0) {
                 showToast("Please add at least one question.", 'warning');
             submitButton.disabled = false;
@@ -387,12 +404,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
 
             // --- BACKEND CALL ---
             const method = isEditing ? 'PUT' : 'POST';
+            await resolveBackendUrl();
             const data = await apiFetch(isEditing ? `/quizzes/${editQuizId}` : '/quizzes', {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
+                credentials: 'include',
                 body: JSON.stringify(quizData)
             });
             if (!data) {
@@ -408,6 +427,58 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
             submitButton.textContent = "Create Quiz";
         }
     });
+
+    // --- CSV Upload and Parse via Backend ---
+    const csvInput = document.getElementById('csv-questions');
+    const csvStatus = document.getElementById('csv-status');
+    if (csvInput) {
+        csvInput.addEventListener('change', async function(){
+            const file = csvInput.files && csvInput.files[0];
+            if (!file) return;
+            parsedCSVQuestions = null; csvErrors = [];
+            if (csvStatus) { csvStatus.textContent = 'Uploading CSV...'; csvStatus.style.color = '#666'; }
+            try{
+                await resolveBackendUrl();
+                const fd = new FormData(); fd.append('file', file);
+                const res = await fetch(activeBackendUrl + '/quizzes/parse-csv', { method:'POST', headers:{ 'Authorization': `Bearer ${token}` }, credentials:'include', body: fd });
+                if (!res.ok) throw new Error('CSV upload failed: HTTP '+res.status);
+                const data = await res.json();
+                if (!data || !data.success) throw new Error(data && data.message ? data.message : 'CSV parse failed');
+                parsedCSVQuestions = Array.isArray(data.questions) ? data.questions : [];
+                csvErrors = Array.isArray(data.errors) ? data.errors : [];
+                // Replace questions UI preview with parsed ones
+                questionsContainer.innerHTML=''; questionCount = 0;
+                parsedCSVQuestions.forEach(function(q){
+                    questionCount++;
+                    const block = document.createElement('div'); block.className='question-block';
+                    block.innerHTML = `
+                        <h4>Question ${questionCount}</h4>
+                        <div class="form-group"><label>Question Type</label><select class="question-type"><option value="mcq">Multiple Choice Question (MCQ)</option></select></div>
+                        <div class="form-group"><label>Question Text</label><textarea class="question-text" required>${q.questionText||''}</textarea></div>
+                        <div class="mcq-only"><div class="options-container"></div></div>
+                        <div class="form-group"><label>Marks</label><input type="number" class="question-marks" value="${Number.isFinite(q.marks)?q.marks:1}" required></div>`;
+                    const cont = block.querySelector('.options-container');
+                    (q.options||[]).forEach(function(opt,idx){
+                        const row = document.createElement('div'); row.className='option-row';
+                        row.innerHTML = `<div class="form-group" style="display:flex; gap:10px; align-items:center;"><input type="checkbox" class="option-correct" ${idx === q.correctAnswer ? 'checked':''}><input type="text" class="option-text" value="${opt.text||''}" required style="flex:1;"></div>`;
+                        cont.appendChild(row);
+                    });
+                    questionsContainer.appendChild(block);
+                });
+                if (csvStatus) { csvStatus.textContent = `Parsed ${parsedCSVQuestions.length} questions. ${csvErrors.length?('Rejected: '+csvErrors.length):'All valid.'}`; csvStatus.style.color = '#0a7'; }
+            }catch(err){
+                console.error('CSV Parse Error:', err);
+                let msg = String(err && err.message || 'CSV upload failed');
+                if (err && err.message && /HTTP\s+(401|403)/.test(err.message)) {
+                    msg = 'Authorization failed. Please login again.';
+                } else if (err && err.name === 'TypeError') {
+                    msg = 'Network error (CORS or server unreachable).';
+                }
+                if (csvStatus) { csvStatus.textContent = msg; csvStatus.style.color = '#c00'; }
+                showToast(msg, 'error');
+            }
+        });
+    }
 
     // --- Load Quiz for Editing ---
     async function loadQuizForEditing(quizId) {

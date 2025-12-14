@@ -94,17 +94,21 @@ const backendUrl = window.API_BASE;
 
     async function fetchMyRegisteredQuizzes() {
         try {
-            const data = await apiFetch('/user/registered-quizzes');
+            const data = await apiFetch('/quizzes/user/registered');
             registeredAll = data.quizzes || [];
             try { localStorage.setItem('osianRegisteredQuizzes', JSON.stringify(registeredAll)); } catch (_) {}
             regTotalPages = Math.max(1, Math.ceil(registeredAll.length / regPageSize));
             regCurrentPage = 1;
             renderRegisteredPage();
             scheduleRemindersForQuizzes(registeredAll);
-
         } catch (error) {
-            console.error('Error fetching registered quizzes:', error);
-            // Keep the existing logic for results if this fails
+            const registeredQuizzesContainer = document.getElementById('registered-quizzes');
+            if (registeredQuizzesContainer) {
+                const msg = /Unauthorized|Forbidden/i.test(String(error && error.message || ''))
+                  ? 'Not authorized'
+                  : 'Unable to load quizzes';
+                registeredQuizzesContainer.innerHTML = `<p class="no-data">${msg}</p>`;
+            }
         }
     }
 

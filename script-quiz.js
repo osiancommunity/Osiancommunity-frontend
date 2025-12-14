@@ -171,6 +171,19 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 }
             }
 
+            // Block if already attempted
+            try {
+                const attempts = await apiFetch(`/results/quiz/${quizId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const mine = Array.isArray(attempts && attempts.results) ? attempts.results.find(r => String(r.userId && r.userId._id || r.userId) === String(user._id)) : null;
+                if (mine) {
+                    showToast('You have already attempted this quiz', 'warning');
+                    startQuizBtn.disabled = true;
+                    startQuizBtn.textContent = 'Already attempted';
+                    setTimeout(function(){ window.location.href = 'dashboard-user.html'; }, 2000);
+                    return;
+                }
+            } catch(_) {}
+
         } catch (error) {
             console.error('Error loading quiz:', error);
             showToast(`Error: ${error.message}.`, 'error');
@@ -541,11 +554,14 @@ const backendUrl = (location.hostname.endsWith('vercel.app'))
                 const r = data.result || data;
                 finalSubmitModal.querySelector('p').textContent = `Your score: ${r.score} / ${r.totalQuestions}`;
             }
+            setTimeout(function(){ window.location.href = 'dashboard-user.html'; }, 2500);
 
         } catch (error) {
             console.error('Submit Error:', error);
             finalSubmitModal.querySelector('h2').textContent = 'Submission Failed!';
-            finalSubmitModal.querySelector('p').textContent = (error && error.message) ? error.message : 'There was an error saving your results. Please contact support.';
+            var msg = (error && error.message) ? error.message : 'There was an error saving your results. Please contact support.';
+            if (msg === 'Failed to fetch') msg = 'Network error. Server unreachable or blocked.';
+            finalSubmitModal.querySelector('p').textContent = msg;
         }
     }
 

@@ -123,6 +123,14 @@
                 </div>
                 <div class="content-card">
                     <h3>Quiz Questions</h3>
+                    <div class="form-group">
+                        <label>Upload Questions via CSV</label>
+                        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                            <input type="file" id="csv-questions" accept=".csv">
+                            <span id="csv-status" style="font-size:12px;color:#666;"></span>
+                        </div>
+                        <small>Columns: question, optionA, optionB, optionC, optionD, correctOption, marks, difficulty</small>
+                    </div>
                     <div id="questions-container">
                         <div class="question-block">
                             <h4>Question 1</h4>
